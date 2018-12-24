@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="nl.juraji.imagemanager.fxml.SettingsWindow">
+    <top>
+        <ButtonBar prefHeight="35.0" BorderPane.alignment="CENTER">
+            <buttons>
+                <Button mnemonicParsing="false" onAction="#saveSettingsAction" text="Save"/>
+                <Button mnemonicParsing="false" onAction="#close" text="Close"/>
+            </buttons>
+            <padding>
+                <Insets left="5.0" right="5.0"/>
+            </padding>
+        </ButtonBar>
+    </top>
+    <center>
+        <VBox BorderPane.alignment="CENTER">
+            <TitledPane text="Duplicate Scanner Settings">
+                <AnchorPane>
+                    <GridPane hgap="10.0" layoutX="70.0" layoutY="-35.0" vgap="5.0" AnchorPane.bottomAnchor="0.0"
+                              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="NEVER" minWidth="150.0" prefWidth="150.0"/>
+                            <ColumnConstraints hgrow="NEVER" minWidth="300.0" prefWidth="100.0"/>
+                            <ColumnConstraints hgrow="NEVER" minWidth="100.0" prefWidth="100.0"/>
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+                        </rowConstraints>
+
+                        <Label text="Minimal similarity"/>
+                        <Slider fx:id="duplicateScannerMinSimilaritySlider" blockIncrement="1.0" majorTickUnit="10.0"
+                                min="70.0" minorTickCount="5" showTickLabels="true" showTickMarks="true"
+                                GridPane.columnIndex="1"/>
+                        <Label fx:id="duplicateScannerMinSimilarityLabel" text="82%" GridPane.columnIndex="2"/>
+                    </GridPane>
+                </AnchorPane>
+            </TitledPane>
+            <TitledPane text="Pinterest Settings">
+                <AnchorPane>
+                    <GridPane hgap="10.0" layoutX="70.0" layoutY="-35.0" vgap="5.0" AnchorPane.bottomAnchor="0.0"
+                              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="NEVER" minWidth="150.0" prefWidth="150.0"/>
+                            <ColumnConstraints hgrow="NEVER" minWidth="300.0" prefWidth="100.0"/>
+                            <ColumnConstraints hgrow="NEVER" minWidth="100.0" prefWidth="100.0"/>
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+                        </rowConstraints>
+
+                        <Label text="Default target directory"/>
+                        <Label text="Pinterest username" GridPane.rowIndex="1"/>
+                        <Label text="Pinterest password" GridPane.rowIndex="2"/>
+                        <TextField fx:id="defaultTargetDirectoryTextField" GridPane.columnIndex="1"/>
+                        <TextField fx:id="pinterestUsernameTextField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        <PasswordField fx:id="pinterestPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        <Button mnemonicParsing="false" onAction="#browseDefaultTargetDirectory" text="Browse..."
+                                GridPane.columnIndex="2"/>
+                    </GridPane>
+                </AnchorPane>
+            </TitledPane>
+        </VBox>
+    </center>
+</BorderPane>

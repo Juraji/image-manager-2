@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply">
+        <createTable name="hash_data" identityType="external" pkName="pk_hash_data">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="bits" type="varbinary(10000)"/>
+            <column name="contrast" type="integer" checkConstraint="check ( contrast in (0,1))" checkConstraintName="ck_hash_data_contrast"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="local_directory" identityType="external" pkName="pk_local_directory">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="name" type="varchar" notnull="true"/>
+            <column name="location_on_disk" type="varchar(2048)" notnull="true"/>
+            <column name="favorite" type="boolean"/>
+            <column name="parent_id" type="uuid" references="local_directory.id" foreignKeyName="fk_local_directory_parent_id" foreignKeyIndex="ix_local_directory_parent_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="local_meta_data" identityType="external" pkName="pk_local_meta_data">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="path" type="varchar(2048)"/>
+            <column name="quality_rating" type="bigint" notnull="true"/>
+            <column name="file_size" type="bigint" notnull="true"/>
+            <column name="width" type="integer" notnull="true"/>
+            <column name="height" type="integer" notnull="true"/>
+            <column name="file_corrected" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="comments" type="TEXT"/>
+            <column name="hash_id" type="uuid" uniqueOneToOne="uq_local_meta_data_hash_id" references="hash_data.id" foreignKeyName="fk_local_meta_data_hash_id"/>
+            <column name="directory_id" type="uuid" references="local_directory.id" foreignKeyName="fk_local_meta_data_directory_id" foreignKeyIndex="ix_local_meta_data_directory_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="pin_meta_data" identityType="external" pkName="pk_pin_meta_data">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="path" type="varchar(2048)"/>
+            <column name="quality_rating" type="bigint" notnull="true"/>
+            <column name="file_size" type="bigint" notnull="true"/>
+            <column name="width" type="integer" notnull="true"/>
+            <column name="height" type="integer" notnull="true"/>
+            <column name="file_corrected" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="comments" type="TEXT"/>
+            <column name="hash_id" type="uuid" uniqueOneToOne="uq_pin_meta_data_hash_id" references="hash_data.id" foreignKeyName="fk_pin_meta_data_hash_id"/>
+            <column name="pin_id" type="varchar" notnull="true"/>
+            <column name="title" type="varchar"/>
+            <column name="pinterest_uri" type="varchar(2048)" notnull="true"/>
+            <column name="download_url" type="varchar(2048)" notnull="true"/>
+            <column name="source_url" type="varchar(2048)"/>
+            <column name="board_id" type="uuid" references="pinterest_board.id" foreignKeyName="fk_pin_meta_data_board_id" foreignKeyIndex="ix_pin_meta_data_board_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="pinterest_board" identityType="external" pkName="pk_pinterest_board">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="name" type="varchar" notnull="true"/>
+            <column name="location_on_disk" type="varchar(2048)" notnull="true"/>
+            <column name="favorite" type="boolean"/>
+            <column name="board_url" type="varchar" notnull="true"/>
+            <column name="slug" type="varchar" notnull="true"/>
+            <column name="board_id" type="varchar" notnull="true"/>
+            <column name="type" type="integer" checkConstraint="check ( type in (0,1))" checkConstraintName="ck_pinterest_board_type"/>
+            <column name="parent_id" type="uuid" references="pinterest_board.id" foreignKeyName="fk_pinterest_board_parent_id" foreignKeyIndex="ix_pinterest_board_parent_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="settings" identityType="external" pkName="pk_settings">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="cipher_base" type="varchar(16)"/>
+            <column name="pinterest_username" type="varchar"/>
+            <column name="pinterest_password" type="varbinary"/>
+            <column name="default_target_directory" type="varchar(2048)"/>
+            <column name="duplicate_scanner_min_similarity" type="integer" notnull="true"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="web_cookie" identityType="external" pkName="pk_web_cookie">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="root_domain" type="varchar" notnull="true"/>
+            <column name="name" type="varchar" notnull="true"/>
+            <column name="domain" type="varchar(2048)" notnull="true"/>
+            <column name="expiry" type="timestamp"/>
+            <column name="path" type="varchar(2048)"/>
+            <column name="value" type="varchar(4096)" notnull="true"/>
+            <column name="http_only" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="secure" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+        </createTable>
+    </changeSet>
+</migration>

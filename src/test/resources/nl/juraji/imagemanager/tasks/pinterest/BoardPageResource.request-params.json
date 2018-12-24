@@ -1,0 +1,15 @@
+{
+  "DATA": {
+    "source_url": "/jurajix10/ron-levi/",
+    "data": {
+      "options": {
+        "isPrefetch": false,
+        "username": "jurajix10",
+        "slug": "ron-levi",
+        "field_set_key": "detailed",
+        "main_module_name": "BoardPage"
+      },
+      "context": {}
+    }
+  }
+}

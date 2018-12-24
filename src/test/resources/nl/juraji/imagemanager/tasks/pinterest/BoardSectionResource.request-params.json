@@ -1,0 +1,15 @@
+{
+  "URL": "/_ngjs/resource/BoardSectionResource/get/",
+  "DATA": {
+    "source_url": "/jurajix10/tech/watches/",
+    "data": {
+      "options": {
+        "isPrefetch": false,
+        "board_slug": "tech",
+        "section_slug": "watches",
+        "username": "jurajix10"
+      },
+      "context": {}
+    }
+  }
+}

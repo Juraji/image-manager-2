@@ -1,0 +1,3 @@
+entity-packages: nl.juraji.imagemanager.model.domain
+transactional-packages: nl.juraji.imagemanager
+querybean-packages: nl.juraji.imagemanager

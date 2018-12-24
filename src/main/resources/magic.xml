@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE magic PUBLIC "-//jmimemagic//DTD magic config 1.0//EN" "magic_1_0.dtd">
+<magic>
+    <info>
+        <version>0.2</version>
+        <author>dcastro</author>
+        <description>magic file</description>
+    </info>
+    <match-list>
+        <match>
+            <mimetype>image/gif</mimetype>
+            <extension>gif</extension>
+            <description>GIF image data</description>
+            <test type="string" offset="0" length="" bitmask="" comparator="=">GIF8</test>
+            <match-list>
+                <match>
+                    <mimetype>b, version 8%s,</mimetype>
+                    <extension>gif</extension>
+                    <description>b, version 8%s,</description>
+                    <test type="string" offset="4" length="" bitmask="" comparator="=">7a</test>
+                </match>
+                <match>
+                    <mimetype>b, version 8%s,</mimetype>
+                    <extension>gif</extension>
+                    <description>b, version 8%s,</description>
+                    <test type="string" offset="4" length="" bitmask="" comparator="=">9a</test>
+                </match>
+            </match-list>
+        </match>
+        <match>
+            <mimetype>image/tiff</mimetype>
+            <extension>tif</extension>
+            <description>TIFF image data, big-endian</description>
+            <test offset="0" type="string" comparator="=">MM\000\052</test>
+        </match>
+        <match>
+            <mimetype>image/tiff</mimetype>
+            <extension>tif</extension>
+            <description>TIFF image data, little-endian</description>
+            <test offset="0" type="string" comparator="=">II\052\000</test>
+        </match>
+        <match>
+            <mimetype>image/tiff</mimetype>
+            <extension>tiff</extension>
+            <description>TIFF image data, big-endian</description>
+            <test offset="0" type="string" comparator="=">MM\000\052</test>
+        </match>
+        <match>
+            <mimetype>image/tiff</mimetype>
+            <extension>tiff</extension>
+            <description>TIFF image data, little-endian</description>
+            <test offset="0" type="string" comparator="=">II\052\000</test>
+        </match>
+        <match>
+            <mimetype>image/png</mimetype>
+            <extension>png</extension>
+            <description>PNG image data,</description>
+            <test offset="0" type="string" comparator="=">\211NG</test>
+            <match-list>
+                <match>
+                    <mimetype>image/png</mimetype>
+                    <extension>png</extension>
+                    <description>CORRUPTED,</description>
+                    <test offset="4" type="belong" comparator="=">0xd0a1a0a</test>
+                </match>
+                <match>
+                    <mimetype>image/png</mimetype>
+                    <extension>png</extension>
+                    <description>PNG image data</description>
+                    <test offset="4" type="belong" comparator="=">0xd0a1a0a</test>
+                    <match-list>
+                        <!--<match>-->
+                            <!--<mimetype>image/png</mimetype>-->
+                            <!--<extension>png</extension>-->
+                            <!--<description>%ld x</description>-->
+                            <!--<test offset="16" type="belong" comparator="="/>-->
+                        <!--</match>-->
+                        <!--<match>-->
+                            <!--<mimetype>image/png</mimetype>-->
+                            <!--<extension>png</extension>-->
+                            <!--<description>%ld,</description>-->
+                            <!--<test offset="20" type="belong" comparator="="/>-->
+                        <!--</match>-->
+                        <!--<match>-->
+                            <!--<mimetype>image/png</mimetype>-->
+                            <!--<extension>png</extension>-->
+                            <!--<description>%d-bit</description>-->
+                            <!--<test offset="24" type="byte" comparator="="/>-->
+                        <!--</match>-->
+                        <match>
+                            <mimetype>image/png</mimetype>
+                            <extension>png</extension>
+                            <description>grayscale,</description>
+                            <test offset="25" type="byte" comparator="=">0x0</test>
+                        </match>
+                        <match>
+                            <mimetype>image/png</mimetype>
+                            <extension>png</extension>
+                            <description>\b/color RGB,</description>
+                            <test offset="25" type="byte" comparator="=">0x2</test>
+                        </match>
+                        <match>
+                            <mimetype>image/png</mimetype>
+                            <extension>png</extension>
+                            <description>colormap,</description>
+                            <test offset="25" type="byte" comparator="=">0x3</test>
+                        </match>
+                        <match>
+                            <mimetype>image/png</mimetype>
+                            <extension>png</extension>
+                            <description>gray+alpha,</description>
+                            <test offset="25" type="byte" comparator="=">0x4</test>
+                        </match>
+                        <match>
+                            <mimetype>image/png</mimetype>
+                            <extension>png</extension>
+                            <description>\b/color RGBA,</description>
+                            <test offset="25" type="byte" comparator="=">0x6</test>
+                        </match>
+                        <match>
+                            <mimetype>image/png</mimetype>
+                            <extension>png</extension>
+                            <description>non-interlaced</description>
+                            <test offset="28" type="byte" comparator="=">0x0</test>
+                        </match>
+                        <match>
+                            <mimetype>image/png</mimetype>
+                            <extension>png</extension>
+                            <description>interlaced</description>
+                            <test offset="28" type="byte" comparator="=">0x1</test>
+                        </match>
+                    </match-list>
+                </match>
+            </match-list>
+        </match>
+        <match>
+            <mimetype>image/png</mimetype>
+            <extension>png</extension>
+            <description>PNG image data, CORRUPTED</description>
+            <test offset="1" type="string" comparator="=">PNG</test>
+        </match>
+        <match>
+            <mimetype>image/gif</mimetype>
+            <extension>gif</extension>
+            <description>GIF image data</description>
+            <test offset="0" type="string" comparator="=">GIF8</test>
+            <match-list>
+                <match>
+                    <mimetype>image/gif</mimetype>
+                    <extension>gif</extension>
+                    <description>version 8%s,</description>
+                    <test offset="4" type="string" comparator="=">7a</test>
+                </match>
+                <match>
+                    <mimetype>image/gif</mimetype>
+                    <extension>gif</extension>
+                    <description>version 8%s,</description>
+                    <test offset="4" type="string" comparator="=">9a</test>
+                </match>
+                <match>
+                    <mimetype>image/gif</mimetype>
+                    <extension>gif</extension>
+                    <description>%hd x</description>
+                    <test offset="6" type="leshort" comparator="&gt;">0x0</test>
+                </match>
+                <match>
+                    <mimetype>image/gif</mimetype>
+                    <extension>gif</extension>
+                    <description>%hd,</description>
+                    <test offset="8" type="leshort" comparator="&gt;">0x0</test>
+                </match>
+            </match-list>
+        </match>
+        <match>
+            <mimetype>image/jpeg</mimetype>
+            <extension>jpg</extension>
+            <description>JPEG image data</description>
+            <test offset="0" type="beshort" comparator="=">0xffd8</test>
+            <match-list>
+                <match>
+                    <mimetype>image/jpeg</mimetype>
+                    <extension>jpg</extension>
+                    <description>JFIF standard</description>
+                    <test offset="6" type="string" comparator="=">JFIF</test>
+                </match>
+            </match-list>
+        </match>
+        <match>
+            <mimetype>image/jpeg</mimetype>
+            <extension>jpg</extension>
+            <description>JPEG image data, HSI proprietary</description>
+            <test offset="0" type="string" comparator="=">hsi1</test>
+        </match>
+    </match-list>
+</magic>
