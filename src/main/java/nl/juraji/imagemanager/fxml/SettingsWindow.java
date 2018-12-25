@@ -6,9 +6,10 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
+import nl.juraji.imagemanager.model.domain.PinterestSettings;
 import nl.juraji.imagemanager.model.domain.Settings;
 import nl.juraji.imagemanager.model.finders.SettingsFinder;
-import nl.juraji.imagemanager.util.EncryptionUtils;
+import nl.juraji.imagemanager.util.Crypt;
 import nl.juraji.imagemanager.util.StringUtils;
 import nl.juraji.imagemanager.util.fxml.Controller;
 import org.slf4j.LoggerFactory;
@@ -39,11 +40,16 @@ public class SettingsWindow extends Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        // Application Settings
         duplicateScannerMinSimilaritySlider.setValue(settings.getDuplicateScannerMinSimilarity());
         defaultTargetDirectoryTextField.setText(settings.getDefaultTargetDirectory().toString());
-        pinterestUsernameTextField.setText(settings.getPinterestUsername());
 
-        if (settings.getPinterestPassword() != null) {
+        // Pinterest Settings
+        final PinterestSettings pinterestSettings = settings.getPinterestSettings();
+        pinterestUsernameTextField.setText(pinterestSettings.getPinterestUsername());
+
+        if (pinterestSettings.getPinterestPassword() != null) {
             pinterestPasswordField.setText(DUMMY_PASSWORD);
         }
 
@@ -75,23 +81,24 @@ public class SettingsWindow extends Controller implements Initializable {
                 doPersist = true;
             }
 
-            // Pinterest settings
             final String defaultTargetDirectory = defaultTargetDirectoryTextField.getText();
             if (StringUtils.isNotEmpty(defaultTargetDirectory)) {
                 settings.setDefaultTargetDirectory(Paths.get(defaultTargetDirectory));
                 doPersist = true;
             }
 
+            // Pinterest settings
+            final PinterestSettings pinterestSettings = settings.getPinterestSettings();
             final String pinterestUsername = pinterestUsernameTextField.getText();
             if (StringUtils.isNotEmpty(pinterestUsername)) {
-                settings.setPinterestUsername(pinterestUsername);
+                pinterestSettings.setPinterestUsername(pinterestUsername);
                 doPersist = true;
             }
 
             final String pinterestPassword = pinterestPasswordField.getText();
             if (StringUtils.isNotEmpty(pinterestPassword) && !DUMMY_PASSWORD.equals(pinterestPassword)) {
-                final byte[] encryptedPassword = EncryptionUtils.encrypt(settings.getCipherBase(), pinterestPassword);
-                settings.setPinterestPassword(encryptedPassword);
+                final byte[] encryptedPassword = Crypt.init(pinterestSettings.getPasswordSalt()).encrypt(pinterestPassword);
+                pinterestSettings.setPinterestPassword(encryptedPassword);
                 doPersist = true;
             }
 

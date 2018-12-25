@@ -42,7 +42,7 @@ return (function (args) {
     var headers = args[2];
 
     var formData = new FormData();
-    formData.append("source__url", window.location.pathname);
+    formData.append("source_url", window.location.pathname);
     formData.append("data", JSON.stringify({
         options: JSON.parse(args[3]),
         context: {}

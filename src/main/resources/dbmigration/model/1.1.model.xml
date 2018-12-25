@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply">
+        <createTable name="pinterest_settings" identityType="external" pkName="pk_pinterest_settings">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="pinterest_username" type="varchar"/>
+            <column name="password_salt" type="varbinary(16)"/>
+            <column name="pinterest_password" type="varbinary"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+        </createTable>
+        <addColumn tableName="settings">
+            <column name="pinterest_settings_id" type="uuid" uniqueOneToOne="uq_settings_pinterest_settings_id" references="pinterest_settings.id" foreignKeyName="fk_settings_pinterest_settings_id"/>
+        </addColumn>
+    </changeSet>
+    <changeSet type="pendingDrops">
+        <dropColumn columnName="cipher_base" tableName="settings"/>
+        <dropColumn columnName="pinterest_username" tableName="settings"/>
+        <dropColumn columnName="pinterest_password" tableName="settings"/>
+    </changeSet>
+</migration>

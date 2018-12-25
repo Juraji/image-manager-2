@@ -1,13 +1,13 @@
 package nl.juraji.imagemanager.tasks.pinterest;
 
 import com.google.gson.Gson;
-import nl.juraji.imagemanager.model.domain.Settings;
+import nl.juraji.imagemanager.model.domain.PinterestSettings;
 import nl.juraji.imagemanager.model.domain.WebCookie;
 import nl.juraji.imagemanager.model.finders.SettingsFinder;
 import nl.juraji.imagemanager.model.finders.WebCookieFinder;
 import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceRequest;
 import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceResult;
-import nl.juraji.imagemanager.util.EncryptionUtils;
+import nl.juraji.imagemanager.util.Crypt;
 import nl.juraji.imagemanager.util.StringUtils;
 import nl.juraji.imagemanager.util.fxml.concurrent.IndicatorTask;
 import nl.juraji.imagemanager.util.io.web.WebDriverPool;
@@ -46,14 +46,13 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
     public PinterestWebTask(String message, Object... params) {
         super(message, params);
 
-        final Settings settings = SettingsFinder.getSettings();
+        final PinterestSettings settings = SettingsFinder.getSettings().getPinterestSettings();
 
         try {
             this.username = settings.getPinterestUsername();
             this.userProfileName = username.split("@")[0];
-            this.password = EncryptionUtils.decrypt(
-                    settings.getCipherBase(),
-                    settings.getPinterestPassword());
+            this.password = Crypt.init(settings.getPasswordSalt())
+                    .decrypt(settings.getPinterestPassword());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

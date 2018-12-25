@@ -1,8 +1,9 @@
 package nl.juraji.imagemanager.model.finders;
 
 import io.ebean.Finder;
+import nl.juraji.imagemanager.model.domain.PinterestSettings;
 import nl.juraji.imagemanager.model.domain.Settings;
-import nl.juraji.imagemanager.util.EncryptionUtils;
+import nl.juraji.imagemanager.util.Crypt;
 
 import java.nio.file.Paths;
 import java.util.List;
@@ -35,8 +36,10 @@ public class SettingsFinder extends Finder<UUID, Settings> {
     private Settings initSettings() {
         final Settings settings = new Settings();
         settings.setDuplicateScannerMinSimilarity(82);
-        settings.setCipherBase(EncryptionUtils.randomString(16));
         settings.setDefaultTargetDirectory(Paths.get(System.getProperty("user.home")));
+
+        final PinterestSettings pinterestSettings = settings.getPinterestSettings();
+        pinterestSettings.setPasswordSalt(Crypt.generateCipher(16));
 
         settings.save();
         return settings;

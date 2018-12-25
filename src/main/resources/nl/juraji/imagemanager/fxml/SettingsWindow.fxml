@@ -29,13 +29,18 @@
                         </columnConstraints>
                         <rowConstraints>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
                         </rowConstraints>
 
                         <Label text="Minimal similarity"/>
+                        <Label text="Default target directory" GridPane.rowIndex="1"/>
                         <Slider fx:id="duplicateScannerMinSimilaritySlider" blockIncrement="1.0" majorTickUnit="10.0"
                                 min="70.0" minorTickCount="5" showTickLabels="true" showTickMarks="true"
                                 GridPane.columnIndex="1"/>
+                        <TextField fx:id="defaultTargetDirectoryTextField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                         <Label fx:id="duplicateScannerMinSimilarityLabel" text="82%" GridPane.columnIndex="2"/>
+                        <Button mnemonicParsing="false" onAction="#browseDefaultTargetDirectory" text="Browse..."
+                                GridPane.columnIndex="2" GridPane.rowIndex="1"/>
                     </GridPane>
                 </AnchorPane>
             </TitledPane>
@@ -51,17 +56,13 @@
                         <rowConstraints>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
                         </rowConstraints>
 
-                        <Label text="Default target directory"/>
-                        <Label text="Pinterest username" GridPane.rowIndex="1"/>
-                        <Label text="Pinterest password" GridPane.rowIndex="2"/>
-                        <TextField fx:id="defaultTargetDirectoryTextField" GridPane.columnIndex="1"/>
-                        <TextField fx:id="pinterestUsernameTextField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                        <PasswordField fx:id="pinterestPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                        <Button mnemonicParsing="false" onAction="#browseDefaultTargetDirectory" text="Browse..."
-                                GridPane.columnIndex="2"/>
+                        <Label text="Pinterest username"/>
+                        <Label text="Pinterest password" GridPane.rowIndex="1"/>
+                        <TextField fx:id="pinterestUsernameTextField" GridPane.columnIndex="1"/>
+                        <PasswordField fx:id="pinterestPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
                     </GridPane>
                 </AnchorPane>
             </TitledPane>

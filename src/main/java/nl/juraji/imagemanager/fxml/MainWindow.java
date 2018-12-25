@@ -94,7 +94,7 @@ public class MainWindow extends Controller implements Initializable {
     public void menuDirectoriesAddPinterestBoardAction(ActionEvent event) {
         final Settings settings = SettingsFinder.getSettings();
 
-        if (settings.isPinterestSetup()) {
+        if (settings.getPinterestSettings().isPinterestSetup()) {
             final WorkDialog<List<PinterestBoard>> wd = new WorkDialog<>(getStage());
 
             wd.addTaskEndNotification(boards -> {

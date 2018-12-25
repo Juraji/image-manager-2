@@ -24,10 +24,4 @@ class StringUtilsTest {
         assertFalse(StringUtils.isNotEmpty(null));
         assertTrue(StringUtils.isNotEmpty("some text"));
     }
-
-    @Test
-    public void randomString() {
-        final String randomString = EncryptionUtils.randomString(10);
-        assertEquals(10, randomString.length());
-    }
 }

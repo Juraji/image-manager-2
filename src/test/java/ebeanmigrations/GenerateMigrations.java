@@ -19,6 +19,7 @@ public class GenerateMigrations {
         final DbMigration dbMigration = DbMigration.create();
         dbMigration.setPlatform(Platform.H2);
 
+//        System.setProperty("ddl.migration.pendingDropsFor", "1.1");
         dbMigration.generateMigration();
     }
 }

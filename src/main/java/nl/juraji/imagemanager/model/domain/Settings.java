@@ -1,8 +1,8 @@
 package nl.juraji.imagemanager.model.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Created by Juraji on 27-11-2018.
@@ -11,15 +11,6 @@ import java.nio.file.Path;
 @Entity
 public class Settings extends BaseModel {
 
-    @Column(length = 16)
-    private String cipherBase;
-
-    @Column
-    private String pinterestUsername;
-
-    @Column
-    private byte[] pinterestPassword;
-
     @SuppressWarnings("JpaAttributeTypeInspection")
     @Column(length = 2048)
     private Path defaultTargetDirectory;
@@ -27,29 +18,8 @@ public class Settings extends BaseModel {
     @Column
     private int duplicateScannerMinSimilarity;
 
-    public String getCipherBase() {
-        return cipherBase;
-    }
-
-    public void setCipherBase(String cipherBase) {
-        this.cipherBase = cipherBase;
-    }
-
-    public String getPinterestUsername() {
-        return pinterestUsername;
-    }
-
-    public void setPinterestUsername(String pinterestUsername) {
-        this.pinterestUsername = pinterestUsername;
-    }
-
-    public byte[] getPinterestPassword() {
-        return pinterestPassword;
-    }
-
-    public void setPinterestPassword(byte[] pinterestPassword) {
-        this.pinterestPassword = pinterestPassword;
-    }
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private PinterestSettings pinterestSettings;
 
     public Path getDefaultTargetDirectory() {
         return defaultTargetDirectory;
@@ -67,8 +37,10 @@ public class Settings extends BaseModel {
         this.duplicateScannerMinSimilarity = duplicateScannerMinimalSimilarity;
     }
 
-    public boolean isPinterestSetup() {
-        return pinterestUsername != null
-                && pinterestPassword != null;
+    public PinterestSettings getPinterestSettings() {
+        if (pinterestSettings == null) {
+            pinterestSettings = new PinterestSettings();
+        }
+        return pinterestSettings;
     }
 }
