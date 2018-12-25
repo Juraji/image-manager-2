@@ -1,8 +1,8 @@
 package nl.juraji.imagemanager.model.finders;
 
 import io.ebean.Finder;
-import nl.juraji.imagemanager.model.domain.PinterestSettings;
-import nl.juraji.imagemanager.model.domain.Settings;
+import nl.juraji.imagemanager.model.domain.settings.PinterestSettings;
+import nl.juraji.imagemanager.model.domain.settings.Settings;
 import nl.juraji.imagemanager.util.Crypt;
 
 import java.nio.file.Paths;

@@ -1,4 +1,6 @@
-package nl.juraji.imagemanager.model.domain;
+package nl.juraji.imagemanager.model.domain.hashes;
+
+import nl.juraji.imagemanager.model.domain.BaseModel;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

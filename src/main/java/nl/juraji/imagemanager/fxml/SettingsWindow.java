@@ -6,8 +6,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
-import nl.juraji.imagemanager.model.domain.PinterestSettings;
-import nl.juraji.imagemanager.model.domain.Settings;
+import nl.juraji.imagemanager.model.domain.settings.PinterestSettings;
+import nl.juraji.imagemanager.model.domain.settings.Settings;
 import nl.juraji.imagemanager.model.finders.SettingsFinder;
 import nl.juraji.imagemanager.util.Crypt;
 import nl.juraji.imagemanager.util.StringUtils;
@@ -47,9 +47,9 @@ public class SettingsWindow extends Controller implements Initializable {
 
         // Pinterest Settings
         final PinterestSettings pinterestSettings = settings.getPinterestSettings();
-        pinterestUsernameTextField.setText(pinterestSettings.getPinterestUsername());
+        pinterestUsernameTextField.setText(pinterestSettings.getUsername());
 
-        if (pinterestSettings.getPinterestPassword() != null) {
+        if (pinterestSettings.getPassword() != null) {
             pinterestPasswordField.setText(DUMMY_PASSWORD);
         }
 
@@ -91,14 +91,14 @@ public class SettingsWindow extends Controller implements Initializable {
             final PinterestSettings pinterestSettings = settings.getPinterestSettings();
             final String pinterestUsername = pinterestUsernameTextField.getText();
             if (StringUtils.isNotEmpty(pinterestUsername)) {
-                pinterestSettings.setPinterestUsername(pinterestUsername);
+                pinterestSettings.setUsername(pinterestUsername);
                 doPersist = true;
             }
 
             final String pinterestPassword = pinterestPasswordField.getText();
             if (StringUtils.isNotEmpty(pinterestPassword) && !DUMMY_PASSWORD.equals(pinterestPassword)) {
                 final byte[] encryptedPassword = Crypt.init(pinterestSettings.getPasswordSalt()).encrypt(pinterestPassword);
-                pinterestSettings.setPinterestPassword(encryptedPassword);
+                pinterestSettings.setPassword(encryptedPassword);
                 doPersist = true;
             }
 

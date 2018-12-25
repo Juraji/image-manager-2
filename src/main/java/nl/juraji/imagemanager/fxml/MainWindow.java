@@ -15,7 +15,7 @@ import nl.juraji.imagemanager.fxml.dialogs.SelectBoardsDialog;
 import nl.juraji.imagemanager.fxml.dialogs.WorkDialog;
 import nl.juraji.imagemanager.fxml.dialogs.WorkQueueDialog;
 import nl.juraji.imagemanager.model.domain.BaseDirectory;
-import nl.juraji.imagemanager.model.domain.Settings;
+import nl.juraji.imagemanager.model.domain.settings.Settings;
 import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
 import nl.juraji.imagemanager.model.domain.pinterest.PinterestBoard;
 import nl.juraji.imagemanager.model.finders.SettingsFinder;

@@ -1,5 +1,7 @@
 package nl.juraji.imagemanager.model.domain;
 
+import nl.juraji.imagemanager.model.domain.hashes.HashData;
+
 import javax.persistence.*;
 import java.nio.file.Path;
 

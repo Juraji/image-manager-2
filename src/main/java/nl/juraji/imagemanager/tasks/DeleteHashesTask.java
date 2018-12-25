@@ -4,7 +4,7 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import nl.juraji.imagemanager.model.domain.BaseDirectory;
 import nl.juraji.imagemanager.model.domain.BaseMetaData;
-import nl.juraji.imagemanager.model.domain.HashData;
+import nl.juraji.imagemanager.model.domain.hashes.HashData;
 import nl.juraji.imagemanager.util.fxml.concurrent.IndicatorTask;
 
 import java.util.ArrayList;

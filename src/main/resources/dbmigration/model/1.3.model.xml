@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply">
+        <renameColumn oldName="pinterest_username" newName="username" tableName="pinterest_settings"/>
+        <renameColumn oldName="pinterest_password" newName="password" tableName="pinterest_settings"/>
+    </changeSet>
+</migration>

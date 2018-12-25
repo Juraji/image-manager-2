@@ -1,6 +1,5 @@
 package nl.juraji.imagemanager.tasks.pinterest;
 
-import nl.juraji.imagemanager.model.domain.Settings;
 import nl.juraji.imagemanager.model.domain.pinterest.BoardType;
 import nl.juraji.imagemanager.model.domain.pinterest.PinterestBoard;
 import nl.juraji.imagemanager.model.finders.PinterestBoardsFinder;

@@ -1,8 +1,8 @@
 package nl.juraji.imagemanager.tasks.pinterest;
 
 import com.google.gson.Gson;
-import nl.juraji.imagemanager.model.domain.PinterestSettings;
-import nl.juraji.imagemanager.model.domain.WebCookie;
+import nl.juraji.imagemanager.model.domain.settings.PinterestSettings;
+import nl.juraji.imagemanager.model.domain.settings.WebCookie;
 import nl.juraji.imagemanager.model.finders.SettingsFinder;
 import nl.juraji.imagemanager.model.finders.WebCookieFinder;
 import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceRequest;
@@ -49,10 +49,10 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
         final PinterestSettings settings = SettingsFinder.getSettings().getPinterestSettings();
 
         try {
-            this.username = settings.getPinterestUsername();
+            this.username = settings.getUsername();
             this.userProfileName = username.split("@")[0];
             this.password = Crypt.init(settings.getPasswordSalt())
-                    .decrypt(settings.getPinterestPassword());
+                    .decrypt(settings.getPassword());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

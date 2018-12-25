@@ -1,8 +1,9 @@
-package nl.juraji.imagemanager.model.domain;
+package nl.juraji.imagemanager.model.domain.settings;
+
+import nl.juraji.imagemanager.model.domain.BaseModel;
 
 import javax.persistence.*;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Created by Juraji on 27-11-2018.

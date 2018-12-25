@@ -2,7 +2,7 @@ package nl.juraji.imagemanager.model.finders;
 
 import io.ebean.Expr;
 import io.ebean.Finder;
-import nl.juraji.imagemanager.model.domain.WebCookie;
+import nl.juraji.imagemanager.model.domain.settings.WebCookie;
 import org.openqa.selenium.Cookie;
 
 import java.util.Date;

@@ -16,7 +16,7 @@ import nl.juraji.imagemanager.fxml.dialogs.WorkQueueDialog;
 import nl.juraji.imagemanager.model.domain.BaseDirectory;
 import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.DefaultDirectory;
-import nl.juraji.imagemanager.model.domain.Settings;
+import nl.juraji.imagemanager.model.domain.settings.Settings;
 import nl.juraji.imagemanager.model.finders.BaseDirectoryFinder;
 import nl.juraji.imagemanager.model.finders.BaseMetaDataFinder;
 import nl.juraji.imagemanager.model.finders.SettingsFinder;

@@ -1,4 +1,4 @@
-package nl.juraji.imagemanager.model.domain;
+package nl.juraji.imagemanager.model.domain.hashes;
 
 /**
  * Created by Juraji on 21-11-2018.

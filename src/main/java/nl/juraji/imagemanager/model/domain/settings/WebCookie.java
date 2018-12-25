@@ -1,5 +1,6 @@
-package nl.juraji.imagemanager.model.domain;
+package nl.juraji.imagemanager.model.domain.settings;
 
+import nl.juraji.imagemanager.model.domain.BaseModel;
 import org.openqa.selenium.Cookie;
 
 import javax.persistence.Column;
