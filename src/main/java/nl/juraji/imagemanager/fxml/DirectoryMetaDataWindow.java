@@ -196,31 +196,34 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
 
         if (selectedItem != null) {
             final BaseMetaData metaData = selectedItem.getMetaData();
-            final int option = OptionDialogBuilder.build(getStage())
+            final OptionDialogBuilder dialogBuilder = OptionDialogBuilder.build(getStage())
                     .withTitle("Delete " + selectedItem.getText())
                     .withMessage("Should I delete the index only or the image from disk as well?\n" +
                             "This action can not be undone!")
                     .withOption("Index only")
-                    .withOption("Index and from disk")
-                    .show();
+                    .withOption("Index and from disk");
+
+            if (metaData instanceof PinMetaData) {
+                dialogBuilder.withOption("Index, disk and Pinterest");
+            }
+
+            final int option = dialogBuilder.show();
 
             if (option > -1) {
                 final WorkDialog<BaseMetaData> wd = new WorkDialog<>(getStage());
 
-                if (option == 1) {
-                    if (metaData instanceof PinMetaData) {
-                        final boolean doDeletePin = AlertBuilder.confirm(getStage())
-                                .withTitle("Delete from Pinterest")
-                                .withMessage("Do you want this pin to be deleted from Pinterest as well?")
-                                .showAndWait();
-                        if (doDeletePin) {
-                            wd.exec(new DeletePinTask((PinMetaData) metaData));
-                        }
-                    } else {
+                switch (option) {
+                    case 0:
+                        wd.exec(new DeleteMetaDataTask(metaData, false));
+                        break;
+                    case 1:
                         wd.exec(new DeleteMetaDataTask(metaData, true));
-                    }
-                } else {
-                    wd.exec(new DeleteMetaDataTask(metaData, false));
+                        break;
+                    case 2:
+                        wd.exec(new DeleteMetaDataTask(metaData, true));
+                        //noinspection ConstantConditions
+                        wd.exec(new DeletePinTask((PinMetaData) metaData));
+                        break;
                 }
 
                 wd.addTaskEndNotification(deletedItem -> {
