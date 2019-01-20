@@ -12,7 +12,6 @@ import java.nio.file.Path;
 @Entity
 public class Settings extends BaseModel {
 
-    @SuppressWarnings("JpaAttributeTypeInspection")
     @Column(length = 2048)
     private Path defaultTargetDirectory;
 
@@ -39,9 +38,10 @@ public class Settings extends BaseModel {
     }
 
     public PinterestSettings getPinterestSettings() {
-        if (pinterestSettings == null) {
-            pinterestSettings = new PinterestSettings();
-        }
         return pinterestSettings;
+    }
+
+    public void setPinterestSettings(PinterestSettings pinterestSettings) {
+        this.pinterestSettings = pinterestSettings;
     }
 }

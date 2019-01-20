@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply">
+        <alterColumn columnName="username" tableName="pinterest_settings" type="varchar" currentType="varchar(255)" currentNotnull="false"/>
+        <alterColumn columnName="password" tableName="pinterest_settings" type="varchar" currentType="varbinary(255)" currentNotnull="false"/>
+    </changeSet>
+    <changeSet type="pendingDrops">
+        <dropColumn columnName="password_salt" tableName="pinterest_settings"/>
+    </changeSet>
+</migration>

@@ -1,5 +1,6 @@
 package nl.juraji.imagemanager.model.domain.settings;
 
+import io.ebean.annotation.Encrypted;
 import nl.juraji.imagemanager.model.domain.BaseModel;
 
 import javax.persistence.Column;
@@ -15,34 +16,24 @@ public class PinterestSettings extends BaseModel {
     @Column
     private String username;
 
-    @Column(length = 16)
-    private byte[] passwordSalt;
-
     @Column
-    private byte[] password;
-
-    public byte[] getPasswordSalt() {
-        return passwordSalt;
-    }
-
-    public void setPasswordSalt(byte[] salt) {
-        this.passwordSalt = salt;
-    }
+    @Encrypted
+    private String password;
 
     public String getUsername() {
         return username;
     }
 
-    public void setUsername(String pinterestUsername) {
-        this.username = pinterestUsername;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public byte[] getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    public void setPassword(byte[] pinterestPassword) {
-        this.password = pinterestPassword;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public boolean isPinterestSetup() {

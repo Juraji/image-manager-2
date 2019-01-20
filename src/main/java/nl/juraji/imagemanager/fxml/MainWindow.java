@@ -15,9 +15,9 @@ import nl.juraji.imagemanager.fxml.dialogs.SelectBoardsDialog;
 import nl.juraji.imagemanager.fxml.dialogs.WorkDialog;
 import nl.juraji.imagemanager.fxml.dialogs.WorkQueueDialog;
 import nl.juraji.imagemanager.model.domain.BaseDirectory;
-import nl.juraji.imagemanager.model.domain.settings.Settings;
 import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
 import nl.juraji.imagemanager.model.domain.pinterest.PinterestBoard;
+import nl.juraji.imagemanager.model.domain.settings.Settings;
 import nl.juraji.imagemanager.model.finders.SettingsFinder;
 import nl.juraji.imagemanager.tasks.DeleteHashesTask;
 import nl.juraji.imagemanager.tasks.ImportLocalDirectoryTask;
@@ -32,6 +32,7 @@ import nl.juraji.imagemanager.util.types.ListAdditionListener;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -154,6 +155,12 @@ public class MainWindow extends Controller implements Initializable {
         IndexDirectoryTaskBuilder.standard(window)
                 .afterEach(directoriesTableView::refresh)
                 .execute(directories);
+    }
+
+    public void menuDirectoriesOpenTargetDirectoryAction() {
+        final Settings settings = SettingsFinder.getSettings();
+        final Path defaultTargetDirectory = settings.getDefaultTargetDirectory();
+        DesktopUtils.openFile(defaultTargetDirectory);
     }
 
     public void menuToolsDuplicateScannerAction() {

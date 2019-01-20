@@ -23,6 +23,7 @@
                           accelerator="Shortcut+I"/>
                 <MenuItem onAction="#menuDirectoriesIndexFavoriteDirectoriesAction" text="Index favorite directories"
                           accelerator="Shortcut+Alt+I"/>
+                <MenuItem onAction="#menuDirectoriesOpenTargetDirectoryAction" text="Open Target Directory"/>
             </Menu>
             <Menu text="Tools">
                 <MenuItem onAction="#menuToolsDuplicateScannerAction" text="Duplicate Scanner..." accelerator="Shortcut+D"/>

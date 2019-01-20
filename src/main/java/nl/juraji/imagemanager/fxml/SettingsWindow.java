@@ -9,15 +9,12 @@ import javafx.stage.DirectoryChooser;
 import nl.juraji.imagemanager.model.domain.settings.PinterestSettings;
 import nl.juraji.imagemanager.model.domain.settings.Settings;
 import nl.juraji.imagemanager.model.finders.SettingsFinder;
-import nl.juraji.imagemanager.util.Crypt;
 import nl.juraji.imagemanager.util.StringUtils;
 import nl.juraji.imagemanager.util.fxml.Controller;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.security.GeneralSecurityException;
 import java.util.ResourceBundle;
 
 /**
@@ -71,44 +68,39 @@ public class SettingsWindow extends Controller implements Initializable {
     }
 
     public void saveSettingsAction() {
-        try {
-            boolean doPersist = false;
+        boolean doPersist = false;
 
-            // Duplicate Scanner settings
-            final double minimalSimilarity = duplicateScannerMinSimilaritySlider.getValue();
-            if (minimalSimilarity != settings.getDuplicateScannerMinSimilarity()) {
-                settings.setDuplicateScannerMinSimilarity((int) minimalSimilarity);
-                doPersist = true;
-            }
-
-            final String defaultTargetDirectory = defaultTargetDirectoryTextField.getText();
-            if (StringUtils.isNotEmpty(defaultTargetDirectory)) {
-                settings.setDefaultTargetDirectory(Paths.get(defaultTargetDirectory));
-                doPersist = true;
-            }
-
-            // Pinterest settings
-            final PinterestSettings pinterestSettings = settings.getPinterestSettings();
-            final String pinterestUsername = pinterestUsernameTextField.getText();
-            if (StringUtils.isNotEmpty(pinterestUsername)) {
-                pinterestSettings.setUsername(pinterestUsername);
-                doPersist = true;
-            }
-
-            final String pinterestPassword = pinterestPasswordField.getText();
-            if (StringUtils.isNotEmpty(pinterestPassword) && !DUMMY_PASSWORD.equals(pinterestPassword)) {
-                final byte[] encryptedPassword = Crypt.init(pinterestSettings.getPasswordSalt()).encrypt(pinterestPassword);
-                pinterestSettings.setPassword(encryptedPassword);
-                doPersist = true;
-            }
-
-            if (doPersist) {
-                settings.save();
-            }
-
-            this.close();
-        } catch (GeneralSecurityException e) {
-            LoggerFactory.getLogger(this.getClass()).error("Failed persisting settings", e);
+        // Duplicate Scanner settings
+        final double minimalSimilarity = duplicateScannerMinSimilaritySlider.getValue();
+        if (minimalSimilarity != settings.getDuplicateScannerMinSimilarity()) {
+            settings.setDuplicateScannerMinSimilarity((int) minimalSimilarity);
+            doPersist = true;
         }
+
+        final String defaultTargetDirectory = defaultTargetDirectoryTextField.getText();
+        if (StringUtils.isNotEmpty(defaultTargetDirectory)) {
+            settings.setDefaultTargetDirectory(Paths.get(defaultTargetDirectory));
+            doPersist = true;
+        }
+
+        // Pinterest settings
+        final PinterestSettings pinterestSettings = settings.getPinterestSettings();
+        final String pinterestUsername = pinterestUsernameTextField.getText();
+        if (StringUtils.isNotEmpty(pinterestUsername)) {
+            pinterestSettings.setUsername(pinterestUsername);
+            doPersist = true;
+        }
+
+        final String pinterestPassword = pinterestPasswordField.getText();
+        if (StringUtils.isNotEmpty(pinterestPassword) && !DUMMY_PASSWORD.equals(pinterestPassword)) {
+            pinterestSettings.setPassword(pinterestPassword);
+            doPersist = true;
+        }
+
+        if (doPersist) {
+            settings.save();
+        }
+
+        this.close();
     }
 }

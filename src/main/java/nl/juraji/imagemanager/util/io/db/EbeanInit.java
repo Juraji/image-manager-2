@@ -35,6 +35,9 @@ public final class EbeanInit {
         serverConfig.setRegister(true);
         serverConfig.setDefaultServer(true);
 
+        // Set encryption key manager
+        serverConfig.setEncryptKeyManager(new EncryptionKeyManager());
+
         // Start server
         EbeanServerFactory.create(serverConfig);
     }

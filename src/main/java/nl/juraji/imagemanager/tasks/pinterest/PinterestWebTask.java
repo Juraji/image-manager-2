@@ -7,7 +7,6 @@ import nl.juraji.imagemanager.model.finders.SettingsFinder;
 import nl.juraji.imagemanager.model.finders.WebCookieFinder;
 import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceRequest;
 import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceResult;
-import nl.juraji.imagemanager.util.Crypt;
 import nl.juraji.imagemanager.util.StringUtils;
 import nl.juraji.imagemanager.util.fxml.concurrent.IndicatorTask;
 import nl.juraji.imagemanager.util.io.web.WebDriverPool;
@@ -39,6 +38,7 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
     private final String username;
     private final String password;
     private final String userProfileName;
+    private final String originalMessage;
     private RemoteWebDriver driver;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -51,8 +51,8 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
         try {
             this.username = settings.getUsername();
             this.userProfileName = username.split("@")[0];
-            this.password = Crypt.init(settings.getPasswordSalt())
-                    .decrypt(settings.getPassword());
+            this.password = settings.getPassword();
+            this.originalMessage = this.getMessage();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -81,6 +81,8 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
     }
 
     protected void init() throws Exception {
+        super.updateMessage("Initializing web session...");
+
         // Get a WebDriver instance from the pool
         this.driver = WebDriverPool.borrowDriver();
 
@@ -95,6 +97,7 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
 
             if (isUnAuthenticated()) {
                 logger.info("Driver: Not authenticated, logging in as {}", username);
+                super.updateMessage("Logging in as %s...", username);
 
                 WebElement usernameInput = getElementBy(By.xpath("//*[@id=\"email\"]"));
                 WebElement passwordInput = getElementBy(By.xpath("//*[@id=\"password\"]"));
@@ -109,8 +112,10 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
                     driver.get(pinterestHomeUri);
                 }
             }
+
         }
 
+        super.updateMessage(originalMessage);
         this.persistDriverCookies();
     }
 
