@@ -12,29 +12,31 @@
             <Menu text="System">
                 <MenuItem onAction="#menuSystemSettingsAction" text="Settings..."/>
                 <MenuItem onAction="#menuSystemViewLogsAction" text="View logs"/>
-                <MenuItem onAction="#menuSystemExitAction" text="Exit" accelerator="Alt+Q"/>
+                <MenuItem accelerator="Alt+Q" onAction="#menuSystemExitAction" text="Exit"/>
             </Menu>
             <Menu text="Directories">
-                <MenuItem onAction="#menuDirectoriesAddLocalDirectoryAction" text="Add local directory..."
-                          accelerator="Alt+A"/>
-                <MenuItem onAction="#menuDirectoriesAddPinterestBoardAction" text="Add Pinterest board..."
-                          accelerator="Alt+Shift+A"/>
-                <MenuItem onAction="#menuDirectoriesIndexAllDirectoriesAction" text="Index all directories"
-                          accelerator="Shortcut+I"/>
-                <MenuItem onAction="#menuDirectoriesIndexFavoriteDirectoriesAction" text="Index favorite directories"
-                          accelerator="Shortcut+Alt+I"/>
+                <MenuItem accelerator="Alt+A" onAction="#menuDirectoriesAddLocalDirectoryAction"
+                          text="Add local directory..."/>
+                <MenuItem accelerator="Alt+Shift+A" onAction="#menuDirectoriesAddPinterestBoardAction"
+                          text="Add Pinterest board..."/>
+                <MenuItem accelerator="Shortcut+I" onAction="#menuDirectoriesIndexAllDirectoriesAction"
+                          text="Index all directories"/>
+                <MenuItem accelerator="Shortcut+Alt+I" onAction="#menuDirectoriesIndexFavoriteDirectoriesAction"
+                          text="Index favorite directories"/>
                 <MenuItem onAction="#menuDirectoriesOpenTargetDirectoryAction" text="Open Target Directory"/>
             </Menu>
             <Menu text="Tools">
-                <MenuItem onAction="#menuToolsDuplicateScannerAction" text="Duplicate Scanner..." accelerator="Shortcut+D"/>
+                <MenuItem accelerator="Shortcut+D" onAction="#menuToolsDuplicateScannerAction"
+                          text="Duplicate Scanner..."/>
                 <MenuItem onAction="#menuToolsGenerateMissingHashesAction" text="Generate missing hashes..."/>
                 <MenuItem onAction="#menuToolsAllDeleteHashesAction" text="Delete all hashes..."/>
             </Menu>
         </MenuBar>
     </top>
     <center>
-        <DirectoryTreeTableView fx:id="directoriesTableView" BorderPane.alignment="CENTER"
-                                stylesheets="@/nl/juraji/imagemanager/fxml/css/tree-table-default.css" onMouseClicked="#directoriesTableViewMouseClickedAction">
+        <DirectoryTreeTableView fx:id="directoriesTableView" onMouseClicked="#directoriesTableViewMouseClickedAction"
+                                stylesheets="@/nl/juraji/imagemanager/fxml/css/tree-table-default.css"
+                                BorderPane.alignment="CENTER">
             <columns>
                 <TreeTableColumn prefWidth="390.0" text="Name">
                     <cellValueFactory>
@@ -72,4 +74,10 @@
             </columns>
         </DirectoryTreeTableView>
     </center>
+    <bottom>
+        <ToolBar prefHeight="20.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <Label text="Total images:"/>
+            <Label fx:id="totalImagesStatusLabel" text="0"/>
+        </ToolBar>
+    </bottom>
 </BorderPane>

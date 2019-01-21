@@ -3,6 +3,7 @@ package nl.juraji.imagemanager.fxml;
 import io.ebean.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseButton;
@@ -45,10 +46,12 @@ import java.util.stream.Collectors;
 public class MainWindow extends Controller implements Initializable {
 
     public DirectoryTreeTableView directoriesTableView;
+    public Label totalImagesStatusLabel;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         directoriesTableView.loadDirectoryTrees();
+        totalImagesStatusLabel.textProperty().bind(directoriesTableView.totalImagesProperty().asString());
     }
 
     public void menuSystemSettingsAction() {
