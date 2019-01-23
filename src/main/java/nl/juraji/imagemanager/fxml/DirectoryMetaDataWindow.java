@@ -9,8 +9,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 import nl.juraji.imagemanager.fxml.controls.MetaDataLabel;
 import nl.juraji.imagemanager.fxml.dialogs.MoveMetaDataDialog;
 import nl.juraji.imagemanager.fxml.dialogs.WorkDialog;
@@ -24,10 +23,8 @@ import nl.juraji.imagemanager.tasks.pinterest.DeletePinTask;
 import nl.juraji.imagemanager.util.DesktopUtils;
 import nl.juraji.imagemanager.util.FileUtils;
 import nl.juraji.imagemanager.util.StringUtils;
-import nl.juraji.imagemanager.util.fxml.AlertBuilder;
-import nl.juraji.imagemanager.util.fxml.Controller;
-import nl.juraji.imagemanager.util.fxml.FXMLStage;
-import nl.juraji.imagemanager.util.fxml.OptionDialogBuilder;
+import nl.juraji.imagemanager.util.fxml.ContextMenuBuilder;
+import nl.juraji.imagemanager.util.fxml.*;
 import nl.juraji.imagemanager.util.types.NullSafeBinding;
 import nl.juraji.imagemanager.util.types.ValueListener;
 
@@ -36,6 +33,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -46,7 +44,6 @@ import java.util.stream.Collectors;
  */
 public class DirectoryMetaDataWindow extends Controller implements Initializable {
 
-    private final Image checkImage = new Image("/nl/juraji/imagemanager/images/check.png", true);
     private final SimpleObjectProperty<BaseDirectory> directory = new SimpleObjectProperty<>();
     private final SimpleListProperty<MetaDataLabel> metaDataLabels = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final FilteredList<MetaDataLabel> filteredMetaDataLabels = new FilteredList<>(metaDataLabels, s -> true);
@@ -54,19 +51,16 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
             .withZone(ZoneId.systemDefault());
     private NullSafeBinding<BaseMetaData> selectedMetaData;
 
-    public VBox actionButtonContainer;
     public Label directoryNameLabel;
     public Label imageCountLabel;
     public Label originLabel;
     public TextField searchTextField;
     public ListView<MetaDataLabel> metaDataListView;
-    public BorderPane imageViewContainer;
     public ImageView imageView;
+    public StackPane imageViewContainer;
     public Label localPathLabel;
     public Label dimensionsLabel;
     public Label downloadedOnLabel;
-    public TextArea commentsTextArea;
-    public ImageView hashCreatedImageView;
     public MenuButton metaDataOptionsMenu;
 
     public void setDirectory(BaseDirectory directory) {
@@ -76,13 +70,9 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
     @Override
     @SuppressWarnings("unchecked")
     public void initialize(URL location, ResourceBundle resources) {
-        commentsTextArea.setWrapText(true);
-
         final MultipleSelectionModel<MetaDataLabel> selectionModel = metaDataListView.getSelectionModel();
         selectionModel.setSelectionMode(SelectionMode.MULTIPLE);
         selectionModel.clearSelection();
-        imageView.fitWidthProperty().bind(imageViewContainer.widthProperty());
-        imageView.fitHeightProperty().bind(imageViewContainer.heightProperty());
         selectedMetaData = NullSafeBinding.create(() ->
                         selectionModel.selectedItemProperty().get().getMetaData(),
                 selectionModel.selectedItemProperty());
@@ -125,6 +115,9 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
         this.metaDataListView.setItems(filteredMetaDataLabels);
 
         // Bind metadata list selection to update view logic
+        imageView.fitWidthProperty().bind(imageViewContainer.widthProperty().subtract(20));
+        imageView.fitHeightProperty().bind(imageViewContainer.heightProperty().subtract(20));
+
         final NullSafeBinding<Image> imageBinding = NullSafeBinding.create(() ->
                 new Image(selectedMetaData.get().getPath().toUri().toString(), true), selectedMetaData);
         imageView.imageProperty().bind(imageBinding);
@@ -144,40 +137,25 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
                 dateTimeFormatter.format(selectedMetaData.get().getCreated()), selectedMetaData);
         downloadedOnLabel.textProperty().bind(downloadedOnBinding);
 
-        selectedMetaData.addListener((ValueListener<BaseMetaData>) metaData -> {
-            if (metaData == null) {
-                commentsTextArea.setText(null);
-            } else {
-                commentsTextArea.setText(metaData.getComments());
-            }
-        });
-        commentsTextArea.disableProperty().bind(selectedMetaData.isNull());
-
-        final NullSafeBinding<Image> hashPresentBinding = NullSafeBinding.create(() ->
-                selectedMetaData.get().getHash() == null ? null : checkImage, selectedMetaData);
-        hashCreatedImageView.imageProperty().bind(hashPresentBinding);
-
-        actionButtonContainer.getChildren().forEach(node ->
-                node.disableProperty().bind(selectedMetaData.isNull()));
-
         NullSafeBinding.create(directory::get, directory).addListener((ValueListener<BaseDirectory>) d -> {
-            // If directory is a PinterestBoard
-            // Add actions to options menu related to pins
-            final ObservableList<MenuItem> optionsMenuItems = metaDataOptionsMenu.getItems();
-            optionsMenuItems.clear();
-
-            final MenuItem openInViewer = new MenuItem("Open in viewer");
-            openInViewer.setOnAction(e -> this.openInViewerAction());
-            optionsMenuItems.add(openInViewer);
+            final ContextMenuBuilder<BaseDirectory> contextMenuBuilder = ContextMenuBuilder.build(d)
+                    .appendItem("Open in viewer", this::openInViewerAction, Objects::isNull)
+                    .appendItem("Open directory", this::openDirectoryAction, Objects::isNull);
 
             if (d instanceof PinterestBoard) {
-                final MenuItem openPinInPinterest = new MenuItem("Open pin in Pinterest");
-                openPinInPinterest.setOnAction(e -> this.openPinInPinterestAction());
-                optionsMenuItems.add(openPinInPinterest);
-                final MenuItem openBoardInPinterest = new MenuItem("Open board in Pinterest");
-                openBoardInPinterest.setOnAction(e -> this.openBoardInPinterestAction());
-                optionsMenuItems.add(openBoardInPinterest);
+                // If directory is a PinterestBoard
+                // Add actions to options menu related to pins
+                contextMenuBuilder
+                        .appendItem("Open pin in Pinterest", this::openPinInPinterestAction, Objects::isNull)
+                        .appendItem("Open board in Pinterest", this::openBoardInPinterestAction, Objects::isNull);
             }
+
+            contextMenuBuilder
+                    .appendItem("Move selected item(s)", this::moveAction)
+                    .appendItem("Delete selected item(s)", this::deleteAction);
+
+            metaDataOptionsMenu.getItems().clear();
+            metaDataOptionsMenu.getItems().addAll(contextMenuBuilder.getItems());
         });
     }
 
@@ -243,14 +221,6 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
 
     public void openDirectoryAction() {
         DesktopUtils.openFile(directory.get().getLocationOnDisk());
-    }
-
-    public void saveAction() {
-        final BaseMetaData metaData = selectedMetaData.get();
-        if (metaData != null) {
-            metaData.setComments(commentsTextArea.getText());
-            metaData.save();
-        }
     }
 
     public void moveAction() {

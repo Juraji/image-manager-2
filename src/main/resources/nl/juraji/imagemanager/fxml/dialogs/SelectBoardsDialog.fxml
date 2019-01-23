@@ -5,7 +5,7 @@
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
-<BorderPane prefHeight="768.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
+<BorderPane prefHeight="800.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="nl.juraji.imagemanager.fxml.dialogs.SelectBoardsDialog">
     <top>
         <VBox BorderPane.alignment="CENTER">

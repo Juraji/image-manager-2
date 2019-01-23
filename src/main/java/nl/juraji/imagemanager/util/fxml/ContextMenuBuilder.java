@@ -42,6 +42,18 @@ public final class ContextMenuBuilder<T> {
      *
      * @param label         Menu item label
      * @param onActionEvent Action when menu item activated
+     * @param disable       When true this action will be disabled
+     * @return this
+     */
+    public ContextMenuBuilder<T> appendItem(String label, Runnable onActionEvent, Predicate<T> disable) {
+        return appendItem(label, t -> onActionEvent.run(), disable);
+    }
+
+    /**
+     * Append a menu item with post event runnable
+     *
+     * @param label         Menu item label
+     * @param onActionEvent Action when menu item activated
      * @return this
      */
     public ContextMenuBuilder<T> appendItem(String label, Consumer<T> onActionEvent) {
