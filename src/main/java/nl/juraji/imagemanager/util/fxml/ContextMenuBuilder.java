@@ -1,5 +1,6 @@
 package nl.juraji.imagemanager.util.fxml;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -45,7 +46,7 @@ public final class ContextMenuBuilder<T> {
      * @param disable       When true this action will be disabled
      * @return this
      */
-    public ContextMenuBuilder<T> appendItem(String label, Runnable onActionEvent, Predicate<T> disable) {
+    public ContextMenuBuilder<T> appendItem(String label, Runnable onActionEvent, BooleanBinding disable) {
         return appendItem(label, t -> onActionEvent.run(), disable);
     }
 
@@ -72,6 +73,23 @@ public final class ContextMenuBuilder<T> {
         MenuItem menuItem = new MenuItem(label);
         menuItem.setOnAction(e -> onActionEvent.accept(subject));
         menuItem.setDisable(disable.test(subject));
+
+        this.contextMenu.getItems().add(menuItem);
+        return this;
+    }
+
+    /**
+     * Append a menu item with post event runnable
+     *
+     * @param label         Menu item label
+     * @param onActionEvent Action when menu item activated
+     * @param disable       When true this action will be disabled
+     * @return this
+     */
+    public ContextMenuBuilder<T> appendItem(String label, Consumer<T> onActionEvent, BooleanBinding disable) {
+        MenuItem menuItem = new MenuItem(label);
+        menuItem.setOnAction(e -> onActionEvent.accept(subject));
+        menuItem.disableProperty().bind(disable);
 
         this.contextMenu.getItems().add(menuItem);
         return this;

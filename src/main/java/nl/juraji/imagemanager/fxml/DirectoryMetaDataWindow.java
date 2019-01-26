@@ -1,5 +1,7 @@
 package nl.juraji.imagemanager.fxml;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -11,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import nl.juraji.imagemanager.fxml.controls.MetaDataLabel;
+import nl.juraji.imagemanager.fxml.dialogs.EditMetaDataDialog;
 import nl.juraji.imagemanager.fxml.dialogs.MoveMetaDataDialog;
 import nl.juraji.imagemanager.fxml.dialogs.WorkDialog;
 import nl.juraji.imagemanager.model.domain.BaseDirectory;
@@ -33,7 +36,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Comparator;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -137,22 +139,29 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
                 dateTimeFormatter.format(selectedMetaData.get().getCreated()), selectedMetaData);
         downloadedOnLabel.textProperty().bind(downloadedOnBinding);
 
+        final BooleanBinding selectionEmptyBinding = Bindings.createBooleanBinding(() ->
+                        metaDataListView.getSelectionModel().isEmpty(),
+                metaDataListView.getSelectionModel().getSelectedItems());
+        final BooleanBinding multipleSelectedBinding = Bindings.createBooleanBinding(() ->
+                        metaDataListView.getSelectionModel().getSelectedItems().size() > 1,
+                metaDataListView.getSelectionModel().getSelectedItems());
         NullSafeBinding.create(directory::get, directory).addListener((ValueListener<BaseDirectory>) d -> {
             final ContextMenuBuilder<BaseDirectory> contextMenuBuilder = ContextMenuBuilder.build(d)
-                    .appendItem("Open in viewer", this::openInViewerAction, Objects::isNull)
-                    .appendItem("Open directory", this::openDirectoryAction, Objects::isNull);
+                    .appendItem("Open in viewer", this::openInViewerAction, selectionEmptyBinding.or(multipleSelectedBinding))
+                    .appendItem("Open directory", this::openDirectoryAction, selectionEmptyBinding);
 
             if (d instanceof PinterestBoard) {
                 // If directory is a PinterestBoard
                 // Add actions to options menu related to pins
                 contextMenuBuilder
-                        .appendItem("Open pin in Pinterest", this::openPinInPinterestAction, Objects::isNull)
-                        .appendItem("Open board in Pinterest", this::openBoardInPinterestAction, Objects::isNull);
+                        .appendItem("Open pin in Pinterest", this::openPinInPinterestAction, selectionEmptyBinding.or(multipleSelectedBinding))
+                        .appendItem("Open board in Pinterest", this::openBoardInPinterestAction, selectionEmptyBinding);
             }
 
             contextMenuBuilder
-                    .appendItem("Move selected item(s)", this::moveAction)
-                    .appendItem("Delete selected item(s)", this::deleteAction);
+                    .appendItem("Edit meta data", this::editMetaDataAction, selectionEmptyBinding.or(multipleSelectedBinding))
+                    .appendItem("Move selected item(s)", this::moveAction, selectionEmptyBinding)
+                    .appendItem("Delete selected item(s)", this::deleteAction, selectionEmptyBinding);
 
             metaDataOptionsMenu.getItems().clear();
             metaDataOptionsMenu.getItems().addAll(contextMenuBuilder.getItems());
@@ -221,6 +230,19 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
 
     public void openDirectoryAction() {
         DesktopUtils.openFile(directory.get().getLocationOnDisk());
+    }
+
+    private void editMetaDataAction() {
+        final MultipleSelectionModel<MetaDataLabel> selectionModel = metaDataListView.getSelectionModel();
+        final MetaDataLabel selectedItem = selectionModel.getSelectedItem();
+
+        if (selectedItem != null) {
+            final FXMLStage<EditMetaDataDialog> fxmlStage = Controller.init(EditMetaDataDialog.class, "Edit meta data", getStage());
+            final EditMetaDataDialog controller = fxmlStage.getController();
+
+            controller.setMetaData(selectedItem.getMetaData());
+            fxmlStage.show();
+        }
     }
 
     public void moveAction() {

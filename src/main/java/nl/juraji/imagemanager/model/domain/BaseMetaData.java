@@ -12,7 +12,6 @@ import java.nio.file.Path;
 @MappedSuperclass
 public abstract class BaseMetaData extends BaseModel {
 
-    @SuppressWarnings("JpaAttributeTypeInspection")
     @Column(length = 2048)
     private Path path;
 

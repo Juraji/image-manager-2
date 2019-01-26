@@ -3,11 +3,13 @@ package nl.juraji.imagemanager.util.fxml;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Created by Juraji on 1-12-2018.
@@ -36,6 +38,10 @@ public abstract class Controller {
         this.onClose = onClose;
     }
 
+    public void initAccelerators(Map<KeyCombination, Runnable> accelerators) {
+        accelerators.put(KeyCombination.keyCombination("ESC"), this::close);
+    }
+
     public static <T extends Controller> FXMLStage<T> initStage(Class<T> controllerClass, String title, Stage stage) {
         try {
             final String fxmlName = '/' + controllerClass.getName()
@@ -50,6 +56,7 @@ public abstract class Controller {
             stage.getIcons().add(FXMLUtils.getApplicationIcon());
 
             controller.setStage(stage);
+            controller.initAccelerators(stage.getScene().getAccelerators());
 
             return new FXMLStage<>(controller, stage);
         } catch (IOException e) {
