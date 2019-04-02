@@ -9,8 +9,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class AtomicString extends AtomicReference<String> {
     public boolean equals(String otherString) {
         final String thisString = this.get();
-        return thisString != null
-                && otherString != null
-                && thisString.equals(otherString);
+        return thisString != null && thisString.equals(otherString);
     }
 }

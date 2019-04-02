@@ -11,6 +11,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import nl.juraji.imagemanager.fxml.controls.MetaDataLabel;
 import nl.juraji.imagemanager.fxml.dialogs.EditMetaDataDialog;
@@ -23,6 +25,7 @@ import nl.juraji.imagemanager.model.domain.pinterest.PinMetaData;
 import nl.juraji.imagemanager.model.domain.pinterest.PinterestBoard;
 import nl.juraji.imagemanager.tasks.DeleteMetaDataTask;
 import nl.juraji.imagemanager.tasks.pinterest.DeletePinTask;
+import nl.juraji.imagemanager.util.DateUtils;
 import nl.juraji.imagemanager.util.DesktopUtils;
 import nl.juraji.imagemanager.util.FileUtils;
 import nl.juraji.imagemanager.util.StringUtils;
@@ -32,9 +35,6 @@ import nl.juraji.imagemanager.util.types.NullSafeBinding;
 import nl.juraji.imagemanager.util.types.ValueListener;
 
 import java.net.URL;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.Comparator;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -49,8 +49,6 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
     private final SimpleObjectProperty<BaseDirectory> directory = new SimpleObjectProperty<>();
     private final SimpleListProperty<MetaDataLabel> metaDataLabels = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final FilteredList<MetaDataLabel> filteredMetaDataLabels = new FilteredList<>(metaDataLabels, s -> true);
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG)
-            .withZone(ZoneId.systemDefault());
     private NullSafeBinding<BaseMetaData> selectedMetaData;
 
     public Label directoryNameLabel;
@@ -136,7 +134,7 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
         dimensionsLabel.textProperty().bind(dimensionsBinding);
 
         final NullSafeBinding<String> downloadedOnBinding = NullSafeBinding.create(() ->
-                dateTimeFormatter.format(selectedMetaData.get().getCreated()), selectedMetaData);
+                DateUtils.formatDefault(selectedMetaData.get().getCreated()), selectedMetaData);
         downloadedOnLabel.textProperty().bind(downloadedOnBinding);
 
         final BooleanBinding selectionEmptyBinding = Bindings.createBooleanBinding(() ->
@@ -230,6 +228,12 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
 
     public void openDirectoryAction() {
         DesktopUtils.openFile(directory.get().getLocationOnDisk());
+    }
+
+    public void editMetaDataMouseAction(MouseEvent event) {
+        if(event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+            this.editMetaDataAction();
+        }
     }
 
     private void editMetaDataAction() {

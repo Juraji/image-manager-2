@@ -9,6 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.FileChooser;
 import nl.juraji.imagemanager.model.domain.BaseMetaData;
+import nl.juraji.imagemanager.util.DateUtils;
 import nl.juraji.imagemanager.util.FileUtils;
 import nl.juraji.imagemanager.util.fxml.Controller;
 import nl.juraji.imagemanager.util.types.ValueListener;
@@ -29,6 +30,8 @@ public class EditMetaDataDialog extends Controller implements Initializable {
     public Label dimensionsLabel;
     public Label fileSizeLabel;
     public Label qualityRatingLabel;
+    public Label downloadedOnLabel;
+    public Label hashCreatedLabel;
     public TextField pathTextField;
     public TextArea commentsTextArea;
     public Button saveButton;
@@ -43,6 +46,8 @@ public class EditMetaDataDialog extends Controller implements Initializable {
             dimensionsLabel.setText(md.getWidth() + "x" + md.getHeight());
             fileSizeLabel.setText(FileUtils.getHumanReadableSize(md.getFileSize()));
             qualityRatingLabel.setText(String.valueOf(md.getQualityRating()));
+            downloadedOnLabel.setText(DateUtils.formatDefault(md.getCreated()));
+            hashCreatedLabel.setText(md.getHash() != null ? "Yes" : "No");
 
             pathTextField.setText(md.getPath().toString());
             commentsTextArea.setText(md.getComments());
