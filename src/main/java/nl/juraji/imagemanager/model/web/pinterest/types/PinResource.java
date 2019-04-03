@@ -1,5 +1,7 @@
 package nl.juraji.imagemanager.model.web.pinterest.types;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -18,8 +20,10 @@ public class PinResource {
     @SerializedName("link")
     private String link;
 
+    // Set as JsonElement, since the Pinterest APi sometimes returns
+    // an object with formatting options
     @SerializedName("title")
-    private String title;
+    private JsonElement title;
 
     @SerializedName("description")
     private String description;
@@ -40,7 +44,15 @@ public class PinResource {
     }
 
     public String getTitle() {
-        return title;
+        if (this.title != null) {
+            final JsonPrimitive primitive = this.title.getAsJsonPrimitive();
+
+            if (primitive.isString()) {
+                return primitive.getAsString();
+            }
+        }
+
+        return null;
     }
 
     public String getDescription() {
