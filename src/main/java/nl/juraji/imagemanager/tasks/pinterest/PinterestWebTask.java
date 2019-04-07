@@ -37,7 +37,6 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
 
     private final String username;
     private final String password;
-    private final String userProfileName;
     private final String originalMessage;
     private RemoteWebDriver driver;
 
@@ -50,7 +49,6 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
 
         try {
             this.username = settings.getUsername();
-            this.userProfileName = username.split("@")[0];
             this.password = settings.getPassword();
             this.originalMessage = this.getMessage();
         } catch (Exception e) {
@@ -72,7 +70,11 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
     }
 
     protected String getUserProfileName() {
-        return userProfileName;
+        // Use the profile link tag to extrapolate the sanitized username
+        // (There could be special characters we don't know about)
+        final WebElement profileLinkTag = getElementBy(By.xpath("//*[@id=\"HeaderContent\"]/div[1]/div/div[2]/div/div/div[3]/div[3]/div/div/div/div/div/a"));
+        final String relProfileLink = profileLinkTag.getAttribute("href");
+        return relProfileLink.substring(25, relProfileLink.length() - 1);
     }
 
     protected String getCSRFToken() {

@@ -39,12 +39,12 @@ public class BoardsResourceRequest extends ResourceRequest<BoardsResourceResult>
     public BoardsResourceRequest(String username) {
         super("/_ngjs/resource/BoardsResource/get/", BoardsResourceResult.class);
         this.username = username;
-        this.isPrefetch = true;
+        this.isPrefetch = false;
         this.privacyFilter = "all";
         this.sort = "alphabetical";
         this.fieldSetKey = "profile_grid_item";
         this.pageSize = 500;
-        this.groupBy = "visibility";
+        this.groupBy = "mix_public_private";
         this.includeArchived = true;
         this.reduxNormalizeFeed = true;
     }
