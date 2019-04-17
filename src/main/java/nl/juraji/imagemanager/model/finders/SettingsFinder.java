@@ -1,7 +1,6 @@
 package nl.juraji.imagemanager.model.finders;
 
 import io.ebean.Finder;
-import nl.juraji.imagemanager.model.domain.settings.PinterestSettings;
 import nl.juraji.imagemanager.model.domain.settings.Settings;
 
 import java.nio.file.Paths;
@@ -36,9 +35,6 @@ public class SettingsFinder extends Finder<UUID, Settings> {
         final Settings settings = new Settings();
         settings.setDuplicateScannerMinSimilarity(82);
         settings.setDefaultTargetDirectory(Paths.get(System.getProperty("user.home")));
-
-        // To initialize the object
-        settings.setPinterestSettings(new PinterestSettings());
 
         settings.save();
         return settings;

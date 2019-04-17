@@ -2,14 +2,15 @@ package nl.juraji.imagemanager.fxml;
 
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
-import nl.juraji.imagemanager.model.domain.settings.PinterestSettings;
+import nl.juraji.imagemanager.fxml.dialogs.WorkDialog;
 import nl.juraji.imagemanager.model.domain.settings.Settings;
 import nl.juraji.imagemanager.model.finders.SettingsFinder;
+import nl.juraji.imagemanager.tasks.pinterest.PinterestLoginTask;
 import nl.juraji.imagemanager.util.StringUtils;
+import nl.juraji.imagemanager.util.fxml.AlertBuilder;
 import nl.juraji.imagemanager.util.fxml.Controller;
 
 import java.io.File;
@@ -28,8 +29,6 @@ public class SettingsWindow extends Controller implements Initializable {
     public Slider duplicateScannerMinSimilaritySlider;
     public Label duplicateScannerMinSimilarityLabel;
     public TextField defaultTargetDirectoryTextField;
-    public TextField pinterestUsernameTextField;
-    public PasswordField pinterestPasswordField;
 
     public SettingsWindow() {
         this.settings = SettingsFinder.getSettings();
@@ -42,15 +41,30 @@ public class SettingsWindow extends Controller implements Initializable {
         duplicateScannerMinSimilaritySlider.setValue(settings.getDuplicateScannerMinSimilarity());
         defaultTargetDirectoryTextField.setText(settings.getDefaultTargetDirectory().toString());
 
-        // Pinterest Settings
-        final PinterestSettings pinterestSettings = settings.getPinterestSettings();
-        pinterestUsernameTextField.setText(pinterestSettings.getUsername());
-
-        if (pinterestSettings.getPassword() != null) {
-            pinterestPasswordField.setText(DUMMY_PASSWORD);
-        }
 
         duplicateScannerMinSimilarityLabel.textProperty().bind(duplicateScannerMinSimilaritySlider.valueProperty().asString("%.0f%%"));
+    }
+
+    public void runPinterestLogin() {
+        if (PinterestLoginTask.preTaskCheck(getStage())) {
+            final WorkDialog<Boolean> dialog = new WorkDialog<>(getStage());
+
+            dialog.addTaskEndNotification(success -> {
+                if (success) {
+                    AlertBuilder.info(getStage())
+                            .withTitle("Login success")
+                            .withMessage("Pinterest authentication successful!")
+                            .show();
+                } else {
+                    AlertBuilder.warning(getStage())
+                            .withTitle("Login failed")
+                            .withMessage("Pinterest authentication failed! Be sure to not close the browser window, it will close by itself.")
+                            .show();
+                }
+            });
+
+            dialog.exec(new PinterestLoginTask(), true);
+        }
     }
 
     public void browseDefaultTargetDirectory() {
@@ -80,20 +94,6 @@ public class SettingsWindow extends Controller implements Initializable {
         final String defaultTargetDirectory = defaultTargetDirectoryTextField.getText();
         if (StringUtils.isNotEmpty(defaultTargetDirectory)) {
             settings.setDefaultTargetDirectory(Paths.get(defaultTargetDirectory));
-            doPersist = true;
-        }
-
-        // Pinterest settings
-        final PinterestSettings pinterestSettings = settings.getPinterestSettings();
-        final String pinterestUsername = pinterestUsernameTextField.getText();
-        if (StringUtils.isNotEmpty(pinterestUsername)) {
-            pinterestSettings.setUsername(pinterestUsername);
-            doPersist = true;
-        }
-
-        final String pinterestPassword = pinterestPasswordField.getText();
-        if (StringUtils.isNotEmpty(pinterestPassword) && !DUMMY_PASSWORD.equals(pinterestPassword)) {
-            pinterestSettings.setPassword(pinterestPassword);
             doPersist = true;
         }
 

@@ -26,6 +26,26 @@ public class WebCookieFinder extends Finder<UUID, WebCookie> {
     }
 
     /**
+     * Find a specific cookie for a root domain
+     *
+     * @param rootDomain The root domain, usually the website address
+     * @param name       The name of the cookie to retrieve
+     * @return The corresponding WebCookie (if valid)
+     */
+    public boolean cookieValueEquals(String rootDomain, String name, String value) {
+        final WebCookie cookie = this.query().where()
+                .endsWith("rootDomain", rootDomain)
+                .eq("name", name)
+                .or(
+                        Expr.isNull("expiry"),
+                        Expr.gt("expiry", new Date())
+                )
+                .findOne();
+
+        return cookie != null && value.equals(cookie.getValue());
+    }
+
+    /**
      * Find cookies for a root domain
      *
      * @param rootDomain The root domain, usually the website address
@@ -68,5 +88,11 @@ public class WebCookieFinder extends Finder<UUID, WebCookie> {
         }
 
         this.db().saveAll(updatedCookies);
+    }
+
+    public void deleteCookies(String rootDomain) {
+        this.query().where()
+                .endsWith("rootDomain", rootDomain)
+                .delete();
     }
 }

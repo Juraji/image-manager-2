@@ -50,18 +50,14 @@
                         </columnConstraints>
                         <rowConstraints>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+                            <RowConstraints/>
                         </rowConstraints>
-
-                        <Label text="Pinterest username"/>
-                        <Label text="Pinterest password" GridPane.rowIndex="1"/>
-                        <Label text="Default target directory" GridPane.rowIndex="2"/>
-                        <TextField fx:id="pinterestUsernameTextField" GridPane.columnIndex="1"/>
-                        <PasswordField fx:id="pinterestPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                        <TextField fx:id="defaultTargetDirectoryTextField" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        <Button mnemonicParsing="false" text="Log in on Pinterest" onAction="#runPinterestLogin"/>
+                        <Label text="Default target directory" GridPane.rowIndex="1"/>
+                        <TextField fx:id="defaultTargetDirectoryTextField" GridPane.columnIndex="1"
+                                   GridPane.rowIndex="1"/>
                         <Button mnemonicParsing="false" onAction="#browseDefaultTargetDirectory" text="Browse..."
-                                GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                                GridPane.columnIndex="2" GridPane.rowIndex="1"/>
                     </GridPane>
                 </AnchorPane>
             </TitledPane>

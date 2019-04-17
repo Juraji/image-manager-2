@@ -1,9 +1,7 @@
 package nl.juraji.imagemanager.tasks.pinterest;
 
 import com.google.gson.Gson;
-import nl.juraji.imagemanager.model.domain.settings.PinterestSettings;
 import nl.juraji.imagemanager.model.domain.settings.WebCookie;
-import nl.juraji.imagemanager.model.finders.SettingsFinder;
 import nl.juraji.imagemanager.model.finders.WebCookieFinder;
 import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceRequest;
 import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceResult;
@@ -33,10 +31,8 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
     private static final long WEB_DRIVER_TIMEOUT_SEC = 2;
     private static final long WEB_DRIVER_SLEEP_MILLIS = 500;
 
-    protected static final URI PINTEREST_BASE_URI = URI.create("https://pinterest.com");
+    public static final URI PINTEREST_BASE_URI = URI.create("https://pinterest.com");
 
-    private final String username;
-    private final String password;
     private final String originalMessage;
     private RemoteWebDriver driver;
 
@@ -45,11 +41,7 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
     public PinterestWebTask(String message, Object... params) {
         super(message, params);
 
-        final PinterestSettings settings = SettingsFinder.getSettings().getPinterestSettings();
-
         try {
-            this.username = settings.getUsername();
-            this.password = settings.getPassword();
             this.originalMessage = this.getMessage();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -63,10 +55,6 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
 
         // Return the WebDriver instance to the pool
         WebDriverPool.returnDriver(driver);
-    }
-
-    protected String getUsername() {
-        return username;
     }
 
     protected String getUserProfileName() {
@@ -98,21 +86,8 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
             this.driver.get(pinterestHomeUri);
 
             if (isUnAuthenticated()) {
-                logger.info("Driver: Not authenticated, logging in as {}", username);
-                super.updateMessage("Logging in as %s...", username);
-
-                WebElement usernameInput = getElementBy(By.xpath("//*[@id=\"email\"]"));
-                WebElement passwordInput = getElementBy(By.xpath("//*[@id=\"password\"]"));
-                WebElement loginButton = getElementBy(By.className("SignupButton"));
-
-                if (usernameInput != null && passwordInput != null) {
-                    usernameInput.sendKeys(username);
-                    passwordInput.sendKeys(password);
-                    loginButton.click();
-
-                    getElementBy(By.className("gridCentered"));
-                    driver.get(pinterestHomeUri);
-                }
+                logger.info("Driver: Not authenticated!");
+                throw new Exception("Not authenticated on Pinterest");
             }
 
         }

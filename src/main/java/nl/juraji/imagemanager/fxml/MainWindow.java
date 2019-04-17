@@ -20,6 +20,7 @@ import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
 import nl.juraji.imagemanager.model.domain.pinterest.PinterestBoard;
 import nl.juraji.imagemanager.model.domain.settings.Settings;
 import nl.juraji.imagemanager.model.finders.SettingsFinder;
+import nl.juraji.imagemanager.model.finders.WebCookieFinder;
 import nl.juraji.imagemanager.tasks.DeleteHashesTask;
 import nl.juraji.imagemanager.tasks.ImportLocalDirectoryTask;
 import nl.juraji.imagemanager.tasks.IndexDirectoryTaskBuilder;
@@ -38,6 +39,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+
+import static nl.juraji.imagemanager.tasks.pinterest.PinterestWebTask.PINTEREST_BASE_URI;
 
 /**
  * Created by Juraji on 23-11-2018.
@@ -96,9 +99,8 @@ public class MainWindow extends Controller implements Initializable {
     }
 
     public void menuDirectoriesAddPinterestBoardAction(ActionEvent event) {
-        final Settings settings = SettingsFinder.getSettings();
-
-        if (settings.getPinterestSettings().isPinterestSetup()) {
+        final boolean isAuth = WebCookieFinder.find().cookieValueEquals(PINTEREST_BASE_URI.getHost(), "_auth", "1");
+        if (isAuth) {
             final WorkDialog<List<PinterestBoard>> wd = new WorkDialog<>(getStage());
 
             wd.addTaskEndNotification(boards -> {
@@ -129,8 +131,8 @@ public class MainWindow extends Controller implements Initializable {
             final Window window = ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
             AlertBuilder.warning(window)
                     .withTitle("Pinterest integration unavailable")
-                    .withMessage("You have not setup your Pinterest credentials yet.\n" +
-                            "Go to System -> Settings and supply a username and password to your Pinterest profile.")
+                    .withMessage("You have not setup Pinterest yet.\n" +
+                            "Go to System -> Settings and use the Pinterest login button to log in.")
                     .show();
         }
     }

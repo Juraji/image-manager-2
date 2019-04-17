@@ -25,14 +25,14 @@ public final class ChromeDriverFactory extends BasePooledObjectFactory<RemoteWeb
 
     private final ChromeOptions driverOptions;
 
-    public ChromeDriverFactory() {
+    public ChromeDriverFactory(boolean headless) {
         final WebDriverManager driverManager = WebDriverManager.chromedriver();
         driverManager.targetPath("./");
         driverManager.setup();
 
         this.driverOptions = new ChromeOptions();
         this.driverOptions.addArguments("--window-size=1024,768");
-        this.driverOptions.setHeadless(!Main.isDebugMode());
+        this.driverOptions.setHeadless(!Main.isDebugMode() || headless);
 
         final LoggingPreferences loggingPreferences = new LoggingPreferences();
         loggingPreferences.enable(LogType.BROWSER, Level.WARNING);

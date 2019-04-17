@@ -18,9 +18,6 @@ public class Settings extends BaseModel {
     @Column
     private int duplicateScannerMinSimilarity;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private PinterestSettings pinterestSettings;
-
     public Path getDefaultTargetDirectory() {
         return defaultTargetDirectory;
     }
@@ -35,13 +32,5 @@ public class Settings extends BaseModel {
 
     public void setDuplicateScannerMinSimilarity(int duplicateScannerMinimalSimilarity) {
         this.duplicateScannerMinSimilarity = duplicateScannerMinimalSimilarity;
-    }
-
-    public PinterestSettings getPinterestSettings() {
-        return pinterestSettings;
-    }
-
-    public void setPinterestSettings(PinterestSettings pinterestSettings) {
-        this.pinterestSettings = pinterestSettings;
     }
 }

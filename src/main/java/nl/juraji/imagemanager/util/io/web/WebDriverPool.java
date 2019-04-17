@@ -17,7 +17,7 @@ public final class WebDriverPool extends GenericObjectPool<RemoteWebDriver> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public WebDriverPool() {
-        super(new ChromeDriverFactory());
+        super(new ChromeDriverFactory(true));
         this.setBlockWhenExhausted(true);
         this.setMaxTotal(1);
         this.setTestOnBorrow(true);
@@ -42,6 +42,13 @@ public final class WebDriverPool extends GenericObjectPool<RemoteWebDriver> {
 
     public static void returnDriver(RemoteWebDriver driver) {
         INSTANCE.get().returnObject(driver);
+    }
+
+    public static void shutdown() {
+        final WebDriverPool pool = INSTANCE.get();
+        if (pool != null) {
+            pool.close();
+        }
     }
 
     @Override
