@@ -50,11 +50,13 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
 
     @Override
     protected void done() {
-        // Persist cookies
-        this.persistDriverCookies();
+        if (driver != null) {
+            // Persist cookies
+            this.persistDriverCookies();
 
-        // Return the WebDriver instance to the pool
-        WebDriverPool.returnDriver(driver);
+            // Return the WebDriver instance to the pool
+            WebDriverPool.returnDriver(driver);
+        }
     }
 
     protected String getUserProfileName() {
@@ -75,6 +77,10 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
 
         // Get a WebDriver instance from the pool
         this.driver = WebDriverPool.borrowDriver();
+
+        if (driver==null) {
+            throw new Exception("Failed requesting web driver instance from driver pool");
+        }
 
         if (this.driver.getCurrentUrl().equals("data:,")) {
             logger.info("Initializing driver for {}", PINTEREST_BASE_URI);
