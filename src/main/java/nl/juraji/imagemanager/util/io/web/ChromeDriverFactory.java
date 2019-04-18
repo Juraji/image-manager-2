@@ -32,7 +32,7 @@ public final class ChromeDriverFactory extends BasePooledObjectFactory<RemoteWeb
 
         this.driverOptions = new ChromeOptions();
         this.driverOptions.addArguments("--window-size=1024,768");
-        this.driverOptions.setHeadless(!Main.isDebugMode() || headless);
+        this.driverOptions.setHeadless(headless && !Main.isDebugMode());
 
         final LoggingPreferences loggingPreferences = new LoggingPreferences();
         loggingPreferences.enable(LogType.BROWSER, Level.WARNING);
