@@ -15,6 +15,11 @@ _That's it really_
   a. Double-clicking the JAR file (Which should have Java open and start it for you).  
   b. Opening your OS's terminal, browsing to the directory in which you placed the JAR file and issuing  
   `$ java -jar image-manager-2.x.x.jar`
+  
+### Updating an existing installation
+1. Download the latest version of the Image Manager JAR from [releases](https://github.com/Juraji/image-manager-2/releases).
+2. Replace the old JAR file with the newly downloaded JAR file
+3. Start Image Manager the same way as you did before, but using the new JAR file instead.
 
 ## Usage
 > I will implement a wiki for this, if people need it.  
