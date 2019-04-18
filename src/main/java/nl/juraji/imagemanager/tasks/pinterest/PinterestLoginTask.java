@@ -17,6 +17,7 @@ import static nl.juraji.imagemanager.tasks.pinterest.PinterestWebTask.PINTEREST_
  * Image Manager 2
  */
 public class PinterestLoginTask extends IndicatorTask<Boolean> {
+
     public PinterestLoginTask() {
         super("Authenticating on Pinterest...");
     }
@@ -45,8 +46,8 @@ public class PinterestLoginTask extends IndicatorTask<Boolean> {
 
     @Override
     protected Boolean call() throws Exception {
-        // Shutdown WebDriverPool (so it does not retain a session)
-        WebDriverPool.shutdown();
+        // Clear drivers in the web driver pool, so no session information is kept in memory
+        WebDriverPool.clearDrivers();
 
         // Delete any existing Pinterest cookies
         final String rootDomain = PINTEREST_BASE_URI.getHost();
