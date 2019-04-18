@@ -8,6 +8,7 @@ import javafx.stage.DirectoryChooser;
 import nl.juraji.imagemanager.fxml.dialogs.WorkDialog;
 import nl.juraji.imagemanager.model.domain.settings.Settings;
 import nl.juraji.imagemanager.model.finders.SettingsFinder;
+import nl.juraji.imagemanager.model.finders.WebCookieFinder;
 import nl.juraji.imagemanager.tasks.pinterest.PinterestLoginTask;
 import nl.juraji.imagemanager.util.StringUtils;
 import nl.juraji.imagemanager.util.fxml.AlertBuilder;
@@ -17,6 +18,8 @@ import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
+
+import static nl.juraji.imagemanager.tasks.pinterest.PinterestWebTask.PINTEREST_BASE_URI;
 
 /**
  * Created by Juraji on 27-11-2018.
@@ -46,7 +49,25 @@ public class SettingsWindow extends Controller implements Initializable {
     }
 
     public void runPinterestLogin() {
-        if (PinterestLoginTask.preTaskCheck(getStage())) {
+        // Check if already logged in:
+        boolean doLogin = !WebCookieFinder.find().cookieValueEquals(PINTEREST_BASE_URI.getHost(), "_auth", "1");
+
+        if (!doLogin) {
+            doLogin = AlertBuilder.confirm(getStage())
+                    .withTitle("Already authenticated")
+                    .withMessage("You have already successfully authenticated with Pinterest, would you like to authenticate with a different account?")
+                    .showAndWait();
+        }
+
+        if (doLogin) {
+            AlertBuilder.info(getStage())
+                    .withTitle("Alert")
+                    .withMessage("You will be presented with a browser to log on to your Pinterest account. " +
+                            "Do NOT close the browser, it will close automatically after you have successfully logged in.")
+                    .showAndWait();
+        }
+
+        if (doLogin) {
             final WorkDialog<Boolean> dialog = new WorkDialog<>(getStage());
 
             dialog.addTaskEndNotification(success -> {

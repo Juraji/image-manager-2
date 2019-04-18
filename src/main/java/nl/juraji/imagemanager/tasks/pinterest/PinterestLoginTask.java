@@ -22,28 +22,6 @@ public class PinterestLoginTask extends IndicatorTask<Boolean> {
         super("Authenticating on Pinterest...");
     }
 
-    public static boolean preTaskCheck(Window stage) {
-        // Check if already logged in:
-        boolean doLogin = !WebCookieFinder.find().cookieValueEquals(PINTEREST_BASE_URI.getHost(), "_auth", "1");
-
-        if (!doLogin) {
-            doLogin = AlertBuilder.confirm(stage)
-                    .withTitle("Already authenticated")
-                    .withMessage("You have already successfully authenticated with Pinterest, would you like to authenticate with a different account?")
-                    .showAndWait();
-        }
-
-        if (doLogin) {
-            AlertBuilder.info(stage)
-                    .withTitle("Alert")
-                    .withMessage("You will be presented with a browser to log on to your Pinterest account. " +
-                            "Do NOT close the browser, it will close automatically after you have succesfully logged in.")
-                    .showAndWait();
-        }
-
-        return doLogin;
-    }
-
     @Override
     protected Boolean call() throws Exception {
         // Clear drivers in the web driver pool, so no session information is kept in memory
