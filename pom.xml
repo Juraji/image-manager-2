@@ -19,6 +19,18 @@
     </repositories>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <!-- Fix Maven Sonar plugin version -->
+                    <!-- Sonar host and login should be defined in Maven settings.xml -->
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>3.6.0.1398</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <!-- Configure the compiler to use Java 8 -->
             <plugin>
