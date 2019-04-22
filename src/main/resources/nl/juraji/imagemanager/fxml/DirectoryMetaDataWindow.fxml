@@ -1,36 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ButtonBar?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
-<BorderPane prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nl.juraji.imagemanager.fxml.DirectoryMetaDataWindow">
+<BorderPane prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="nl.juraji.imagemanager.fxml.DirectoryMetaDataWindow">
     <top>
         <ButtonBar prefHeight="35.0" BorderPane.alignment="CENTER">
             <buttons>
                 <Label fx:id="directoryNameLabel" text="Directory name" ButtonBar.buttonData="LEFT">
                     <font>
-                        <Font size="18.0" />
+                        <Font size="18.0"/>
                     </font>
                 </Label>
-                <Label fx:id="imageCountLabel" text="Image count" ButtonBar.buttonData="LEFT" />
-                <Label fx:id="originLabel" text="source" ButtonBar.buttonData="LEFT" />
-                <MenuButton fx:id="metaDataOptionsMenu" mnemonicParsing="false" text="Options" />
+                <Label fx:id="imageCountLabel" text="Image count" ButtonBar.buttonData="LEFT"/>
+                <Label fx:id="originLabel" text="source" ButtonBar.buttonData="LEFT"/>
+                <MenuButton fx:id="metaDataOptionsMenu" mnemonicParsing="false" text="Options"/>
             </buttons>
             <padding>
-                <Insets left="5.0" right="5.0" />
+                <Insets left="5.0" right="5.0"/>
             </padding>
         </ButtonBar>
     </top>
@@ -38,31 +29,36 @@
         <SplitPane dividerPositions="0.3" BorderPane.alignment="CENTER">
             <BorderPane>
                 <top>
-                    <TextField fx:id="searchTextField" promptText="Search" BorderPane.alignment="CENTER" />
+                    <TextField fx:id="searchTextField" promptText="Search" BorderPane.alignment="CENTER"/>
                 </top>
                 <center>
                     <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" pannable="true">
-                        <ListView fx:id="metaDataListView" onMouseClicked="#editMetaDataMouseAction" prefHeight="200.0" prefWidth="200.0" />
+                        <ListView fx:id="metaDataListView" onMouseClicked="#editMetaDataMouseAction" prefHeight="200.0"
+                                  prefWidth="200.0"/>
                     </ScrollPane>
                 </center>
             </BorderPane>
-            <AnchorPane minHeight="0.0" minWidth="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                <StackPane fx:id="imageViewContainer" minHeight="0.0" minWidth="0.0" style="-fx-background-color: #333333;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane minHeight="0.0" minWidth="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                        AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <StackPane fx:id="imageViewContainer" minHeight="0.0" minWidth="0.0"
+                           style="-fx-background-color: #333333;" AnchorPane.bottomAnchor="0.0"
+                           AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true">
                         <effect>
-                            <DropShadow blurType="GAUSSIAN" color="#00000078" height="30.0" radius="14.5" width="30.0" />
+                            <DropShadow blurType="GAUSSIAN" color="#00000078" height="30.0" radius="14.5" width="30.0"/>
                         </effect>
                     </ImageView>
-                    <VBox maxHeight="0.0" prefWidth="400.0" style="-fx-background-color: rgba(0,0,0,.3);" StackPane.alignment="TOP_LEFT">
+                    <VBox maxHeight="0.0" prefWidth="400.0" style="-fx-background-color: rgba(0,0,0,.3);"
+                          StackPane.alignment="TOP_LEFT">
                         <StackPane.margin>
-                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                         </StackPane.margin>
                         <padding>
-                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                         </padding>
-                        <Label fx:id="localPathLabel" text="Path" textAlignment="RIGHT" textFill="WHITE" />
-                        <Label fx:id="dimensionsLabel" text="Dimensions" textFill="WHITE" />
-                        <Label fx:id="downloadedOnLabel" text="Downloaded on" textFill="WHITE" />
+                        <Label fx:id="localPathLabel" text="Path" textAlignment="RIGHT" textFill="WHITE"/>
+                        <Label fx:id="dimensionsLabel" text="Dimensions" textFill="WHITE"/>
+                        <Label fx:id="downloadedOnLabel" text="Downloaded on" textFill="WHITE"/>
                     </VBox>
                 </StackPane>
             </AnchorPane>

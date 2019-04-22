@@ -231,7 +231,7 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
     }
 
     public void editMetaDataMouseAction(MouseEvent event) {
-        if(event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+        if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
             this.editMetaDataAction();
         }
     }

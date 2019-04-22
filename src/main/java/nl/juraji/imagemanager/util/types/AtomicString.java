@@ -7,7 +7,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * Image Manager 2
  */
 public class AtomicString extends AtomicReference<String> {
-    public boolean equals(String otherString) {
+
+    public boolean equalsStr(String otherString) {
         final String thisString = this.get();
         return thisString != null && thisString.equals(otherString);
     }

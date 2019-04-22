@@ -14,7 +14,7 @@ public class MetaDataLabel extends Label {
     public MetaDataLabel(BaseMetaData metaData) {
         this.metaData = metaData;
 
-        if(metaData.getPath()!=null){
+        if (metaData.getPath() != null) {
             this.setText(metaData.getPath().getFileName().toString());
         } else {
             this.setText("**No file known**");

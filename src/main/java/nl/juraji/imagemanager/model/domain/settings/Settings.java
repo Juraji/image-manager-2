@@ -2,7 +2,8 @@ package nl.juraji.imagemanager.model.domain.settings;
 
 import nl.juraji.imagemanager.model.domain.BaseModel;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import java.nio.file.Path;
 
 /**

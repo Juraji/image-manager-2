@@ -1,8 +1,6 @@
 package nl.juraji.imagemanager.tasks.pinterest;
 
-import javafx.stage.Window;
 import nl.juraji.imagemanager.model.finders.WebCookieFinder;
-import nl.juraji.imagemanager.util.fxml.AlertBuilder;
 import nl.juraji.imagemanager.util.fxml.concurrent.IndicatorTask;
 import nl.juraji.imagemanager.util.io.web.ChromeDriverFactory;
 import nl.juraji.imagemanager.util.io.web.WebDriverPool;

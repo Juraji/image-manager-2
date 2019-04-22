@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by Juraji on 24-11-2018.
@@ -27,7 +28,7 @@ public final class FileUtils {
     }
 
     public static List<Path> getDirectoryFiles(Path directory, Collection<String> fileExtensions) {
-        final List<Path> files = listDirectoryChildren(directory, Files::isRegularFile);
+        final List<Path> files = listDirectoryChildren(directory, p -> p.toFile().isFile());
 
         if (fileExtensions == null) {
             return files;
@@ -39,20 +40,18 @@ public final class FileUtils {
     }
 
     public static List<Path> getDirectorySubDirectories(Path directory) {
-        return listDirectoryChildren(directory, Files::isDirectory);
+        return listDirectoryChildren(directory, p -> p.toFile().isDirectory());
     }
 
     private static List<Path> listDirectoryChildren(Path parent, Predicate<Path> filter) {
-        if (!Files.isDirectory(parent)) {
-            throw new RuntimeException(parent.toString() + " is not a directory");
-        }
-
-        try {
-            return Files.list(parent)
-                    .filter(filter)
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (parent.toFile().isDirectory()) {
+            try (Stream<Path> stream = Files.list(parent)) {
+                return stream
+                        .filter(filter)
+                        .collect(Collectors.toList());
+            } catch (IOException ignored) {
+                // Ignored exception
+            }
         }
 
         return new ArrayList<>();
@@ -60,7 +59,7 @@ public final class FileUtils {
 
     public static void delete(Path path) throws IOException {
         if (exists(path)) {
-            if (Files.isRegularFile(path)) {
+            if (path.toFile().isFile()) {
                 Files.deleteIfExists(path);
             } else {
                 Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -106,6 +105,6 @@ public final class FileUtils {
     }
 
     public static boolean exists(Path path) {
-        return path != null && Files.exists(path);
+        return path != null && path.toFile().exists();
     }
 }

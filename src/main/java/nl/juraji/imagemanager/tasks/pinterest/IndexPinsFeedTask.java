@@ -74,7 +74,7 @@ public abstract class IndexPinsFeedTask extends PinterestWebTask<Void> {
                     .forEach(fetchedPins::add);
 
             setProgress(fetchedPins.size());
-        } while (fetchedPins.size() < pinsToFetchCount && !bookmarkTemp.equals("-end-"));
+        } while (fetchedPins.size() < pinsToFetchCount && !bookmarkTemp.equalsStr("-end-"));
 
         logger.info("Fetched {} new pins for {}", fetchedPins.size(), board.getName());
         PinterestBoardsFinder.find().db().saveAll(fetchedPins);

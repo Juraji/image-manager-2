@@ -70,22 +70,22 @@
                     <test offset="4" type="belong" comparator="=">0xd0a1a0a</test>
                     <match-list>
                         <!--<match>-->
-                            <!--<mimetype>image/png</mimetype>-->
-                            <!--<extension>png</extension>-->
-                            <!--<description>%ld x</description>-->
-                            <!--<test offset="16" type="belong" comparator="="/>-->
+                        <!--<mimetype>image/png</mimetype>-->
+                        <!--<extension>png</extension>-->
+                        <!--<description>%ld x</description>-->
+                        <!--<test offset="16" type="belong" comparator="="/>-->
                         <!--</match>-->
                         <!--<match>-->
-                            <!--<mimetype>image/png</mimetype>-->
-                            <!--<extension>png</extension>-->
-                            <!--<description>%ld,</description>-->
-                            <!--<test offset="20" type="belong" comparator="="/>-->
+                        <!--<mimetype>image/png</mimetype>-->
+                        <!--<extension>png</extension>-->
+                        <!--<description>%ld,</description>-->
+                        <!--<test offset="20" type="belong" comparator="="/>-->
                         <!--</match>-->
                         <!--<match>-->
-                            <!--<mimetype>image/png</mimetype>-->
-                            <!--<extension>png</extension>-->
-                            <!--<description>%d-bit</description>-->
-                            <!--<test offset="24" type="byte" comparator="="/>-->
+                        <!--<mimetype>image/png</mimetype>-->
+                        <!--<extension>png</extension>-->
+                        <!--<description>%d-bit</description>-->
+                        <!--<test offset="24" type="byte" comparator="="/>-->
                         <!--</match>-->
                         <match>
                             <mimetype>image/png</mimetype>

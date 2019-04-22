@@ -11,7 +11,8 @@
             <column name="modified" type="timestamp" notnull="true"/>
         </createTable>
         <addColumn tableName="settings">
-            <column name="pinterest_settings_id" type="uuid" uniqueOneToOne="uq_settings_pinterest_settings_id" references="pinterest_settings.id" foreignKeyName="fk_settings_pinterest_settings_id"/>
+            <column name="pinterest_settings_id" type="uuid" uniqueOneToOne="uq_settings_pinterest_settings_id"
+                    references="pinterest_settings.id" foreignKeyName="fk_settings_pinterest_settings_id"/>
         </addColumn>
     </changeSet>
     <changeSet type="pendingDrops">

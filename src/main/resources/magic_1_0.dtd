@@ -61,7 +61,7 @@
     </match-list>
 </match>
 -->
-<?xml encoding="UTF-8"?>
+        <?xml encoding="UTF-8"?>
 
         <!ELEMENT magic (info,match-list)>
         <!ATTLIST magic

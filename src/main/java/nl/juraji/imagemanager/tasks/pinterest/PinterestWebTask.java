@@ -78,7 +78,7 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
         // Get a WebDriver instance from the pool
         this.driver = WebDriverPool.borrowDriver();
 
-        if (driver==null) {
+        if (driver == null) {
             throw new Exception("Failed requesting web driver instance from driver pool");
         }
 
@@ -105,7 +105,7 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
     protected <U, R extends ResourceResult<U>> R executeResourceRequest(ResourceRequest<R> request) throws Exception {
         final Gson gson = new Gson();
 
-        logger.info("New Resource request: {}", request.toString());
+        logger.info("New Resource request: {}", request.getHeaders());
 
         String result;
         try (InputStream stream = PinterestWebTask.class.getResourceAsStream("/nl/juraji/imagemanager/tasks/pinterest/PinterestResourceRequestExecutor.js")) {
