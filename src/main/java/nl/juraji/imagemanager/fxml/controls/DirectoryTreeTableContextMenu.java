@@ -75,7 +75,7 @@ public class DirectoryTreeTableContextMenu extends ContextMenu {
 
     private void indexSelectedDirectoriesAction() {
         final List<TreeItem<BaseDirectory>> directories = reduceSelectionToParents();
-        if (directories.size() > 0) {
+        if (directories.isEmpty()) {
             IndexDirectoryTaskBuilder.standard(getOwnerWindow())
                     .afterEach(parentTableView::refresh)
                     .execute(directories.stream()
@@ -87,7 +87,7 @@ public class DirectoryTreeTableContextMenu extends ContextMenu {
     private void scanForDuplicatesAction() {
         final List<TreeItem<BaseDirectory>> selection = reduceSelectionToParents();
 
-        if (selection.size() > 0) {
+        if (selection.isEmpty()) {
             final FXMLStage<DuplicateScannerWindow> fxmlStage = Controller.init(DuplicateScannerWindow.class,
                     "Image Manager - Duplicate Scanner", getOwnerWindow());
 
@@ -143,7 +143,7 @@ public class DirectoryTreeTableContextMenu extends ContextMenu {
     private void deleteActionImpl(boolean deleteFromDisk) {
         final List<TreeItem<BaseDirectory>> selection = reduceSelectionToParents();
 
-        if (selection.size() > 0) {
+        if (selection.isEmpty()) {
             final boolean doDelete = AlertBuilder.confirm(getOwnerWindow())
                     .withTitle("Delete directory")
                     .withMessage("Are you sure you want to delete the %s selected from %sImage Manager's index?\n" +
@@ -164,7 +164,9 @@ public class DirectoryTreeTableContextMenu extends ContextMenu {
                         item.getParent().getChildren().remove(item);
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    AlertBuilder.warning(getOwnerWindow())
+                            .withTitle("Deletion failed")
+                            .withMessage("Failed deleting {}, make sure you have the correct access rights!");
                 }
 
                 parentTableView.getSelectionModel().clearSelection();
