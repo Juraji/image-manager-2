@@ -39,9 +39,9 @@ public class MovePinResourceRequest extends ResourceRequest<MovePinResourceResul
     @SerializedName("title")
     private String title;
 
-    public MovePinResourceRequest(PinMetaData metaData, PinterestBoard target, String CSRFToken) {
+    public MovePinResourceRequest(PinMetaData metaData, PinterestBoard target, String csrfToken) {
         super(HttpMethod.POST, "/resource/PinResource/update/", MovePinResourceResult.class);
-        super.getHeaders().put("X-CSRFToken", CSRFToken);
+        super.getHeaders().put("X-CSRFToken", csrfToken);
 
         // Set boardId to board id if is board
         if (BoardType.BOARD.equals(target.getType())) {

@@ -19,7 +19,6 @@ public abstract class BaseDirectory<T extends BaseDirectory<T, U>, U extends Bas
     @Column(nullable = false)
     private String name;
 
-    @SuppressWarnings("JpaAttributeTypeInspection")
     @Column(nullable = false, length = 2048)
     private Path locationOnDisk;
 

@@ -26,8 +26,6 @@ import static nl.juraji.imagemanager.tasks.pinterest.PinterestWebTask.PINTEREST_
  * Image Manager 2
  */
 public class SettingsWindow extends Controller implements Initializable {
-    private static final String DUMMY_PASSWORD = "DUMMY_PASSWORD";
-
     private final Settings settings;
     public Slider duplicateScannerMinSimilaritySlider;
     public Label duplicateScannerMinSimilarityLabel;

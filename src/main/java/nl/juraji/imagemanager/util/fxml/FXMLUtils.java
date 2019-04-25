@@ -6,8 +6,10 @@ import javafx.scene.control.Dialog;
 import javafx.scene.image.Image;
 import javafx.stage.Window;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.DoubleConsumer;
+import java.util.function.DoubleSupplier;
 
 /**
  * Created by Juraji on 23-11-2018.
@@ -37,26 +39,26 @@ public final class FXMLUtils {
                 child::setX, child::setY, child::setOnShown);
     }
 
-    private static <EV extends Event> void centerOnParentEx(
+    private static <E extends Event> void centerOnParentEx(
             Window parent,
-            Supplier<Double> childWidthSupplier,
-            Supplier<Double> childHeightSupplier,
-            Supplier<Boolean> childIsShowingSupplier,
-            Consumer<Double> childXSetter,
-            Consumer<Double> childYSetter,
-            Consumer<EventHandler<EV>> childOnShownEventHandlerSetter) {
+            DoubleSupplier childWidthSupplier,
+            DoubleSupplier childHeightSupplier,
+            BooleanSupplier childIsShowingSupplier,
+            DoubleConsumer childXSetter,
+            DoubleConsumer childYSetter,
+            Consumer<EventHandler<E>> childOnShownEventHandlerSetter) {
 
         Runnable calculateAndSetCoordinates = () -> {
             // parent center coordinates
             final double centerX = parent.getX() + (parent.getWidth() / 2d);
             final double centerY = parent.getY() + (parent.getHeight() / 2d);
-            childXSetter.accept(centerX - (childWidthSupplier.get() / 2d));
-            childYSetter.accept(centerY - (childHeightSupplier.get() / 2d));
+            childXSetter.accept(centerX - (childWidthSupplier.getAsDouble() / 2d));
+            childYSetter.accept(centerY - (childHeightSupplier.getAsDouble() / 2d));
         };
 
         // If child is already showing apply immediately,
         // else delay until shown
-        if (childIsShowingSupplier.get()) {
+        if (childIsShowingSupplier.getAsBoolean()) {
             calculateAndSetCoordinates.run();
         } else {
             childOnShownEventHandlerSetter.accept(e -> calculateAndSetCoordinates.run());

@@ -20,7 +20,9 @@ import nl.juraji.imagemanager.util.types.ListAdditionListener;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -73,54 +75,56 @@ public class MoveMetaDataDialog extends Controller implements Initializable {
 
     public void moveItem() {
         final DirectoryChoiceBoxItem selectedItem = this.directoryChoiceBox.getValue();
+        if (selectedItem == null) {
+            return;
+        }
 
-        if (selectedItem != null) {
-            final BaseDirectory directory = selectedItem.directory;
+        final BaseDirectory directory = selectedItem.directory;
+        final AtomicBoolean doMoveOnPinterest = new AtomicBoolean(false);
 
-            boolean doMoveOnPinterest = false;
+        if (this.checkIsPins(metaDataToMove)) {
+            final boolean movePinterestPins = AlertBuilder.confirm(getStage())
+                    .withTitle("Move Pinterest pins")
+                    .withMessage("Do you want the selected pin(s) to be moved to %s on Pinterest as well?",
+                            directory.getName())
+                    .showAndWait();
 
-            if (this.checkIsPins(metaDataToMove)) {
-                doMoveOnPinterest = AlertBuilder.confirm(getStage())
-                        .withTitle("Move Pinterest pins")
-                        .withMessage("Do you want the selected pin(s) to be moved to %s on Pinterest as well?",
-                                directory.getName())
+            doMoveOnPinterest.set(movePinterestPins);
+        }
+
+        final WorkQueueDialog<BaseMetaData> queueDialog = new WorkQueueDialog<>(getStage());
+
+        metaDataToMove.stream()
+                .filter(Objects::nonNull)
+                .forEach(metaData -> {
+                    if (doMoveOnPinterest.get()) {
+                        queueDialog.queue(new MovePinTask((PinMetaData) metaData, (PinterestBoard) directory));
+                    }
+
+                    queueDialog.queue(new MoveMetaDataTask(metaData, directory));
+                });
+
+        queueDialog.addQueueEndNotification(movedItems -> {
+            if (!movedItems.isEmpty()) {
+                AlertBuilder.info(getStage())
+                        .withTitle("Items moved")
+                        .withMessage("Moved %d items to %s", movedItems.size(), directory.getName())
                         .showAndWait();
             }
 
-            final WorkQueueDialog<BaseMetaData> queueDialog = new WorkQueueDialog<>(getStage());
-
-            for (BaseMetaData metaData : metaDataToMove) {
-                if (metaData != null) {
-                    if (doMoveOnPinterest) {
-                        queueDialog.queue(new MovePinTask((PinMetaData) metaData, (PinterestBoard) directory));
-                    } else {
-                        queueDialog.queue(new MoveMetaDataTask(metaData, directory));
-                    }
-                }
+            if (movedItems.size() != metaDataToMove.size()) {
+                AlertBuilder.info(getStage())
+                        .withTitle("Some moves failed")
+                        .withMessage("%d items failed to move, move them manually or try again later.",
+                                metaDataToMove.size() - movedItems.size())
+                        .showAndWait();
             }
 
-            queueDialog.addQueueEndNotification(movedItems -> {
-                if (movedItems.size() > 0) {
-                    AlertBuilder.info(getStage())
-                            .withTitle("Items moved")
-                            .withMessage("Moved %d items to %s", movedItems.size(), directory.getName())
-                            .showAndWait();
-                }
+            itemsMoved.addAll(movedItems);
+            close();
+        });
 
-                if (movedItems.size() != metaDataToMove.size()) {
-                    AlertBuilder.info(getStage())
-                            .withTitle("Some moves failed")
-                            .withMessage("%d items failed to move, move them manually or try again later.",
-                                    metaDataToMove.size() - movedItems.size())
-                            .showAndWait();
-                }
-
-                itemsMoved.addAll(movedItems);
-                close();
-            });
-
-            queueDialog.execute();
-        }
+        queueDialog.execute();
     }
 
     private boolean checkIsPins(List<? extends BaseMetaData> metaDataToMove) {

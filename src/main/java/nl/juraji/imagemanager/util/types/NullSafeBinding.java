@@ -1,6 +1,5 @@
 package nl.juraji.imagemanager.util.types;
 
-import com.sun.javafx.collections.ImmutableObservableList;
 import javafx.beans.Observable;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
@@ -32,6 +31,7 @@ public class NullSafeBinding<T> extends ObjectBinding<T> {
         try {
             return supplier.get();
         } catch (NullPointerException ignored) {
+            // Nulls are ignored
         } catch (Exception e) {
             LoggerFactory.getLogger(getClass()).warn("Exception while evaluating binding", e);
         }
@@ -46,10 +46,13 @@ public class NullSafeBinding<T> extends ObjectBinding<T> {
 
     @Override
     public ObservableList<Observable> getDependencies() {
-        return ((dependencies == null) || (dependencies.length == 0)) ?
-                FXCollections.emptyObservableList()
-                : (dependencies.length == 1) ?
-                FXCollections.singletonObservableList(dependencies[0])
-                : new ImmutableObservableList<>(dependencies);
+        if ((dependencies == null) || (dependencies.length == 0)) {
+            return FXCollections.emptyObservableList();
+        } else if (dependencies.length == 1) {
+            return FXCollections.singletonObservableList(dependencies[0]);
+        } else {
+            return FXCollections.unmodifiableObservableList(
+                    FXCollections.observableArrayList(dependencies));
+        }
     }
 }

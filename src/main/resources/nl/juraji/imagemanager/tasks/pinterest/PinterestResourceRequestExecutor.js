@@ -49,10 +49,10 @@ return (function (args) {
     }));
 
     var request;
-    if ("GET" === method) {
-        request = doGet(resourcePath, headers, formData);
-    } else if ("POST" === method) {
+    if ("POST" === method) {
         request = doPost(resourcePath, headers, formData);
+    } else {
+        request = doGet(resourcePath, headers, formData);
     }
 
     if (request.status === 200) {

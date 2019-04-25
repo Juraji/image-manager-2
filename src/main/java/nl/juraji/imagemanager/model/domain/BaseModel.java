@@ -68,10 +68,13 @@ public abstract class BaseModel extends Model implements Comparable<BaseModel> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BaseMetaData)) return false;
-        final UUID id = getId();
-        return id != null && id == ((BaseMetaData) o).getId();
+        if (this == o) {
+            return true;
+        } else if (!(o instanceof BaseMetaData)) {
+            return false;
+        } else {
+            return id != null && id == ((BaseMetaData) o).getId();
+        }
     }
 
     @Override
@@ -81,8 +84,12 @@ public abstract class BaseModel extends Model implements Comparable<BaseModel> {
 
     @Override
     public int compareTo(@NotNull BaseModel o) {
-        return this.getId() == null ? -1
-                : o.getId() == null ? 1
-                : Objects.compare(this.getId(), o.getId(), UUID::compareTo);
+        if (this.getId() == null) {
+            return -1;
+        } else if (o.getId() == null) {
+            return 1;
+        } else {
+            return Objects.compare(this.getId(), o.getId(), UUID::compareTo);
+        }
     }
 }

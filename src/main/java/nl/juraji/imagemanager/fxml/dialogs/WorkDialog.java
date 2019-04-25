@@ -111,7 +111,7 @@ public class WorkDialog<T> extends BorderPane implements Initializable {
     }
 
     public void exec(IndicatorTask<T> task, boolean closeOnCompletion) {
-        logger.info("Executing task \"" + task.getMessage() + "\"");
+        logger.info("Executing task \"{}\"", task.getMessage());
 
         // Set current task
         this.currentTask.set(task);
@@ -139,12 +139,11 @@ public class WorkDialog<T> extends BorderPane implements Initializable {
 
                 this.resultNotificationList.add(task.get());
                 this.currentTask.set(null);
-                logger.info("Completed task \"" + task.getMessage() + "\"");
+                logger.info("Completed task \"{}\"", task.getMessage());
             } catch (CancellationException e) {
                 logger.info("Task canceled");
             } catch (Exception e) {
                 logger.error("Error executing task", e);
-                throw new RuntimeException(e);
             }
         };
 

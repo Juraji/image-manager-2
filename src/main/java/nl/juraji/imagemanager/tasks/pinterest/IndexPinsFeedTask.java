@@ -9,8 +9,6 @@ import nl.juraji.imagemanager.model.web.pinterest.types.PinResourceImage;
 import nl.juraji.imagemanager.util.StringUtils;
 import nl.juraji.imagemanager.util.URIUtils;
 import nl.juraji.imagemanager.util.types.AtomicString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -25,7 +23,6 @@ import java.util.Set;
 public abstract class IndexPinsFeedTask extends PinterestWebTask<Void> {
     private static final int PIN_FETCH_COUNT_OFFSET = 100;
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final PinterestBoard board;
     private final boolean doReindex;
 
@@ -46,7 +43,7 @@ public abstract class IndexPinsFeedTask extends PinterestWebTask<Void> {
 
         if (doReindex) {
             pinsToFetchCount = reportedPinCount + PIN_FETCH_COUNT_OFFSET;
-            logger.info("Reindexing entire {}!", board.getType().toString());
+            logger.info("Reindexing entire {}!", board.getType());
         } else {
             pinsToFetchCount = reportedPinCount - knownMetaDataSize + PIN_FETCH_COUNT_OFFSET;
         }

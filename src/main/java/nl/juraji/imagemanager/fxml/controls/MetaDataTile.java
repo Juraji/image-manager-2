@@ -141,7 +141,7 @@ public class MetaDataTile extends VBox implements Initializable {
         controller.setMetaDataToMove(Collections.singletonList(metaData));
 
         controller.onItemsMoved(movedMetaData -> {
-            if (movedMetaData.size() > 0) {
+            if (!movedMetaData.isEmpty()) {
                 this.updateView();
             }
         });

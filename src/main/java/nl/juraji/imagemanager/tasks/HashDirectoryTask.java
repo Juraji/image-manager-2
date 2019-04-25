@@ -83,7 +83,7 @@ public class HashDirectoryTask extends IndicatorTask<Void> {
         final Path filePath = metaData.getPath();
 
         if (FileUtils.exists(filePath)) {
-            logger.info("Generating hash for " + filePath);
+            logger.info("Generating hash for {}", filePath);
 
             try {
                 final File file = filePath.toFile();
@@ -103,7 +103,7 @@ public class HashDirectoryTask extends IndicatorTask<Void> {
                 metaData.setWidth(image.getWidth());
                 metaData.setHeight(image.getHeight());
                 metaData.setFileSize(file.length());
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 logger.warn("Failed building hash for {}, {}", filePath, e.getMessage());
             }
         }

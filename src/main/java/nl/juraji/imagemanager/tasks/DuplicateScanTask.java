@@ -58,7 +58,7 @@ public class DuplicateScanTask extends IndicatorTask<List<DuplicateSet>> {
                         }
                     }
 
-                    if (similarMetaData.size() > 0) {
+                    if (!similarMetaData.isEmpty()) {
                         final int averageSimilarity = (int) (addedSimilarity.get() / similarMetaData.size());
                         compareQueue.remove(a);
                         compareQueue.removeAll(similarMetaData);
@@ -97,8 +97,7 @@ public class DuplicateScanTask extends IndicatorTask<List<DuplicateSet>> {
         final HashData ah = a.getHash();
         final HashData bh = b.getHash();
 
-        if (ah != null && bh != null) {
-            if (Objects.equals(ah.getContrast(), bh.getContrast())) {
+        if (ah != null && bh != null && Objects.equals(ah.getContrast(), bh.getContrast())) {
                 BitSet xor = (BitSet) ah.getBitSet().clone();
                 xor.xor(bh.getBitSet());
                 int similarBitCount = xor.length() - xor.cardinality();
@@ -106,7 +105,6 @@ public class DuplicateScanTask extends IndicatorTask<List<DuplicateSet>> {
                 if (similarBitCount > minSimilarBitCount) {
                     return (similarBitCount / (double) xor.length()) * 100.0;
                 }
-            }
         }
 
         return -1.0;

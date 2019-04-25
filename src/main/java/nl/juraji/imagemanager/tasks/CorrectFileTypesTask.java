@@ -109,10 +109,8 @@ public class CorrectFileTypesTask extends IndicatorTask<Void> {
             final MagicMatch magicMatch = Magic.getMagicMatch(path.toFile(), false, true);
             final String magicMatchExtension = magicMatch.getExtension();
 
-            if (StringUtils.isNotEmpty(magicMatchExtension)) {
-                if (!magicMatchExtension.equals(orgExtension)) {
-                    path = Paths.get(path.getFileName().toString().replace(orgExtension, magicMatchExtension));
-                }
+            if (StringUtils.isNotEmpty(magicMatchExtension) && !magicMatchExtension.equals(orgExtension)) {
+                path = Paths.get(path.getFileName().toString().replace(orgExtension, magicMatchExtension));
             }
         } catch (MagicParseException | MagicMatchNotFoundException | MagicException e) {
             // If file type can't be inferred there's nothing we can do

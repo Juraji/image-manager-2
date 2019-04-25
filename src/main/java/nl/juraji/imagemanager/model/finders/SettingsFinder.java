@@ -24,7 +24,7 @@ public class SettingsFinder extends Finder<UUID, Settings> {
 
     private Settings settings() {
         final List<Settings> all = this.all();
-        if (all.size() == 0) {
+        if (all.isEmpty()) {
             return this.initSettings();
         } else {
             return all.get(0);

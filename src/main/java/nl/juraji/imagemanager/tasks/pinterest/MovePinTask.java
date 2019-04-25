@@ -37,10 +37,6 @@ public class MovePinTask extends PinterestWebTask<BaseMetaData> {
         // Update pin info
         metaData.setPinterestUri(targetBoard.getBoardUrl().resolve("/pin/" + metaData.getPinId()));
 
-        // Move pin locally
-        final MoveMetaDataTask moveMetaDataTask = new MoveMetaDataTask(metaData, targetBoard);
-        moveMetaDataTask.run();
-
-        return moveMetaDataTask.get();
+        return metaData;
     }
 }

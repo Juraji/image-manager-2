@@ -2,12 +2,14 @@ package nl.juraji.imagemanager.model.web.pinterest.resources;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by Juraji on 3-12-2018.
  * Image Manager 2
  */
 @SuppressWarnings("unused")
-public abstract class ResourceResult<T> {
+public abstract class ResourceResult<T> implements Serializable {
 
     @SerializedName("status")
     private int status;

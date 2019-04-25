@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 /**
@@ -109,7 +110,7 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
 
         String result;
         try (InputStream stream = PinterestWebTask.class.getResourceAsStream("/nl/juraji/imagemanager/tasks/pinterest/PinterestResourceRequestExecutor.js")) {
-            String script = IOUtils.toString(stream, "UTF-8");
+            String script = IOUtils.toString(stream, StandardCharsets.UTF_8);
             result = (String) driver.executeScript(script,
                     request.getMethod().toString(),
                     request.getResourcePath(),

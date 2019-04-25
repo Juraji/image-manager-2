@@ -197,18 +197,14 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
             if (option > -1) {
                 final WorkDialog<BaseMetaData> wd = new WorkDialog<>(getStage());
 
-                switch (option) {
-                    case 0:
-                        wd.exec(new DeleteMetaDataTask(metaData, false));
-                        break;
-                    case 1:
-                        wd.exec(new DeleteMetaDataTask(metaData, true));
-                        break;
-                    case 2:
-                        wd.exec(new DeleteMetaDataTask(metaData, true));
-                        //noinspection ConstantConditions
-                        wd.exec(new DeletePinTask((PinMetaData) metaData));
-                        break;
+                if (option == 0) {
+                    wd.exec(new DeleteMetaDataTask(metaData, false));
+                } else if (option == 1) {
+                    wd.exec(new DeleteMetaDataTask(metaData, true));
+                } else if (option == 2) {
+                    wd.exec(new DeleteMetaDataTask(metaData, true));
+                    //noinspection ConstantConditions
+                    wd.exec(new DeletePinTask((PinMetaData) metaData));
                 }
 
                 wd.addTaskEndNotification(deletedItem -> {
@@ -251,7 +247,7 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
 
     public void moveAction() {
         final ObservableList<MetaDataLabel> selectedItems = metaDataListView.getSelectionModel().getSelectedItems();
-        if (selectedItems.size() > 0) {
+        if (!selectedItems.isEmpty()) {
             final FXMLStage<MoveMetaDataDialog> fxmlStage = Controller.init(MoveMetaDataDialog.class, "Move item", getStage());
             final MoveMetaDataDialog controller = fxmlStage.getController();
 

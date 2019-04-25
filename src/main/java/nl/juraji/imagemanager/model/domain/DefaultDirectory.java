@@ -2,6 +2,7 @@ package nl.juraji.imagemanager.model.domain;
 
 import nl.juraji.imagemanager.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -17,7 +18,7 @@ public class DefaultDirectory extends BaseDirectory<DefaultDirectory, BaseMetaDa
 
     @Override
     public Set<DefaultDirectory> getChildren() {
-        return null;
+        return Collections.emptySet();
     }
 
     @Override

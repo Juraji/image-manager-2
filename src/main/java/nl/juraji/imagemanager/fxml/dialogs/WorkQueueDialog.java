@@ -75,7 +75,7 @@ public class WorkQueueDialog<T> extends WorkDialog<T> implements Initializable {
         final Thread thread = new Thread(() -> {
             logger.info("Start dequeuing and executing tasks...");
 
-            while (taskQueue.size() > 0) {
+            while (!taskQueue.isEmpty()) {
                 final double tasksProgress = (taskCount.get() - taskQueue.size()) / taskCount.get();
                 tasksProgressBar.setProgress(tasksProgress);
 
@@ -84,20 +84,18 @@ public class WorkQueueDialog<T> extends WorkDialog<T> implements Initializable {
                     final IndicatorTask<T> queueTask = taskQueue.take();
 
                     // Start execution from java fx thread
-                    Platform.runLater(() -> super.exec(queueTask, taskQueue.size() == 0));
+                    Platform.runLater(() -> super.exec(queueTask, taskQueue.isEmpty()));
 
                     // Wait for task to complete
                     queueResults.add(queueTask.get());
+                } catch (CancellationException e) {
+                    // Queue was canceled, clear queue and break loop
+                    logger.info("Canceled tasks");
+                    taskQueue.clear();
+                    Platform.runLater(this::hide);
+                    break;
                 } catch (Exception e) {
-                    if (e instanceof CancellationException) {
-                        // Queue was canceled, clear queue and break loop
-                        logger.info("Canceled tasks");
-                        taskQueue.clear();
-                        Platform.runLater(this::hide);
-                        break;
-                    } else {
-                        logger.error("Error executing task", e);
-                    }
+                    logger.error("Error executing task", e);
                 }
             }
 

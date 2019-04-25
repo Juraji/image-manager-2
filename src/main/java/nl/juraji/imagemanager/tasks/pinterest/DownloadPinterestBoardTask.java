@@ -65,7 +65,7 @@ public class DownloadPinterestBoardTask extends IndicatorTask<Void> {
 
         this.checkCanceled();
         final Set<PinterestBoard> boardChildren = parent.getChildren();
-        if (boardChildren.size() > 0) {
+        if (!boardChildren.isEmpty()) {
             for (PinterestBoard child : boardChildren) {
                 this.downloadPins(child);
             }

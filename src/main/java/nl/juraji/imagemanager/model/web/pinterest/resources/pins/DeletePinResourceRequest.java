@@ -13,9 +13,9 @@ public class DeletePinResourceRequest extends ResourceRequest<DeletePinResourceR
     @SerializedName("id")
     private String pinId;
 
-    public DeletePinResourceRequest(String pinId, String CSRFToken) {
+    public DeletePinResourceRequest(String pinId, String csrfToken) {
         super(HttpMethod.POST, "/resource/PinResource/delete/", DeletePinResourceResult.class);
         this.pinId = pinId;
-        super.getHeaders().put("X-CSRFToken", CSRFToken);
+        super.getHeaders().put("X-csrfToken", csrfToken);
     }
 }

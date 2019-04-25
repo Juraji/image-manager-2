@@ -76,13 +76,10 @@ public class DuplicateScannerWindow extends Controller implements Initializable 
                 .withOption("Scan across all directories")
                 .show();
 
-        switch (optionIndex) {
-            case 0:
-                this.runScanPerDirectory(null);
-                break;
-            case 1:
-                this.runScanAcrossDirectories();
-                break;
+        if (optionIndex == 0) {
+            this.runScanPerDirectory(null);
+        } else if (optionIndex == 1) {
+            this.runScanAcrossDirectories();
         }
     }
 
@@ -100,7 +97,7 @@ public class DuplicateScannerWindow extends Controller implements Initializable 
         directories.forEach(directory -> wd.queue(new DuplicateScanTask(directory, minSimilaritySlider.getValue())));
         wd.addTaskEndNotification(list -> this.duplicateSetList.getItems().addAll(list));
         wd.addQueueEndNotification(() -> {
-            if (this.duplicateSetList.getItems().size() > 0) {
+            if (!this.duplicateSetList.getItems().isEmpty()) {
                 this.duplicateSetList.getSelectionModel().select(0);
                 this.duplicateSetList.requestFocus();
             }

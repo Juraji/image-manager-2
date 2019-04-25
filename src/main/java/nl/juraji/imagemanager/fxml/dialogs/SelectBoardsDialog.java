@@ -40,7 +40,7 @@ public class SelectBoardsDialog extends Controller implements Initializable {
     public void processSelectedItems() {
         final ObservableList<PinterestBoard> items = this.itemsTableView.getSelectionModel().getSelectedItems();
 
-        if (items.size() > 0) {
+        if (!items.isEmpty()) {
             selectedItems.addAll(items);
         }
 

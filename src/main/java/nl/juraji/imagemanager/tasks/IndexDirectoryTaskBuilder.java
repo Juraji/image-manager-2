@@ -118,11 +118,9 @@ public final class IndexDirectoryTaskBuilder {
             }
         }
 
-        if (doOptionalDownload) {
-            if (directory instanceof PinterestBoard) {
-                // Download Pin images
-                indicator.queue(new DownloadPinterestBoardTask((PinterestBoard) directory));
-            }
+        if (doOptionalDownload && directory instanceof PinterestBoard) {
+            // Download Pin images
+            indicator.queue(new DownloadPinterestBoardTask((PinterestBoard) directory));
         }
 
         if (doCorrectFileTypes) {

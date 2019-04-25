@@ -54,6 +54,7 @@ public class EditMetaDataDialog extends Controller implements Initializable {
         });
     }
 
+    @Override
     public void initAccelerators(Map<KeyCombination, Runnable> accelerators) {
         super.initAccelerators(accelerators);
 
@@ -61,12 +62,12 @@ public class EditMetaDataDialog extends Controller implements Initializable {
     }
 
     public void save() {
-        final BaseMetaData metaData = this.metaData.get();
+        final BaseMetaData md = this.metaData.get();
 
-        metaData.setPath(Paths.get(pathTextField.getText()));
-        metaData.setComments(commentsTextArea.getText());
+        md.setPath(Paths.get(pathTextField.getText()));
+        md.setComments(commentsTextArea.getText());
 
-        metaData.save();
+        md.save();
         saveButton.setText("Saved!");
     }
 
