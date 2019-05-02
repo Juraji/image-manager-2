@@ -24,7 +24,7 @@ public class IndexBoardPinsFeedTask extends IndexPinsFeedTask {
     @Override
     protected int getReportedPinCount() throws Exception {
         final BoardPageResourceRequest boardPageResourceRequest = new BoardPageResourceRequest(
-                getUserProfileName(),
+                getInitialState().getViewer().getUsername(),
                 getBoard().getSlug());
 
         final BoardPageResourceResult result = executeResourceRequest(boardPageResourceRequest);

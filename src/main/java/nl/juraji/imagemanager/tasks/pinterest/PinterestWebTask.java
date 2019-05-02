@@ -5,6 +5,7 @@ import nl.juraji.imagemanager.model.domain.settings.WebCookie;
 import nl.juraji.imagemanager.model.finders.WebCookieFinder;
 import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceRequest;
 import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceResult;
+import nl.juraji.imagemanager.model.web.pinterest.types.initialstate.InitialStateObject;
 import nl.juraji.imagemanager.util.StringUtils;
 import nl.juraji.imagemanager.util.fxml.concurrent.IndicatorTask;
 import nl.juraji.imagemanager.util.io.web.WebDriverPool;
@@ -35,7 +36,9 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
     public static final URI PINTEREST_BASE_URI = URI.create("https://pinterest.com");
 
     private final String originalMessage;
+    private final Gson gson;
     private RemoteWebDriver driver;
+    private InitialStateObject initialState;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -44,6 +47,7 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
 
         try {
             this.originalMessage = this.getMessage();
+            this.gson = new Gson();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -60,12 +64,11 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
         }
     }
 
-    protected String getUserProfileName() {
-        // Use the profile link tag to extrapolate the sanitized username
-        // (There could be special characters we don't know about)
-        final WebElement profileLinkTag = getElementBy(By.xpath("//*[@id=\"HeaderContent\"]/div[1]/div/div[2]/div/div/div[3]/div[3]/div/div/div/div/div/a"));
-        final String relProfileLink = profileLinkTag.getAttribute("href");
-        return relProfileLink.substring(25, relProfileLink.length() - 1);
+    /**
+     * @return an InitialStateObject for the current session
+     */
+    protected InitialStateObject getInitialState() {
+        return this.initialState;
     }
 
     protected String getCSRFToken() {
@@ -97,6 +100,9 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
                 throw new Exception("Not authenticated on Pinterest");
             }
 
+            // Load initial-state
+            final WebElement initialStateElement = getElementBy(By.id("initial-state"));
+            this.initialState = gson.fromJson(initialStateElement.getAttribute("innerHTML"), InitialStateObject.class);
         }
 
         super.updateMessage(originalMessage);
@@ -104,8 +110,6 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
     }
 
     protected <U, R extends ResourceResult<U>> R executeResourceRequest(ResourceRequest<R> request) throws Exception {
-        final Gson gson = new Gson();
-
         logger.info("New Resource request: {}", request.getHeaders());
 
         String result;

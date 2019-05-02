@@ -13,6 +13,6 @@ public final class Bootstrap {
      * @param args Application arguments
      */
     public static void main(String[] args) {
-        Main.main(args);
+        Main.init(args);
     }
 }

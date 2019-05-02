@@ -25,7 +25,7 @@ public class IndexSectionPinsFeedTask extends IndexPinsFeedTask {
     protected int getReportedPinCount() throws Exception {
         final PinterestBoard board = getBoard();
         final BoardSectionResourceRequest boardSectionResourceRequest = new BoardSectionResourceRequest(
-                getUserProfileName(),
+                getInitialState().getViewer().getUsername(),
                 board.getParent().getSlug(),
                 board.getSlug());
 

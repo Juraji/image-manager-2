@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Main extends Application {
     private static final AtomicReference<Main> INSTANCE = new AtomicReference<>();
 
-    public static void main(String[] args) {
+    public static void init(String[] args) {
         Application.launch(Main.class, args);
     }
 
