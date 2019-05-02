@@ -99,11 +99,11 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
                 logger.info("Driver: Not authenticated!");
                 throw new Exception("Not authenticated on Pinterest");
             }
-
-            // Load initial-state
-            final WebElement initialStateElement = getElementBy(By.id("initial-state"));
-            this.initialState = gson.fromJson(initialStateElement.getAttribute("innerHTML"), InitialStateObject.class);
         }
+
+        // Load initial-state
+        final WebElement initialStateElement = getElementBy(By.id("initial-state"));
+        this.initialState = gson.fromJson(initialStateElement.getAttribute("innerHTML"), InitialStateObject.class);
 
         super.updateMessage(originalMessage);
         this.persistDriverCookies();
