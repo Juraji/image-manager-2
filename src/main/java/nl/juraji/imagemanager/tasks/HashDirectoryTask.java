@@ -79,7 +79,7 @@ public class HashDirectoryTask extends IndicatorTask<Void> {
     }
 
     private HashData generate(BaseMetaData metaData) {
-        HashData hashData = null;
+        HashData hashData = new HashData();
         final Path filePath = metaData.getPath();
 
         if (FileUtils.exists(filePath)) {
@@ -93,7 +93,6 @@ public class HashDirectoryTask extends IndicatorTask<Void> {
                     throw new IOException("Failed reading file");
                 }
 
-                hashData = new HashData();
                 final long qualityRating = calculateQualityRating(image, file);
 
                 generateHash(image, hashData);
@@ -113,10 +112,11 @@ public class HashDirectoryTask extends IndicatorTask<Void> {
 
     private BufferedImage getImage(Path path) throws IOException {
         final String fileExtension = FileUtils.getFileExtension(path).toUpperCase();
+        final File file = path.toFile();
 
         if ("GIF".equals(fileExtension)) {
             // Gif images are treated by first frame
-            try (final ImageInputStream in = ImageIO.createImageInputStream(path)) {
+            try (final ImageInputStream in = ImageIO.createImageInputStream(file)) {
                 final ImageReader reader = ImageIO.getImageReadersBySuffix("GIF").next();
                 reader.setInput(in);
 
@@ -130,7 +130,7 @@ public class HashDirectoryTask extends IndicatorTask<Void> {
                 return hqFrame;
             }
         } else {
-            return ImageIO.read(path.toFile());
+            return ImageIO.read(file);
         }
     }
 
