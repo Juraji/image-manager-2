@@ -17,24 +17,33 @@ import java.util.List;
  * Image Manager 2
  */
 public class EncryptionKeyManager implements EncryptKeyManager {
-    private static final Path KEY_FILE = Paths.get("./key_file");
-    private static final int KEY_SIZE = 265;
+
+    private final Path keyFile;
+    private final int keySize;
+
+    public EncryptionKeyManager(String keyFile, int keySize) {
+        if ("::UNSAFE".equals(keyFile)) {
+            this.keyFile = null;
+        } else {
+            this.keyFile = Paths.get(keyFile);
+        }
+        this.keySize = keySize;
+    }
 
     @Override
     public void initialise() {
 
         try {
             // Check if key file exists
-            if (!FileUtils.exists(KEY_FILE)) {
+            if (keyFile != null && !FileUtils.exists(keyFile)) {
                 // If not, generate random seed and create key_file
-                final byte[] bytes = new SecureRandom().generateSeed(KEY_SIZE);
+                final byte[] bytes = new SecureRandom().generateSeed(keySize);
                 final byte[] seed = Base64.getEncoder().encode(bytes);
 
-
-                Files.write(KEY_FILE, seed);
+                Files.write(keyFile, seed);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new EncryptionKeyManagerError(e);
         }
     }
 
@@ -42,11 +51,24 @@ public class EncryptionKeyManager implements EncryptKeyManager {
     public EncryptKey getEncryptKey(String table, String column) {
         return () -> {
             try {
-                final List<String> lines = Files.readAllLines(KEY_FILE);
-                return lines.get(0) + "::" + table + "::" + column;
+                final String base = table + "::" + column;
+
+                if (keyFile != null) {
+                    final List<String> lines = Files.readAllLines(keyFile);
+                    return lines.get(0) + "::" + base;
+                } else {
+                    return base;
+                }
+
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new EncryptionKeyManagerError(e);
             }
         };
+    }
+
+    private static class EncryptionKeyManagerError extends RuntimeException {
+        public EncryptionKeyManagerError(Throwable cause) {
+            super(cause);
+        }
     }
 }

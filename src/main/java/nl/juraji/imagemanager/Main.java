@@ -28,7 +28,7 @@ public class Main extends Application {
         INSTANCE.set(this);
 
         // Setup database
-        EbeanInit.init();
+        EbeanInit.initDataSource();
 
         // Setup primary stage with root scene and load
         Controller.initStage(MainWindow.class, "Image manager", stage);

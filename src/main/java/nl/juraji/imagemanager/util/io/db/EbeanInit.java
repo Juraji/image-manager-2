@@ -2,7 +2,8 @@ package nl.juraji.imagemanager.util.io.db;
 
 import io.ebean.EbeanServerFactory;
 import io.ebean.config.ServerConfig;
-import io.ebean.datasource.DataSourceConfig;
+
+import java.util.Properties;
 
 /**
  * Created by Juraji on 29-11-2018.
@@ -12,21 +13,13 @@ public final class EbeanInit {
     private EbeanInit() {
     }
 
-    public static void init() {
+    public static void initDataSource() {
 
         // Setup server configuration
         final ServerConfig serverConfig = new ServerConfig();
-        serverConfig.setName("storage");
+        serverConfig.setName("db");
 
-        // Setup datasource
-        final DataSourceConfig storageDb = new DataSourceConfig();
-        storageDb.setDriver("org.h2.Driver");
-        storageDb.setUsername("sa");
-        storageDb.setPassword("sa");
-        storageDb.setUrl("jdbc:h2:file:./storage;COMPRESS=TRUE;DEFRAG_ALWAYS=TRUE");
-
-        // Register datasource to server config
-        serverConfig.setDataSourceConfig(storageDb);
+        serverConfig.loadFromProperties();
 
         // Set config to always run migrations
         serverConfig.setRunMigration(true);
@@ -36,7 +29,10 @@ public final class EbeanInit {
         serverConfig.setDefaultServer(true);
 
         // Set encryption key manager
-        serverConfig.setEncryptKeyManager(new EncryptionKeyManager());
+        final Properties configProperties = serverConfig.getProperties();
+        final String keyFile = configProperties.getProperty("encryption.keyFile");
+        final int keySize = Integer.parseInt(configProperties.getProperty("encryption.size"));
+        serverConfig.setEncryptKeyManager(new EncryptionKeyManager(keyFile, keySize));
 
         // Start server
         EbeanServerFactory.create(serverConfig);
