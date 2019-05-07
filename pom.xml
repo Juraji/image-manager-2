@@ -10,14 +10,6 @@
     <name>Image Manager</name>
     <packaging>jar</packaging>
 
-    <repositories>
-        <repository>
-            <id>imageio-webp</id>
-            <name>ImageIO-WebP on github</name>
-            <url>https://github.com/Juraji/ImageIO-WebP/raw/repository</url>
-        </repository>
-    </repositories>
-
     <build>
         <pluginManagement>
             <plugins>
@@ -211,13 +203,6 @@
                     <artifactId>log4j</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <!-- ImageIO plugins -->
-        <dependency>
-            <groupId>nl.juraji</groupId>
-            <artifactId>imageio-webp</artifactId>
-            <version>1.0.0</version>
         </dependency>
 
         <!-- Utils -->

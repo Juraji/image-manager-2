@@ -1,7 +1,5 @@
 package nl.juraji.imagemanager.tasks;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
 import nl.juraji.imagemanager.model.domain.BaseDirectory;
 import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.hashes.Contrast;
@@ -20,8 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.BitSet;
-import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,32 +50,27 @@ public class HashDirectoryTask extends IndicatorTask<Void> {
         updateMessage("Creating hashes for: %s", parent.getName());
 
         final Set<BaseMetaData> parentMetaData = ((Set<BaseMetaData>) parent.getMetaData()).stream()
-                .filter(m -> m.getHash() == null)
+                .filter(m -> m.getHash() == null || m.getHash().getBits() == null)
                 .collect(Collectors.toSet());
         final int metaDataCount = parent.getMetaData().size();
 
         if (metaDataCount > 0) {
             addToTotalWork(metaDataCount);
 
-            final List<HashData> hashResults = parentMetaData.parallelStream()
-                    .peek(o -> this.checkCanceled())
-                    .map(this::generate)
-                    .peek(o -> incrementProgress())
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-
-            // Save generated hashes in single transaction
-            final EbeanServer db = Ebean.getDefaultServer();
-            db.saveAll(hashResults);
-            db.updateAll(parentMetaData);
+            parentMetaData.parallelStream().forEach(metaData -> {
+                this.checkCanceled();
+                this.generate(metaData);
+                metaData.save();
+                this.incrementProgress();
+            });
         }
 
         this.checkCanceled();
         parent.getChildren().forEach(o -> this.buildHashes((BaseDirectory) o));
     }
 
-    private HashData generate(BaseMetaData metaData) {
-        HashData hashData = new HashData();
+    private void generate(BaseMetaData metaData) {
+        final HashData hashData = new HashData();
         final Path filePath = metaData.getPath();
 
         if (FileUtils.exists(filePath)) {
@@ -107,7 +98,6 @@ public class HashDirectoryTask extends IndicatorTask<Void> {
             }
         }
 
-        return hashData;
     }
 
     private BufferedImage getImage(Path path) throws IOException {
