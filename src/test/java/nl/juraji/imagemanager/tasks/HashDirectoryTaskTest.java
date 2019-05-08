@@ -229,5 +229,4 @@ class HashDirectoryTaskTest extends JavaFXAndEbeanBootstrappedTest {
         final byte[] imageBits = Files.readAllBytes(testImagesDirectory.resolve("webp-image.webp.hash.bin"));
         assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
     }
-
 }
