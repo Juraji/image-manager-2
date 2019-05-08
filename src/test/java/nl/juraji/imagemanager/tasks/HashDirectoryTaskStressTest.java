@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Created by Juraji on 7-5-2019.
  * image-manager
  */
-@Disabled
+@Disabled("Used during development for performance testing")
 class HashDirectoryTaskStressTest extends JavaFXAndEbeanBootstrappedTest {
     private static final int NO_META_DATA = 1000;
 

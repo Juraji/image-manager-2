@@ -5,7 +5,7 @@ import io.ebean.EbeanServer;
 import nl.juraji.imagemanager.model.domain.hashes.Contrast;
 import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
 import nl.juraji.imagemanager.model.domain.local.LocalMetaData;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.RepeatedTest;
 import util.JavaFXAndEbeanBootstrappedTest;
 
 import java.io.IOException;
@@ -30,7 +30,7 @@ class HashDirectoryTaskTest extends JavaFXAndEbeanBootstrappedTest {
         this.db = Ebean.getDefaultServer();
     }
 
-    @Test
+    @RepeatedTest(5)
     void testHashingGif() throws IOException {
         // Setup test directory
         final LocalDirectory directory = new LocalDirectory();
@@ -70,7 +70,7 @@ class HashDirectoryTaskTest extends JavaFXAndEbeanBootstrappedTest {
         assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
     }
 
-    @Test
+    @RepeatedTest(5)
     void testHashingJpg() throws IOException {
         // Setup test directory
         final LocalDirectory directory = new LocalDirectory();
@@ -110,7 +110,7 @@ class HashDirectoryTaskTest extends JavaFXAndEbeanBootstrappedTest {
         assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
     }
 
-    @Test
+    @RepeatedTest(5)
     void testHashingPng() throws IOException {
         // Setup test directory
         final LocalDirectory directory = new LocalDirectory();
@@ -150,7 +150,7 @@ class HashDirectoryTaskTest extends JavaFXAndEbeanBootstrappedTest {
         assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
     }
 
-    @Test
+    @RepeatedTest(5)
     void testHashingAnimatedGif() throws IOException {
         // Setup test directory
         final LocalDirectory directory = new LocalDirectory();
@@ -190,7 +190,7 @@ class HashDirectoryTaskTest extends JavaFXAndEbeanBootstrappedTest {
         assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
     }
 
-    @Test
+    @RepeatedTest(5)
     void testHashingWebP() throws IOException {
         // Setup test directory
         final LocalDirectory directory = new LocalDirectory();
@@ -230,83 +230,4 @@ class HashDirectoryTaskTest extends JavaFXAndEbeanBootstrappedTest {
         assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
     }
 
-    @Test
-    void testHashingWebPLossless() throws IOException {
-        // Setup test directory
-        final LocalDirectory directory = new LocalDirectory();
-        directory.setName("Test WebP lossless directory");
-        directory.setLocationOnDisk(testImagesDirectory);
-
-        final LocalMetaData metaData = new LocalMetaData();
-        metaData.setDirectory(directory);
-        metaData.setPath(testImagesDirectory.resolve("webp-lossless-image.webp"));
-
-        // Task expects directory to be persisted in the database in order to update it
-        directory.getMetaData().add(metaData);
-        directory.save();
-
-        // Call hashing task
-        final HashDirectoryTask hashDirectoryTask = new HashDirectoryTask(directory);
-        hashDirectoryTask.call();
-
-        // Check hashes
-        // Reload entity from the database, to make sure it persisted
-        final LocalMetaData metaDataFromDb = db.find(LocalMetaData.class, metaData.getId());
-        assertNotNull(metaDataFromDb);
-
-        // Check image properties
-        assertEquals(400, metaDataFromDb.getWidth());
-        assertEquals(301, metaDataFromDb.getHeight());
-        assertEquals(81978, metaDataFromDb.getFileSize());
-
-        // Assert a hash exists
-        assertNotNull(metaDataFromDb.getHash());
-
-        // Assert the correct contrast
-        assertEquals(Contrast.DARK, metaDataFromDb.getHash().getContrast());
-
-        // Assert the hashed bits are correct
-        final byte[] imageBits = Files.readAllBytes(testImagesDirectory.resolve("webp-lossless-alpha-image.webp.hash.bin"));
-        assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
-    }
-
-    @Test
-    void testHashingWebPLosslessAlpha() throws IOException {
-        // Setup test directory
-        final LocalDirectory directory = new LocalDirectory();
-        directory.setName("Test WebP lossless directory");
-        directory.setLocationOnDisk(testImagesDirectory);
-
-        final LocalMetaData metaData = new LocalMetaData();
-        metaData.setDirectory(directory);
-        metaData.setPath(testImagesDirectory.resolve("webp-lossless-alpha-image.webp"));
-
-        // Task expects directory to be persisted in the database in order to update it
-        directory.getMetaData().add(metaData);
-        directory.save();
-
-        // Call hashing task
-        final HashDirectoryTask hashDirectoryTask = new HashDirectoryTask(directory);
-        hashDirectoryTask.call();
-
-        // Check hashes
-        // Reload entity from the database, to make sure it persisted
-        final LocalMetaData metaDataFromDb = db.find(LocalMetaData.class, metaData.getId());
-        assertNotNull(metaDataFromDb);
-
-        // Check image properties
-        assertEquals(400, metaDataFromDb.getWidth());
-        assertEquals(301, metaDataFromDb.getHeight());
-        assertEquals(18840, metaDataFromDb.getFileSize());
-
-        // Assert a hash exists
-        assertNotNull(metaDataFromDb.getHash());
-
-        // Assert the correct contrast
-        assertEquals(Contrast.DARK, metaDataFromDb.getHash().getContrast());
-
-        // Assert the hashed bits are correct
-        final byte[] imageBits = Files.readAllBytes(testImagesDirectory.resolve("webp-lossless-image.webp.hash.bin"));
-        assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
-    }
 }

@@ -84,7 +84,8 @@ public class DuplicateScanTask extends IndicatorTask<List<DuplicateSet>> {
     }
 
     /**
-     * Where the contrast of image a and b are equal,
+     * Where the contrast of image a and b are equal:
+     * If the bitsets equal (same bits) then result is 100% else
      * calculate the cardinality between a and b using an XOR operation on the
      * sets of bytes, calculated by {@link HashDirectoryTask}.
      * The cardinality of an XOR operation on two bit sets is the count of unequal bits.
@@ -98,14 +99,20 @@ public class DuplicateScanTask extends IndicatorTask<List<DuplicateSet>> {
         final HashData ah = a.getHash();
         final HashData bh = b.getHash();
 
-        if (ah != null && bh != null && Objects.equals(ah.getContrast(), bh.getContrast())) {
-                BitSet xor = (BitSet) ah.getBitSet().clone();
-                xor.xor(bh.getBitSet());
+        if (ah != null && bh != null && ah.getContrast().equals(bh.getContrast())) {
+            final BitSet ahBits = ah.getBitSet();
+            final BitSet bhBits = bh.getBitSet();
+            if (ahBits.equals(bhBits)) {
+                return 100.0;
+            } else {
+                BitSet xor = (BitSet) ahBits.clone();
+                xor.xor(bhBits);
                 int similarBitCount = xor.length() - xor.cardinality();
                 double minSimilarBitCount = xor.length() * minSimilarity;
                 if (similarBitCount > minSimilarBitCount) {
                     return (similarBitCount / (double) xor.length()) * 100.0;
                 }
+            }
         }
 
         return -1.0;
