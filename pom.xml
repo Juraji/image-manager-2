@@ -10,6 +10,15 @@
     <name>Image Manager</name>
     <packaging>jar</packaging>
 
+    <repositories>
+        <repository>
+            <id>assembly-repo</id>
+            <name>Repo in assembly/lib</name>
+            <url>file://${project.basedir}/src/main/assembly/lib</url>
+            <!-- https://sourceforge.net/projects/javavp8decoder/ -->
+        </repository>
+    </repositories>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -220,6 +229,11 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>17.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf</groupId>
+            <artifactId>javavp8decoder</artifactId>
+            <version>0.0.2</version>
         </dependency>
 
         <!-- Tests -->

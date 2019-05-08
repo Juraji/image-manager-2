@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Created by Juraji on 7-5-2019.
  * image-manager
  */
-//@Disabled
+@Disabled
 class HashDirectoryTaskStressTest extends JavaFXAndEbeanBootstrappedTest {
     private static final int NO_META_DATA = 1000;
 
@@ -44,7 +44,7 @@ class HashDirectoryTaskStressTest extends JavaFXAndEbeanBootstrappedTest {
         // Setup test images
         IntStream.range(0, NO_META_DATA).forEach(i -> {
             final LocalMetaData testImageJpg = new LocalMetaData();
-            testImageJpg.setPath(testImagesDirectory.resolve("test-image.jpg"));
+            testImageJpg.setPath(testImagesDirectory.resolve("jpg-image.jpg"));
             directory.getMetaData().add(testImageJpg);
         });
 
@@ -60,7 +60,7 @@ class HashDirectoryTaskStressTest extends JavaFXAndEbeanBootstrappedTest {
 
         assertEquals(NO_META_DATA, directory.getMetaData().size());
 
-        final byte[] testImageJpgHashBits = Files.readAllBytes(testImagesDirectory.resolve("test-image.jpg.hash.bin"));
+        final byte[] testImageJpgHashBits = Files.readAllBytes(testImagesDirectory.resolve("jpg-image.jpg.hash.bin"));
         directory.getMetaData().forEach(metaData -> {
             assertNotNull(metaData.getHash());
             assertArrayEquals(testImageJpgHashBits, metaData.getHash().getBits());

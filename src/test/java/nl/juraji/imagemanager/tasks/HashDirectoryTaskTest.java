@@ -31,98 +31,282 @@ class HashDirectoryTaskTest extends JavaFXAndEbeanBootstrappedTest {
     }
 
     @Test
-    public void testHashingOfImages() throws IOException {
+    void testHashingGif() throws IOException {
         // Setup test directory
         final LocalDirectory directory = new LocalDirectory();
-        directory.setName("Test directory");
+        directory.setName("Test GIF directory");
         directory.setLocationOnDisk(testImagesDirectory);
 
-        // Setup test images
-        final LocalMetaData testImageJpg = new LocalMetaData();
-        testImageJpg.setDirectory(directory);
-        testImageJpg.setPath(testImagesDirectory.resolve("test-image.jpg"));
-        final LocalMetaData testImagePng = new LocalMetaData();
-        testImagePng.setDirectory(directory);
-        testImagePng.setPath(testImagesDirectory.resolve("test-image.png"));
-        final LocalMetaData testImageGifStill = new LocalMetaData();
-        testImageGifStill.setDirectory(directory);
-        testImageGifStill.setPath(testImagesDirectory.resolve("test-image-still.gif"));
-        final LocalMetaData testImageGifFramed = new LocalMetaData();
-        testImageGifFramed.setDirectory(directory);
-        testImageGifFramed.setPath(testImagesDirectory.resolve("test-image-framed.gif"));
-
-        directory.getMetaData().add(testImageJpg);
-        directory.getMetaData().add(testImagePng);
-        directory.getMetaData().add(testImageGifStill);
-        directory.getMetaData().add(testImageGifFramed);
+        final LocalMetaData metaData = new LocalMetaData();
+        metaData.setDirectory(directory);
+        metaData.setPath(testImagesDirectory.resolve("gif-still-image.gif"));
 
         // Task expects directory to be persisted in the database in order to update it
+        directory.getMetaData().add(metaData);
         directory.save();
-
 
         // Call hashing task
         final HashDirectoryTask hashDirectoryTask = new HashDirectoryTask(directory);
         hashDirectoryTask.call();
 
         // Check hashes
-        // Check JPG image ---------------------------------------------------------------------------------------------
         // Reload entity from the database, to make sure it persisted
-        final LocalMetaData testImageJpgDb = db.find(LocalMetaData.class, testImageJpg.getId());
-        assertNotNull(testImageJpgDb);
+        final LocalMetaData metaDataFromDb = db.find(LocalMetaData.class, metaData.getId());
+        assertNotNull(metaDataFromDb);
+
+        // Check image properties
+        assertEquals(448, metaDataFromDb.getWidth());
+        assertEquals(340, metaDataFromDb.getHeight());
+        assertEquals(92767, metaDataFromDb.getFileSize());
 
         // Assert a hash exists
-        assertNotNull(testImageJpgDb.getHash());
+        assertNotNull(metaDataFromDb.getHash());
 
         // Assert the correct contrast
-        assertEquals(Contrast.DARK, testImageJpgDb.getHash().getContrast());
+        assertEquals(Contrast.DARK, metaDataFromDb.getHash().getContrast());
 
         // Assert the hashed bits are correct
-        final byte[] testImageJpgHashBits = Files.readAllBytes(testImagesDirectory.resolve("test-image.jpg.hash.bin"));
-        assertArrayEquals(testImageJpgHashBits, testImageJpgDb.getHash().getBits());
+        final byte[] imageBits = Files.readAllBytes(testImagesDirectory.resolve("gif-still-image.gif.hash.bin"));
+        assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
+    }
 
-        // Check PNG image ---------------------------------------------------------------------------------------------
+    @Test
+    void testHashingJpg() throws IOException {
+        // Setup test directory
+        final LocalDirectory directory = new LocalDirectory();
+        directory.setName("Test JPG directory");
+        directory.setLocationOnDisk(testImagesDirectory);
+
+        final LocalMetaData metaData = new LocalMetaData();
+        metaData.setDirectory(directory);
+        metaData.setPath(testImagesDirectory.resolve("jpg-image.jpg"));
+
+        // Task expects directory to be persisted in the database in order to update it
+        directory.getMetaData().add(metaData);
+        directory.save();
+
+        // Call hashing task
+        final HashDirectoryTask hashDirectoryTask = new HashDirectoryTask(directory);
+        hashDirectoryTask.call();
+
+        // Check hashes
         // Reload entity from the database, to make sure it persisted
-        final LocalMetaData testImagePngDb = db.find(LocalMetaData.class, testImagePng.getId());
-        assertNotNull(testImagePngDb);
+        final LocalMetaData metaDataFromDb = db.find(LocalMetaData.class, metaData.getId());
+        assertNotNull(metaDataFromDb);
+
+        // Check image properties
+        assertEquals(448, metaDataFromDb.getWidth());
+        assertEquals(340, metaDataFromDb.getHeight());
+        assertEquals(36394, metaDataFromDb.getFileSize());
 
         // Assert a hash exists
-        assertNotNull(testImagePngDb.getHash());
+        assertNotNull(metaDataFromDb.getHash());
 
         // Assert the correct contrast
-        assertEquals(Contrast.DARK, testImagePngDb.getHash().getContrast());
+        assertEquals(Contrast.DARK, metaDataFromDb.getHash().getContrast());
 
         // Assert the hashed bits are correct
-        final byte[] testImagePngHashBits = Files.readAllBytes(testImagesDirectory.resolve("test-image.png.hash.bin"));
-        assertArrayEquals(testImagePngHashBits, testImagePngDb.getHash().getBits());
+        final byte[] imageBits = Files.readAllBytes(testImagesDirectory.resolve("jpg-image.jpg.hash.bin"));
+        assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
+    }
 
-        // Check GIF (still) image -------------------------------------------------------------------------------------
+    @Test
+    void testHashingPng() throws IOException {
+        // Setup test directory
+        final LocalDirectory directory = new LocalDirectory();
+        directory.setName("Test PNG directory");
+        directory.setLocationOnDisk(testImagesDirectory);
+
+        final LocalMetaData metaData = new LocalMetaData();
+        metaData.setDirectory(directory);
+        metaData.setPath(testImagesDirectory.resolve("png-image.png"));
+
+        // Task expects directory to be persisted in the database in order to update it
+        directory.getMetaData().add(metaData);
+        directory.save();
+
+        // Call hashing task
+        final HashDirectoryTask hashDirectoryTask = new HashDirectoryTask(directory);
+        hashDirectoryTask.call();
+
+        // Check hashes
         // Reload entity from the database, to make sure it persisted
-        final LocalMetaData testImageGifStillDb = db.find(LocalMetaData.class, testImageGifStill.getId());
-        assertNotNull(testImageGifStillDb);
+        final LocalMetaData metaDataFromDb = db.find(LocalMetaData.class, metaData.getId());
+        assertNotNull(metaDataFromDb);
+
+        // Check image properties
+        assertEquals(448, metaDataFromDb.getWidth());
+        assertEquals(340, metaDataFromDb.getHeight());
+        assertEquals(188933, metaDataFromDb.getFileSize());
 
         // Assert a hash exists
-        assertNotNull(testImageGifStillDb.getHash());
+        assertNotNull(metaDataFromDb.getHash());
 
         // Assert the correct contrast
-        assertEquals(Contrast.DARK, testImageGifStillDb.getHash().getContrast());
+        assertEquals(Contrast.DARK, metaDataFromDb.getHash().getContrast());
 
         // Assert the hashed bits are correct
-        final byte[] testImageGifStillHashBits = Files.readAllBytes(testImagesDirectory.resolve("test-image-still.gif.hash.bin"));
-        assertArrayEquals(testImageGifStillHashBits, testImageGifStillDb.getHash().getBits());
+        final byte[] imageBits = Files.readAllBytes(testImagesDirectory.resolve("png-image.png.hash.bin"));
+        assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
+    }
 
-        // Check GIF (framed) image ------------------------------------------------------------------------------------
+    @Test
+    void testHashingAnimatedGif() throws IOException {
+        // Setup test directory
+        final LocalDirectory directory = new LocalDirectory();
+        directory.setName("Test Animated GIF directory");
+        directory.setLocationOnDisk(testImagesDirectory);
+
+        final LocalMetaData metaData = new LocalMetaData();
+        metaData.setDirectory(directory);
+        metaData.setPath(testImagesDirectory.resolve("gif-animated-image.gif"));
+
+        // Task expects directory to be persisted in the database in order to update it
+        directory.getMetaData().add(metaData);
+        directory.save();
+
+        // Call hashing task
+        final HashDirectoryTask hashDirectoryTask = new HashDirectoryTask(directory);
+        hashDirectoryTask.call();
+
+        // Check hashes
         // Reload entity from the database, to make sure it persisted
-        final LocalMetaData testImageGifFramedDb = db.find(LocalMetaData.class, testImageGifFramed.getId());
-        assertNotNull(testImageGifFramedDb);
+        final LocalMetaData metaDataFromDb = db.find(LocalMetaData.class, metaData.getId());
+        assertNotNull(metaDataFromDb);
+
+        // Check image properties
+        assertEquals(265, metaDataFromDb.getWidth());
+        assertEquals(199, metaDataFromDb.getHeight());
+        assertEquals(264749, metaDataFromDb.getFileSize());
 
         // Assert a hash exists
-        assertNotNull(testImageGifFramedDb.getHash());
+        assertNotNull(metaDataFromDb.getHash());
 
         // Assert the correct contrast
-        assertEquals(Contrast.DARK, testImageGifFramedDb.getHash().getContrast());
+        assertEquals(Contrast.DARK, metaDataFromDb.getHash().getContrast());
 
         // Assert the hashed bits are correct
-        final byte[] testImageGifFramedBits = Files.readAllBytes(testImagesDirectory.resolve("test-image-framed.gif.hash.bin"));
-        assertArrayEquals(testImageGifFramedBits, testImageGifFramedDb.getHash().getBits());
+        final byte[] imageBits = Files.readAllBytes(testImagesDirectory.resolve("gif-animated-image.gif.hash.bin"));
+        assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
+    }
+
+    @Test
+    void testHashingWebP() throws IOException {
+        // Setup test directory
+        final LocalDirectory directory = new LocalDirectory();
+        directory.setName("Test WebP directory");
+        directory.setLocationOnDisk(testImagesDirectory);
+
+        final LocalMetaData metaData = new LocalMetaData();
+        metaData.setDirectory(directory);
+        metaData.setPath(testImagesDirectory.resolve("webp-image.webp"));
+
+        // Task expects directory to be persisted in the database in order to update it
+        directory.getMetaData().add(metaData);
+        directory.save();
+
+        // Call hashing task
+        final HashDirectoryTask hashDirectoryTask = new HashDirectoryTask(directory);
+        hashDirectoryTask.call();
+
+        // Check hashes
+        // Reload entity from the database, to make sure it persisted
+        final LocalMetaData metaDataFromDb = db.find(LocalMetaData.class, metaData.getId());
+        assertNotNull(metaDataFromDb);
+
+        // Check image properties
+        assertEquals(550, metaDataFromDb.getWidth());
+        assertEquals(368, metaDataFromDb.getHeight());
+        assertEquals(30320, metaDataFromDb.getFileSize());
+
+        // Assert a hash exists
+        assertNotNull(metaDataFromDb.getHash());
+
+        // Assert the correct contrast
+        assertEquals(Contrast.DARK, metaDataFromDb.getHash().getContrast());
+
+        // Assert the hashed bits are correct
+        final byte[] imageBits = Files.readAllBytes(testImagesDirectory.resolve("webp-image.webp.hash.bin"));
+        assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
+    }
+
+    @Test
+    void testHashingWebPLossless() throws IOException {
+        // Setup test directory
+        final LocalDirectory directory = new LocalDirectory();
+        directory.setName("Test WebP lossless directory");
+        directory.setLocationOnDisk(testImagesDirectory);
+
+        final LocalMetaData metaData = new LocalMetaData();
+        metaData.setDirectory(directory);
+        metaData.setPath(testImagesDirectory.resolve("webp-lossless-image.webp"));
+
+        // Task expects directory to be persisted in the database in order to update it
+        directory.getMetaData().add(metaData);
+        directory.save();
+
+        // Call hashing task
+        final HashDirectoryTask hashDirectoryTask = new HashDirectoryTask(directory);
+        hashDirectoryTask.call();
+
+        // Check hashes
+        // Reload entity from the database, to make sure it persisted
+        final LocalMetaData metaDataFromDb = db.find(LocalMetaData.class, metaData.getId());
+        assertNotNull(metaDataFromDb);
+
+        // Check image properties
+        assertEquals(400, metaDataFromDb.getWidth());
+        assertEquals(301, metaDataFromDb.getHeight());
+        assertEquals(81978, metaDataFromDb.getFileSize());
+
+        // Assert a hash exists
+        assertNotNull(metaDataFromDb.getHash());
+
+        // Assert the correct contrast
+        assertEquals(Contrast.DARK, metaDataFromDb.getHash().getContrast());
+
+        // Assert the hashed bits are correct
+        final byte[] imageBits = Files.readAllBytes(testImagesDirectory.resolve("webp-lossless-alpha-image.webp.hash.bin"));
+        assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
+    }
+
+    @Test
+    void testHashingWebPLosslessAlpha() throws IOException {
+        // Setup test directory
+        final LocalDirectory directory = new LocalDirectory();
+        directory.setName("Test WebP lossless directory");
+        directory.setLocationOnDisk(testImagesDirectory);
+
+        final LocalMetaData metaData = new LocalMetaData();
+        metaData.setDirectory(directory);
+        metaData.setPath(testImagesDirectory.resolve("webp-lossless-alpha-image.webp"));
+
+        // Task expects directory to be persisted in the database in order to update it
+        directory.getMetaData().add(metaData);
+        directory.save();
+
+        // Call hashing task
+        final HashDirectoryTask hashDirectoryTask = new HashDirectoryTask(directory);
+        hashDirectoryTask.call();
+
+        // Check hashes
+        // Reload entity from the database, to make sure it persisted
+        final LocalMetaData metaDataFromDb = db.find(LocalMetaData.class, metaData.getId());
+        assertNotNull(metaDataFromDb);
+
+        // Check image properties
+        assertEquals(400, metaDataFromDb.getWidth());
+        assertEquals(301, metaDataFromDb.getHeight());
+        assertEquals(18840, metaDataFromDb.getFileSize());
+
+        // Assert a hash exists
+        assertNotNull(metaDataFromDb.getHash());
+
+        // Assert the correct contrast
+        assertEquals(Contrast.DARK, metaDataFromDb.getHash().getContrast());
+
+        // Assert the hashed bits are correct
+        final byte[] imageBits = Files.readAllBytes(testImagesDirectory.resolve("webp-lossless-image.webp.hash.bin"));
+        assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
     }
 }

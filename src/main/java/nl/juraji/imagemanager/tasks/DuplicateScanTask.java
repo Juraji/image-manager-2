@@ -42,9 +42,10 @@ public class DuplicateScanTask extends IndicatorTask<List<DuplicateSet>> {
         final ArrayList<BaseMetaData> compareQueue = new ArrayList<>(directoryMetaData);
 
         directoryMetaData.stream()
-                .peek(i -> incrementProgress())
-                .peek(i -> this.checkCanceled())
                 .map(a -> {
+                    this.checkCanceled();
+                    this.incrementProgress();
+
                     final AtomicDouble addedSimilarity = new AtomicDouble(0.0);
                     final List<BaseMetaData> similarMetaData = new ArrayList<>();
 
