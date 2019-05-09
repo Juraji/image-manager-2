@@ -7,15 +7,15 @@ import nl.juraji.imagemanager.model.domain.local.LocalMetaData;
 import org.junit.Test;
 import util.EbeanTest;
 
-import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -37,16 +37,22 @@ public class DuplicateScanTaskTest extends EbeanTest {
         directory.setName("Duplicate scan test");
         directory.setLocationOnDisk(testImagesDirectory);
 
-        // Find all test images and add them to the test directory
-        final File[] files = testImagesDirectory.toFile().listFiles((dir, name) -> !name.endsWith(".bin"));
-        assertNotNull(files);
+        // List all test images and add them to the test directory
+        final ArrayList<String> testImages = new ArrayList<>();
+        testImages.add("gif-animated-image.gif");
+        testImages.add("gif-animated-image2.gif");
+        testImages.add("gif-still-image.gif");
+        testImages.add("jpg-image.jpg");
+        testImages.add("png-image.png");
+        testImages.add("webp-image.webp");
+        testImages.add("webp-image2.webp");
 
-        Arrays.stream(files).forEach(file -> {
+        testImages.forEach(imageName -> {
             // Add the image as metadata
             final LocalMetaData metaData = new LocalMetaData();
             metaData.setDirectory(directory);
-            metaData.setPath(file.toPath());
-            metaData.setComments(file.getName());
+            metaData.setPath(testImagesDirectory.resolve(imageName));
+            metaData.setComments(imageName);
             directory.getMetaData().add(metaData);
         });
 
@@ -86,7 +92,7 @@ public class DuplicateScanTaskTest extends EbeanTest {
         );
     }
 
-        private void assertDuplicateSetHasImages(DuplicateSet set, String... names) {
+    private void assertDuplicateSetHasImages(DuplicateSet set, String... names) {
         List<BaseMetaData> duplicates = set.getDuplicates();
         assertEquals(names.length, duplicates.size());
 
