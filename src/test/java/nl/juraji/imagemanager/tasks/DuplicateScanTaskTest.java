@@ -86,7 +86,7 @@ public class DuplicateScanTaskTest extends EbeanTest {
         );
     }
 
-    private void assertDuplicateSetHasImages(DuplicateSet set, String... names) {
+        private void assertDuplicateSetHasImages(DuplicateSet set, String... names) {
         List<BaseMetaData> duplicates = set.getDuplicates();
         assertEquals(names.length, duplicates.size());
 
