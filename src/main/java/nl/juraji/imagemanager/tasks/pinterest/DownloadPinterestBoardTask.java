@@ -6,7 +6,7 @@ import nl.juraji.imagemanager.model.domain.pinterest.PinMetaData;
 import nl.juraji.imagemanager.model.domain.pinterest.PinterestBoard;
 import nl.juraji.imagemanager.util.FileUtils;
 import nl.juraji.imagemanager.util.StringUtils;
-import nl.juraji.imagemanager.util.fxml.concurrent.IndicatorTask;
+import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * Created by Juraji on 26-11-2018.
  * Image Manager 2
  */
-public class DownloadPinterestBoardTask extends IndicatorTask<Void> {
+public class DownloadPinterestBoardTask extends ManagerTask<Void> {
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final PinterestBoard board;
     private final EbeanServer db;
@@ -34,13 +34,13 @@ public class DownloadPinterestBoardTask extends IndicatorTask<Void> {
     }
 
     @Override
-    protected Void call() throws Exception {
+    public Void call() throws Exception {
         this.downloadPins(board);
         return null;
     }
 
     private void updateMessage(PinterestBoard b) {
-        this.updateMessage("Downloading images for %s %s", b.getType().toString(), b.getName());
+        this.updateTaskDescription("Downloading images for %s %s", b.getType().toString(), b.getName());
     }
 
     private void downloadPins(PinterestBoard parent) throws IOException {
@@ -56,14 +56,16 @@ public class DownloadPinterestBoardTask extends IndicatorTask<Void> {
                 .filter(m -> m.getPath() == null)
                 .collect(Collectors.toSet());
 
-        addToTotalWork(pinsToDownload.size());
+        addWorkTodo(pinsToDownload.size());
 
         pinsToDownload.parallelStream()
-                .peek(p -> this.checkCanceled())
-                .peek(p -> incrementProgress())
-                .forEach(m -> this.downloadPin(boardLocationOnDisk, m));
+                .forEach(m -> {
+                    this.checkIsCanceled();
+                    incrementWorkDone();
+                    this.downloadPin(boardLocationOnDisk, m);
+                });
 
-        this.checkCanceled();
+        this.checkIsCanceled();
         final Set<PinterestBoard> boardChildren = parent.getChildren();
         if (!boardChildren.isEmpty()) {
             for (PinterestBoard child : boardChildren) {

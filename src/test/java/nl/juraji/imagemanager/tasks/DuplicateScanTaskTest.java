@@ -4,8 +4,8 @@ import nl.juraji.imagemanager.fxml.controls.DuplicateSet;
 import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
 import nl.juraji.imagemanager.model.domain.local.LocalMetaData;
-import org.junit.jupiter.api.Test;
-import util.JavaFXAndEbeanBootstrappedTest;
+import org.junit.Test;
+import util.EbeanTest;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -14,14 +14,15 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 
 /**
  * Created by Juraji on 8-5-2019.
  * image-manager
  */
-class DuplicateScanTaskTest extends JavaFXAndEbeanBootstrappedTest {
+public class DuplicateScanTaskTest extends EbeanTest {
     private final Path testImagesDirectory;
 
     public DuplicateScanTaskTest() throws URISyntaxException {

@@ -4,9 +4,9 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
 import nl.juraji.imagemanager.model.domain.local.LocalMetaData;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import util.JavaFXAndEbeanBootstrappedTest;
+import org.junit.Ignore;
+import org.junit.Test;
+import util.EbeanTest;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -15,14 +15,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 /**
  * Created by Juraji on 7-5-2019.
  * image-manager
  */
-@Disabled("Used during development for performance testing")
-class HashDirectoryTaskStressTest extends JavaFXAndEbeanBootstrappedTest {
+public class HashDirectoryTaskStressTest extends EbeanTest {
     private static final int NO_META_DATA = 1000;
 
     private final Path testImagesDirectory;
@@ -35,6 +34,7 @@ class HashDirectoryTaskStressTest extends JavaFXAndEbeanBootstrappedTest {
     }
 
     @Test
+    @Ignore("Used during development for performance testing")
     public void testHashingGreatAmountOfImages() throws IOException {
         // Setup test directory
         final LocalDirectory directory = new LocalDirectory();

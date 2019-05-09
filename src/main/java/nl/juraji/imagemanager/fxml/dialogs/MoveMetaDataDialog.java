@@ -15,14 +15,11 @@ import nl.juraji.imagemanager.tasks.MoveMetaDataTask;
 import nl.juraji.imagemanager.tasks.pinterest.MovePinTask;
 import nl.juraji.imagemanager.util.fxml.AlertBuilder;
 import nl.juraji.imagemanager.util.fxml.Controller;
+import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTaskChain;
 import nl.juraji.imagemanager.util.types.ListAdditionListener;
 
 import java.net.URL;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -80,31 +77,29 @@ public class MoveMetaDataDialog extends Controller implements Initializable {
         }
 
         final BaseDirectory directory = selectedItem.directory;
-        final AtomicBoolean doMoveOnPinterest = new AtomicBoolean(false);
+        boolean doMoveOnPinterest = false;
 
         if (this.checkIsPins(metaDataToMove)) {
-            final boolean movePinterestPins = AlertBuilder.confirm(getStage())
+            doMoveOnPinterest = AlertBuilder.confirm(getStage())
                     .withTitle("Move Pinterest pins")
                     .withMessage("Do you want the selected pin(s) to be moved to %s on Pinterest as well?",
                             directory.getName())
                     .showAndWait();
-
-            doMoveOnPinterest.set(movePinterestPins);
         }
 
-        final WorkQueueDialog<BaseMetaData> queueDialog = new WorkQueueDialog<>(getStage());
+        final List<BaseMetaData> metaData = metaDataToMove.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        final List<BaseMetaData> movedItems = new ArrayList<>();
 
-        metaDataToMove.stream()
-                .filter(Objects::nonNull)
-                .forEach(metaData -> {
-                    if (doMoveOnPinterest.get()) {
-                        queueDialog.queue(new MovePinTask((PinMetaData) metaData, (PinterestBoard) directory));
-                    }
+        final ManagerTaskChain<BaseMetaData, BaseMetaData> taskChain = new ManagerTaskChain<>(metaData);
 
-                    queueDialog.queue(new MoveMetaDataTask(metaData, directory));
-                });
+        if (doMoveOnPinterest) {
+            taskChain.nextTask(m -> new MovePinTask((PinMetaData) m, (PinterestBoard) directory));
+        }
 
-        queueDialog.addQueueEndNotification(movedItems -> {
+        taskChain.nextTask(m -> new MoveMetaDataTask(m, directory));
+        taskChain.afterEach(movedItems::add);
+
+        taskChain.afterAll(() -> {
             if (!movedItems.isEmpty()) {
                 AlertBuilder.info(getStage())
                         .withTitle("Items moved")
@@ -124,7 +119,7 @@ public class MoveMetaDataDialog extends Controller implements Initializable {
             close();
         });
 
-        queueDialog.execute();
+        new WorkDialog<Void>(getStage()).exec(taskChain);
     }
 
     private boolean checkIsPins(List<? extends BaseMetaData> metaDataToMove) {

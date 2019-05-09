@@ -12,7 +12,6 @@ import javafx.util.Duration;
 import nl.juraji.imagemanager.fxml.controls.DuplicateSet;
 import nl.juraji.imagemanager.fxml.controls.MetaDataTile;
 import nl.juraji.imagemanager.fxml.dialogs.WorkDialog;
-import nl.juraji.imagemanager.fxml.dialogs.WorkQueueDialog;
 import nl.juraji.imagemanager.model.domain.BaseDirectory;
 import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.DefaultDirectory;
@@ -23,6 +22,7 @@ import nl.juraji.imagemanager.model.finders.SettingsFinder;
 import nl.juraji.imagemanager.tasks.DuplicateScanTask;
 import nl.juraji.imagemanager.util.fxml.Controller;
 import nl.juraji.imagemanager.util.fxml.OptionDialogBuilder;
+import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTaskChain;
 import nl.juraji.imagemanager.util.types.ValueListener;
 
 import java.net.URL;
@@ -88,22 +88,24 @@ public class DuplicateScannerWindow extends Controller implements Initializable 
         this.duplicateSetView.getChildren().clear();
         this.duplicateSetList.getSelectionModel().clearSelection();
 
-        final WorkQueueDialog<List<DuplicateSet>> wd = new WorkQueueDialog<>(getStage());
+        final double minSimilarity = minSimilaritySlider.getValue();
+        final WorkDialog<Void> wd = new WorkDialog<>(getStage());
 
         if (directories == null) {
             directories = BaseDirectoryFinder.findAllRootDirectories();
         }
 
-        directories.forEach(directory -> wd.queue(new DuplicateScanTask(directory, minSimilaritySlider.getValue())));
-        wd.addTaskEndNotification(list -> this.duplicateSetList.getItems().addAll(list));
-        wd.addQueueEndNotification(() -> {
-            if (!this.duplicateSetList.getItems().isEmpty()) {
-                this.duplicateSetList.getSelectionModel().select(0);
-                this.duplicateSetList.requestFocus();
-            }
-        });
+        final ManagerTaskChain<BaseDirectory, List<DuplicateSet>> taskChain = new ManagerTaskChain<BaseDirectory, List<DuplicateSet>>(directories)
+                .nextTask(d -> new DuplicateScanTask(d, minSimilarity))
+                .afterEach(list -> this.duplicateSetList.getItems().addAll(list))
+                .afterAll(() -> {
+                    if (!this.duplicateSetList.getItems().isEmpty()) {
+                        this.duplicateSetList.getSelectionModel().select(0);
+                        this.duplicateSetList.requestFocus();
+                    }
+                });
 
-        wd.execute();
+        wd.exec(taskChain);
     }
 
     private void runScanAcrossDirectories() {

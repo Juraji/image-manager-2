@@ -1,16 +1,17 @@
 package nl.juraji.imagemanager.util;
 
-import org.junit.jupiter.api.Test;
+
+import org.junit.Test;
 
 import java.security.GeneralSecurityException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Juraji on 25-12-2018.
  * Image Manager 2
  */
-class CryptTest {
+public class CryptTest {
 
     @Test
     public void cipherEncryptDecrypt() throws GeneralSecurityException {

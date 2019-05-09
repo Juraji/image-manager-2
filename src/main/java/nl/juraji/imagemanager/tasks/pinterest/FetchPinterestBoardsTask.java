@@ -30,13 +30,13 @@ public class FetchPinterestBoardsTask extends PinterestWebTask<List<PinterestBoa
     }
 
     @Override
-    protected List<PinterestBoard> call() throws Exception {
+    public List<PinterestBoard> call() throws Exception {
         super.init();
 
         final BoardsResourceRequest request = new BoardsResourceRequest(getInitialState().getViewer().getUsername());
         final BoardsResourceResult result = executeResourceRequest(request);
 
-        this.checkCanceled();
+        this.checkIsCanceled();
         return result.getData().stream()
                 .map(this::mapBoardResource)
                 .sorted(Comparator.comparing(PinterestBoard::getName))

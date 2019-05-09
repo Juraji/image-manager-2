@@ -1,8 +1,7 @@
 package util;
 
-import javafx.application.Application;
 import nl.juraji.imagemanager.util.io.db.EbeanInit;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,21 +12,15 @@ import org.slf4j.LoggerFactory;
  * Initializes Ebean with test-ebean.properties and the JavaFX Toolkit
  * Note that the database is not cleaned before each test, so test data remains
  */
-public abstract class JavaFXAndEbeanBootstrappedTest {
+public abstract class EbeanTest extends MockFXTest {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(JavaFXAndEbeanBootstrappedTest.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(EbeanTest.class);
 
-    @BeforeAll
-    public static void setUpClass() throws InterruptedException {
+    @BeforeClass
+    public static void setUpEbean() {
         // Load Ebean mode
         LOGGER.info("Initialize Ebean...");
         EbeanInit.initDataSource();
-
-        // Setup JavaFX test framework
-        LOGGER.info("Initialize JavaFx...");
-        FXInit.initializeFXToolkit();
-
         LOGGER.info("Initialization completed!");
     }
-
 }

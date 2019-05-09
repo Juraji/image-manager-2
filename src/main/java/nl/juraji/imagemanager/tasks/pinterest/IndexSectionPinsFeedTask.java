@@ -6,6 +6,8 @@ import nl.juraji.imagemanager.model.web.pinterest.resources.sections.BoardSectio
 import nl.juraji.imagemanager.model.web.pinterest.resources.sections.BoardSectionResourceRequest;
 import nl.juraji.imagemanager.model.web.pinterest.resources.sections.BoardSectionResourceResult;
 
+import java.io.IOException;
+
 /**
  * Created by Juraji on 4-12-2018.
  * Image Manager 2
@@ -17,12 +19,12 @@ public class IndexSectionPinsFeedTask extends IndexPinsFeedTask {
     }
 
     @Override
-    protected BoardSectionPinsResourceResult getPinsFeed(String boardId, String bookmark) throws Exception {
+    protected BoardSectionPinsResourceResult getPinsFeed(String boardId, String bookmark) throws IOException {
         return executeResourceRequest(new BoardSectionPinsResourceRequest(boardId, bookmark));
     }
 
     @Override
-    protected int getReportedPinCount() throws Exception {
+    protected int getReportedPinCount() throws IOException {
         final PinterestBoard board = getBoard();
         final BoardSectionResourceRequest boardSectionResourceRequest = new BoardSectionResourceRequest(
                 getInitialState().getViewer().getUsername(),

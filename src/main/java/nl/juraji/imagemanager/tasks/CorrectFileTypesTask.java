@@ -7,7 +7,7 @@ import nl.juraji.imagemanager.model.domain.BaseDirectory;
 import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.util.FileUtils;
 import nl.juraji.imagemanager.util.StringUtils;
-import nl.juraji.imagemanager.util.fxml.concurrent.IndicatorTask;
+import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * Created by Juraji on 26-11-2018.
  * Image Manager 2
  */
-public class CorrectFileTypesTask extends IndicatorTask<Void> {
+public class CorrectFileTypesTask extends ManagerTask<Void> {
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final BaseDirectory directory;
     private final EbeanServer db;
@@ -35,26 +35,28 @@ public class CorrectFileTypesTask extends IndicatorTask<Void> {
     }
 
     @Override
-    protected Void call() {
-        setTotalWork(directory.getTotalMetaDataCount());
+    public Void call() {
+        setWorkTodo(directory.getTotalMetaDataCount());
         correctFileTypes(directory);
         return null;
     }
 
     private void updateMessage(BaseDirectory d) {
-        super.updateMessage("Correcting file types for %s", d.getName());
+        super.updateTaskDescription("Correcting file types for %s", d.getName());
     }
 
     @SuppressWarnings("unchecked")
     private void correctFileTypes(BaseDirectory parent) {
-        this.checkCanceled();
+        this.checkIsCanceled();
         updateMessage(parent);
 
         // Correct files not previously corrected
         final Set<BaseMetaData> correctedMetaData = ((Set<BaseMetaData>) parent.getMetaData()).stream()
                 .filter(m -> !m.isFileCorrected())
-                .peek(m -> this.checkCanceled())
-                .map(this::correctFileTypeFor)
+                .map(m -> {
+                    this.checkIsCanceled();
+                    return this.correctFileTypeFor(m);
+                })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 

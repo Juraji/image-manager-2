@@ -5,7 +5,7 @@ import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.hashes.Contrast;
 import nl.juraji.imagemanager.model.domain.hashes.HashData;
 import nl.juraji.imagemanager.util.FileUtils;
-import nl.juraji.imagemanager.util.fxml.concurrent.IndicatorTask;
+import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +27,7 @@ import static java.awt.RenderingHints.*;
  * Created by Juraji on 26-11-2018.
  * Image Manager 2
  */
-public class HashDirectoryTask extends IndicatorTask<Void> {
+public class HashDirectoryTask extends ManagerTask<Void> {
     public static final int SAMPLE_SIZE = 100;
     public static final int CONTRAST_BRIGHTNESS_THRESHOLD = 152;
 
@@ -40,14 +40,14 @@ public class HashDirectoryTask extends IndicatorTask<Void> {
     }
 
     @Override
-    protected Void call() {
+    public Void call() {
         this.buildHashes(directory);
         return null;
     }
 
     @SuppressWarnings("unchecked")
     private void buildHashes(BaseDirectory parent) {
-        updateMessage("Creating hashes for: %s", parent.getName());
+        updateTaskDescription("Creating hashes for: %s", parent.getName());
 
         final Set<BaseMetaData> parentMetaData = ((Set<BaseMetaData>) parent.getMetaData()).stream()
                 .filter(m -> m.getHash() == null || m.getHash().getBits() == null)
@@ -55,17 +55,17 @@ public class HashDirectoryTask extends IndicatorTask<Void> {
         final int metaDataCount = parent.getMetaData().size();
 
         if (metaDataCount > 0) {
-            addToTotalWork(metaDataCount);
+            addWorkTodo(metaDataCount);
 
             parentMetaData.parallelStream().forEach(metaData -> {
-                this.checkCanceled();
+                this.checkIsCanceled();
                 this.generate(metaData);
                 metaData.save();
-                this.incrementProgress();
+                this.incrementWorkDone();
             });
         }
 
-        this.checkCanceled();
+        this.checkIsCanceled();
         parent.getChildren().forEach(o -> this.buildHashes((BaseDirectory) o));
     }
 

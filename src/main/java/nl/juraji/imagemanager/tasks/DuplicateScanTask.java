@@ -5,7 +5,7 @@ import nl.juraji.imagemanager.fxml.controls.DuplicateSet;
 import nl.juraji.imagemanager.model.domain.BaseDirectory;
 import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.hashes.HashData;
-import nl.juraji.imagemanager.util.fxml.concurrent.IndicatorTask;
+import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
 
 import java.util.*;
 
@@ -13,7 +13,7 @@ import java.util.*;
  * Created by Juraji on 1-12-2018.
  * Image Manager 2
  */
-public class DuplicateScanTask extends IndicatorTask<List<DuplicateSet>> {
+public class DuplicateScanTask extends ManagerTask<List<DuplicateSet>> {
     private final BaseDirectory directory;
     private final double minSimilarity;
 
@@ -24,13 +24,13 @@ public class DuplicateScanTask extends IndicatorTask<List<DuplicateSet>> {
     }
 
     @Override
-    protected List<DuplicateSet> call() {
-        setTotalWork(directory.getTotalMetaDataCount());
+    public List<DuplicateSet> call() {
+        setWorkTodo(directory.getTotalMetaDataCount());
         return this.scanForDuplicates(directory);
     }
 
     private void updateMessage(BaseDirectory d) {
-        updateMessage("Scanning duplicates for %s", d.getName());
+        updateTaskDescription("Scanning duplicates for %s", d.getName());
     }
 
     @SuppressWarnings("unchecked")
@@ -43,8 +43,8 @@ public class DuplicateScanTask extends IndicatorTask<List<DuplicateSet>> {
 
         directoryMetaData.stream()
                 .map(a -> {
-                    this.checkCanceled();
-                    this.incrementProgress();
+                    this.checkIsCanceled();
+                    this.incrementWorkDone();
 
                     final AtomicDouble addedSimilarity = new AtomicDouble(0.0);
                     final List<BaseMetaData> similarMetaData = new ArrayList<>();
@@ -72,7 +72,7 @@ public class DuplicateScanTask extends IndicatorTask<List<DuplicateSet>> {
                 .filter(Objects::nonNull)
                 .forEach(duplicateSets::add);
 
-        this.checkCanceled();
+        this.checkIsCanceled();
         final Set<BaseDirectory> children = parent.getChildren();
         if (children != null) {
             for (BaseDirectory child : children) {

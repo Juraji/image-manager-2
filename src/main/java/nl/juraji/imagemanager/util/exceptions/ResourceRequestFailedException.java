@@ -1,4 +1,4 @@
-package nl.juraji.imagemanager.tasks.pinterest;
+package nl.juraji.imagemanager.util.exceptions;
 
 import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceRequest;
 import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceResult;

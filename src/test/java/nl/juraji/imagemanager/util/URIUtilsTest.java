@@ -1,17 +1,17 @@
 package nl.juraji.imagemanager.util;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.net.URI;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertEquals;
+
 
 /**
  * Created by Juraji on 9-12-2018.
  * Image Manager 2
  */
-class URIUtilsTest {
+public class URIUtilsTest {
 
     @Test
     public void getPathSection() {
@@ -21,10 +21,12 @@ class URIUtilsTest {
         assertEquals("awesome", URIUtils.getPathSection(uri, 1));
         assertEquals("path", URIUtils.getPathSection(uri, -1));
         assertEquals("awesome", URIUtils.getPathSection(uri, -2));
+    }
 
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> {
-            URIUtils.getPathSection(uri, -6);
-        });
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void getPathSectionOOB() {
+        final URI uri = URI.create("https://juraji.nl/some/awesome/path/");
+        URIUtils.getPathSection(uri, -6);
     }
 
     @Test

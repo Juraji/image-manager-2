@@ -1,7 +1,7 @@
 package nl.juraji.imagemanager.tasks;
 
 import javafx.stage.Window;
-import nl.juraji.imagemanager.fxml.dialogs.WorkQueueDialog;
+import nl.juraji.imagemanager.fxml.dialogs.WorkDialog;
 import nl.juraji.imagemanager.model.domain.BaseDirectory;
 import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
 import nl.juraji.imagemanager.model.domain.pinterest.BoardType;
@@ -10,72 +10,100 @@ import nl.juraji.imagemanager.tasks.pinterest.DownloadPinterestBoardTask;
 import nl.juraji.imagemanager.tasks.pinterest.IndexBoardPinsFeedTask;
 import nl.juraji.imagemanager.tasks.pinterest.IndexSectionPinsFeedTask;
 import nl.juraji.imagemanager.util.fxml.OptionDialogBuilder;
+import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTaskChain;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.function.Consumer;
 
 /**
  * Created by Juraji on 29-11-2018.
  * Image Manager 2
  */
-public final class IndexDirectoryTaskBuilder {
-    private final WorkQueueDialog<Void> indicator;
+public final class IndexDirectoryTaskBuilder extends ManagerTaskChain<BaseDirectory, Void> {
+    private final Collection<BaseDirectory> directories;
     private final Window owner;
-    private boolean doIndexDirectory = false;
-    private boolean doOptionalDownload = false;
-    private boolean doCorrectFileTypes = false;
-    private boolean doGenerateHashes = false;
-    private boolean doReindexPinterestBoard = false;
+    private boolean doReindex = false;
 
-    private IndexDirectoryTaskBuilder(Window owner) {
-        this.indicator = new WorkQueueDialog<>(owner);
+    private IndexDirectoryTaskBuilder(Window owner, Collection<BaseDirectory> directories) {
+        super(directories);
         this.owner = owner;
+        this.directories = directories;
     }
 
-    public static IndexDirectoryTaskBuilder build(Window owner) {
-        return new IndexDirectoryTaskBuilder(owner);
+    public static IndexDirectoryTaskBuilder build(Window owner, Collection<BaseDirectory> directories) {
+        return new IndexDirectoryTaskBuilder(owner, directories);
     }
 
 
-    public static IndexDirectoryTaskBuilder standard(Window owner) {
-        return build(owner)
+    public static IndexDirectoryTaskBuilder standard(Window owner, Collection<BaseDirectory> directories) {
+        return build(owner, directories)
                 .withIndexItems()
                 .withOptionalDownload()
                 .withCorrectFileTypes()
                 .withGenerateHashes();
     }
 
+    @Override
+    public IndexDirectoryTaskBuilder afterAll(Runnable runnable) {
+        super.afterAll(runnable);
+        return this;
+    }
+
+    @Override
+    public IndexDirectoryTaskBuilder afterEach(Consumer<Void> consumer) {
+        super.afterEach(consumer);
+        return this;
+    }
+
     public IndexDirectoryTaskBuilder withIndexItems() {
-        this.doIndexDirectory = true;
+        this.nextTask(directory -> {
+            // Index directory or Pinterest board
+            if (directory instanceof LocalDirectory) {
+                return new IndexLocalDirectoryTask((LocalDirectory) directory);
+            } else if (directory instanceof PinterestBoard) {
+                PinterestBoard board = (PinterestBoard) directory;
+
+                if (BoardType.BOARD.equals(board.getType())) {
+                    return new ManagerTaskChain<PinterestBoard, Void>(Collections.singleton(board))
+                            .nextTask(d -> new IndexBoardPinsFeedTask(d, doReindex))
+                            .nextTask(d -> new ManagerTaskChain<PinterestBoard, Void>(d.getChildren())
+                                    .nextTask(s -> new IndexSectionPinsFeedTask(s, doReindex)));
+
+                } else {
+                    return new IndexSectionPinsFeedTask(board, doReindex);
+                }
+            }
+
+            throw new UnsupportedOperationException("Indexing of " + directory.getClass() + " not supported!");
+        });
         return this;
     }
 
     public IndexDirectoryTaskBuilder withOptionalDownload() {
-        this.doOptionalDownload = true;
+        this.nextTask(d -> {
+            if (d instanceof PinterestBoard) {
+                return new DownloadPinterestBoardTask((PinterestBoard) d);
+            } else {
+                return null;
+            }
+        });
         return this;
     }
 
     public IndexDirectoryTaskBuilder withCorrectFileTypes() {
-        this.doCorrectFileTypes = true;
+        this.nextTask(CorrectFileTypesTask::new);
         return this;
     }
 
     public IndexDirectoryTaskBuilder withGenerateHashes() {
-        this.doGenerateHashes = true;
+        this.nextTask(HashDirectoryTask::new);
         return this;
     }
 
-    public IndexDirectoryTaskBuilder afterEach(Runnable runnable) {
-        indicator.addTaskEndNotification(o -> runnable.run());
-        return this;
-    }
-
-    public IndexDirectoryTaskBuilder afterAll(Runnable runnable) {
-        indicator.addQueueEndNotification(runnable);
-        return this;
-    }
-
-    public void execute(Collection<BaseDirectory> directories) {
-        final boolean hasPinterestBoards = directories.stream().anyMatch(directory -> directory instanceof PinterestBoard);
+    public void runIndex() {
+        final boolean hasPinterestBoards = this.directories.stream()
+                .anyMatch(directory -> directory instanceof PinterestBoard);
 
         if (hasPinterestBoards) {
             final int optionIndex = OptionDialogBuilder.build(owner)
@@ -92,45 +120,9 @@ public final class IndexDirectoryTaskBuilder {
                 return;
             }
 
-            this.doReindexPinterestBoard = optionIndex == 1;
+            doReindex = optionIndex == 1;
         }
 
-        directories.forEach(this::init);
-        indicator.execute();
-    }
-
-    private void init(BaseDirectory directory) {
-        if (doIndexDirectory) {
-            // Index directory or Pinterest board
-            if (directory instanceof LocalDirectory) {
-                indicator.queue(new IndexLocalDirectoryTask((LocalDirectory) directory));
-            } else if (directory instanceof PinterestBoard) {
-                PinterestBoard board = (PinterestBoard) directory;
-
-                if (BoardType.BOARD.equals(board.getType())) {
-                    indicator.queue(new IndexBoardPinsFeedTask(board, doReindexPinterestBoard));
-
-                    board.getChildren().forEach(section ->
-                            indicator.queue(new IndexSectionPinsFeedTask(section, doReindexPinterestBoard)));
-                } else {
-                    indicator.queue(new IndexSectionPinsFeedTask(board, doReindexPinterestBoard));
-                }
-            }
-        }
-
-        if (doOptionalDownload && directory instanceof PinterestBoard) {
-            // Download Pin images
-            indicator.queue(new DownloadPinterestBoardTask((PinterestBoard) directory));
-        }
-
-        if (doCorrectFileTypes) {
-            // Correct file types
-            indicator.queue(new CorrectFileTypesTask(directory));
-        }
-
-        if (doGenerateHashes) {
-            // Hash files
-            indicator.queue(new HashDirectoryTask(directory));
-        }
+        new WorkDialog<Void>(owner).exec(this);
     }
 }

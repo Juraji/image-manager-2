@@ -76,11 +76,13 @@ public class DirectoryTreeTableContextMenu extends ContextMenu {
     private void indexSelectedDirectoriesAction() {
         final List<TreeItem<BaseDirectory>> directories = reduceSelectionToParents();
         if (!directories.isEmpty()) {
-            IndexDirectoryTaskBuilder.standard(getOwnerWindow())
-                    .afterEach(parentTableView::refresh)
-                    .execute(directories.stream()
-                            .map(TreeItem::getValue)
-                            .collect(Collectors.toList()));
+            final List<BaseDirectory> directories1 = directories.stream()
+                    .map(TreeItem::getValue)
+                    .collect(Collectors.toList());
+
+            IndexDirectoryTaskBuilder.standard(getOwnerWindow(), directories1)
+                    .afterEach(o -> parentTableView.refresh())
+                    .runIndex();
         }
     }
 

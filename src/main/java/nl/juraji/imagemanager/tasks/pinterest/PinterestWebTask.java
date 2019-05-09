@@ -7,7 +7,9 @@ import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceRequest;
 import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceResult;
 import nl.juraji.imagemanager.model.web.pinterest.types.initialstate.InitialStateObject;
 import nl.juraji.imagemanager.util.StringUtils;
-import nl.juraji.imagemanager.util.fxml.concurrent.IndicatorTask;
+import nl.juraji.imagemanager.util.exceptions.ImageManagerError;
+import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
+import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTaskException;
 import nl.juraji.imagemanager.util.io.web.WebDriverPool;
 import org.apache.commons.io.IOUtils;
 import org.openqa.selenium.By;
@@ -19,6 +21,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -28,14 +31,14 @@ import java.util.Set;
  * Created by Juraji on 28-11-2018.
  * Image Manager 2
  */
-public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
+public abstract class PinterestWebTask<T> extends ManagerTask<T> {
 
     private static final long WEB_DRIVER_TIMEOUT_SEC = 2;
     private static final long WEB_DRIVER_SLEEP_MILLIS = 500;
 
     public static final URI PINTEREST_BASE_URI = URI.create("https://pinterest.com");
 
-    private final String originalMessage;
+    private final String originalTaskDescription;
     private final Gson gson;
     private RemoteWebDriver driver;
     private InitialStateObject initialState;
@@ -46,15 +49,15 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
         super(message, params);
 
         try {
-            this.originalMessage = this.getMessage();
+            this.originalTaskDescription = this.getTaskDescription();
             this.gson = new Gson();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ImageManagerError(e);
         }
     }
 
     @Override
-    protected void done() {
+    public void done() {
         if (driver != null) {
             // Persist cookies
             this.persistDriverCookies();
@@ -77,13 +80,13 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
     }
 
     protected void init() throws Exception {
-        super.updateMessage("Initializing web session...");
+        super.updateTaskDescription("Initializing web session...");
 
         // Get a WebDriver instance from the pool
         this.driver = WebDriverPool.borrowDriver();
 
         if (driver == null) {
-            throw new Exception("Failed requesting web driver instance from driver pool");
+            throw new ManagerTaskException("Failed requesting web driver instance from driver pool");
         }
 
         if (this.driver.getCurrentUrl().equals("data:,")) {
@@ -97,7 +100,7 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
 
             if (isUnAuthenticated()) {
                 logger.info("Driver: Not authenticated!");
-                throw new Exception("Not authenticated on Pinterest");
+                throw new ManagerTaskException("Not authenticated on Pinterest");
             }
         }
 
@@ -105,11 +108,11 @@ public abstract class PinterestWebTask<T> extends IndicatorTask<T> {
         final WebElement initialStateElement = getElementBy(By.id("initial-state"));
         this.initialState = gson.fromJson(initialStateElement.getAttribute("innerHTML"), InitialStateObject.class);
 
-        super.updateMessage(originalMessage);
+        super.updateTaskDescription(originalTaskDescription);
         this.persistDriverCookies();
     }
 
-    protected <U, R extends ResourceResult<U>> R executeResourceRequest(ResourceRequest<R> request) throws Exception {
+    protected <U, R extends ResourceResult<U>> R executeResourceRequest(ResourceRequest<R> request) throws IOException {
         logger.info("New Resource request: {}", request.getHeaders());
 
         String result;

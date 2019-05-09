@@ -1,7 +1,7 @@
 package nl.juraji.imagemanager.tasks.pinterest;
 
 import nl.juraji.imagemanager.model.finders.WebCookieFinder;
-import nl.juraji.imagemanager.util.fxml.concurrent.IndicatorTask;
+import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
 import nl.juraji.imagemanager.util.io.web.ChromeDriverFactory;
 import nl.juraji.imagemanager.util.io.web.WebDriverPool;
 import org.openqa.selenium.Cookie;
@@ -14,14 +14,14 @@ import static nl.juraji.imagemanager.tasks.pinterest.PinterestWebTask.PINTEREST_
  * Created by Juraji on 17-4-2019.
  * Image Manager 2
  */
-public class PinterestLoginTask extends IndicatorTask<Boolean> {
+public class PinterestLoginTask extends ManagerTask<Boolean> {
 
     public PinterestLoginTask() {
         super("Authenticating on Pinterest...");
     }
 
     @Override
-    protected Boolean call() throws Exception {
+    public Boolean call() throws Exception {
         // Clear drivers in the web driver pool, so no session information is kept in memory
         WebDriverPool.clearDrivers();
 

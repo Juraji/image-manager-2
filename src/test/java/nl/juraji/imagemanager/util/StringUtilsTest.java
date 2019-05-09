@@ -1,16 +1,17 @@
 package nl.juraji.imagemanager.util;
 
-import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Juraji on 27-11-2018.
  * Image Manager 2
  */
 @SuppressWarnings("ConstantConditions")
-class StringUtilsTest {
+public class StringUtilsTest {
 
     @Test
     public void isEmpty() {

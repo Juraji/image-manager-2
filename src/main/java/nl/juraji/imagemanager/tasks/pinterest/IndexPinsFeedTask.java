@@ -10,6 +10,7 @@ import nl.juraji.imagemanager.util.StringUtils;
 import nl.juraji.imagemanager.util.URIUtils;
 import nl.juraji.imagemanager.util.types.AtomicString;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public abstract class IndexPinsFeedTask extends PinterestWebTask<Void> {
     }
 
     @Override
-    protected Void call() throws Exception {
+    public Void call() throws Exception {
         super.init();
 
         final Set<PinMetaData> existingMetaData = board.getMetaData();
@@ -55,12 +56,12 @@ public abstract class IndexPinsFeedTask extends PinterestWebTask<Void> {
             return null;
         }
 
-        setTotalWork(pinsToFetchCount);
+        setWorkTodo(pinsToFetchCount);
         final List<PinMetaData> fetchedPins = new ArrayList<>();
         final AtomicString bookmarkTemp = new AtomicString();
 
         do {
-            this.checkCanceled();
+            this.checkIsCanceled();
             final ResourceResult<List<PinResource>> result = this.getPinsFeed(board.getBoardId(), bookmarkTemp.get());
 
             bookmarkTemp.set(result.getBookmark());
@@ -70,7 +71,7 @@ public abstract class IndexPinsFeedTask extends PinterestWebTask<Void> {
                     .filter(Objects::nonNull)
                     .forEach(fetchedPins::add);
 
-            setProgress(fetchedPins.size());
+            setWorkDone(fetchedPins.size());
         } while (fetchedPins.size() < pinsToFetchCount && !bookmarkTemp.equalsStr("-end-"));
 
         logger.info("Fetched {} new pins for {}", fetchedPins.size(), board.getName());
@@ -122,7 +123,7 @@ public abstract class IndexPinsFeedTask extends PinterestWebTask<Void> {
         return null;
     }
 
-    protected abstract ResourceResult<List<PinResource>> getPinsFeed(String boardId, String bookmark) throws Exception;
+    protected abstract ResourceResult<List<PinResource>> getPinsFeed(String boardId, String bookmark) throws IOException;
 
-    protected abstract int getReportedPinCount() throws Exception;
+    protected abstract int getReportedPinCount() throws IOException;
 }

@@ -6,7 +6,7 @@ import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
 import nl.juraji.imagemanager.model.domain.local.LocalMetaData;
 import nl.juraji.imagemanager.util.FileUtils;
-import nl.juraji.imagemanager.util.fxml.concurrent.IndicatorTask;
+import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,7 @@ import java.util.Set;
  * Created by Juraji on 25-11-2018.
  * Image Manager 2
  */
-public class IndexLocalDirectoryTask extends IndicatorTask<Void> {
+public class IndexLocalDirectoryTask extends ManagerTask<Void> {
     private static final List<String> SUPPORTED_EXTENSIONS = Arrays.asList("jpg", "jpeg", "gif", "png", "bmp", "webp", "tiff");
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final LocalDirectory directory;
@@ -35,8 +35,8 @@ public class IndexLocalDirectoryTask extends IndicatorTask<Void> {
     }
 
     @Override
-    protected Void call() throws IOException {
-        setTotalWork(calculateTotalDirectoryCount(directory));
+    public Void call() throws IOException {
+        setWorkTodo(calculateTotalDirectoryCount(directory));
         this.indexAndPersist(directory);
         directory.save();
         return null;
@@ -50,7 +50,7 @@ public class IndexLocalDirectoryTask extends IndicatorTask<Void> {
     }
 
     private void indexAndPersist(LocalDirectory parent) throws IOException {
-        updateMessage("Indexing local directory %s", parent.getName());
+        updateTaskDescription("Indexing local directory %s", parent.getName());
         logger.info("Indexing {}", parent.getLocationOnDisk());
 
         final List<Path> files = FileUtils.getDirectoryFiles(parent.getLocationOnDisk(), SUPPORTED_EXTENSIONS);
@@ -76,11 +76,11 @@ public class IndexLocalDirectoryTask extends IndicatorTask<Void> {
         logger.info("Persisted {} meta data objects to the database", createdMetaData.size());
         existingMetaData.addAll(createdMetaData);
 
-        this.checkCanceled();
+        this.checkIsCanceled();
         for (LocalDirectory child : parent.getChildren()) {
             indexAndPersist(child);
         }
 
-        incrementProgress();
+        incrementWorkDone();
     }
 }

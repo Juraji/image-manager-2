@@ -1,6 +1,5 @@
 package nl.juraji.imagemanager.fxml;
 
-import io.ebean.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -14,7 +13,6 @@ import nl.juraji.imagemanager.fxml.controls.DirectoryTreeTableView;
 import nl.juraji.imagemanager.fxml.dialogs.AddLocalDirectoryDialog;
 import nl.juraji.imagemanager.fxml.dialogs.SelectBoardsDialog;
 import nl.juraji.imagemanager.fxml.dialogs.WorkDialog;
-import nl.juraji.imagemanager.fxml.dialogs.WorkQueueDialog;
 import nl.juraji.imagemanager.model.domain.BaseDirectory;
 import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
 import nl.juraji.imagemanager.model.domain.pinterest.PinterestBoard;
@@ -30,12 +28,14 @@ import nl.juraji.imagemanager.util.DesktopUtils;
 import nl.juraji.imagemanager.util.fxml.AlertBuilder;
 import nl.juraji.imagemanager.util.fxml.Controller;
 import nl.juraji.imagemanager.util.fxml.FXMLStage;
+import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTaskChain;
 import nl.juraji.imagemanager.util.types.ListAdditionListener;
 
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -112,15 +112,17 @@ public class MainWindow extends Controller implements Initializable {
                 controller.addAvailableItems(boards);
 
                 controller.onItemsSelected((ListAdditionListener<PinterestBoard>) addedItems -> {
-                    final WorkQueueDialog<Void> indexSectionsDialog = new WorkQueueDialog<>(getStage());
-                    addedItems.stream()
-                            .peek(Model::save) // Save boards
-                            .peek(directoriesTableView::addDirectory) // Add to table view
-                            .map(ImportPinterestBoardSectionsTask::new) // index sections
-                            .forEach(indexSectionsDialog::queue);
+                    addedItems.forEach(board -> {
+                        board.save();
+                        directoriesTableView.addDirectory(board);
+                    });
 
-                    indexSectionsDialog.addQueueEndNotification(directoriesTableView::loadDirectoryTrees);
-                    indexSectionsDialog.execute();
+                    //noinspection unchecked
+                    final ManagerTaskChain<PinterestBoard, Void> taskChain = new ManagerTaskChain<PinterestBoard, Void>((Collection<PinterestBoard>) addedItems)
+                            .nextTask(ImportPinterestBoardSectionsTask::new)
+                            .afterAll(directoriesTableView::loadDirectoryTrees);
+
+                    new WorkDialog<Void>(getStage()).exec(taskChain);
                 });
 
                 stage.show();
@@ -144,9 +146,9 @@ public class MainWindow extends Controller implements Initializable {
                 .collect(Collectors.toList());
 
         final Window window = ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
-        IndexDirectoryTaskBuilder.standard(window)
-                .afterEach(directoriesTableView::refresh)
-                .execute(directories);
+        IndexDirectoryTaskBuilder.standard(window, directories)
+                .afterEach(o -> directoriesTableView.refresh())
+                .runIndex();
     }
 
     public void menuDirectoriesIndexFavoriteDirectoriesAction(ActionEvent event) {
@@ -157,9 +159,9 @@ public class MainWindow extends Controller implements Initializable {
                 .collect(Collectors.toList());
 
         final Window window = ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
-        IndexDirectoryTaskBuilder.standard(window)
-                .afterEach(directoriesTableView::refresh)
-                .execute(directories);
+        IndexDirectoryTaskBuilder.standard(window, directories)
+                .afterEach(o -> directoriesTableView.refresh())
+                .runIndex();
     }
 
     public void menuDirectoriesOpenTargetDirectoryAction() {
@@ -182,13 +184,13 @@ public class MainWindow extends Controller implements Initializable {
                 .map(TreeItem::getValue)
                 .collect(Collectors.toList());
 
-        IndexDirectoryTaskBuilder.build(getStage())
+        IndexDirectoryTaskBuilder.build(getStage(), directories)
                 .withGenerateHashes()
                 .afterAll(directoriesTableView::refresh)
-                .execute(directories);
+                .runIndex();
     }
 
-    public void menuToolsAllDeleteHashesAction(ActionEvent event) {
+    public void menuToolsAllDeleteHashesAction() {
         final boolean doDelete = AlertBuilder.warning(getStage())
                 .withTitle("Delete all hashes")
                 .withMessage("Are you sure you want to delete all generated hashes?\n" +
@@ -201,12 +203,11 @@ public class MainWindow extends Controller implements Initializable {
                     .map(TreeItem::getValue)
                     .collect(Collectors.toList());
 
-            final Window window = ((MenuItem) event.getTarget()).getParentPopup().getOwnerWindow();
-            final WorkQueueDialog<Void> wd = new WorkQueueDialog<>(window);
+            final ManagerTaskChain<BaseDirectory, Void> taskChain = new ManagerTaskChain<BaseDirectory, Void>(directories)
+                    .nextTask(DeleteHashesTask::new);
 
-            directories.forEach(d -> wd.queue(new DeleteHashesTask(d)));
 
-            wd.execute();
+            new WorkDialog<Void>(getStage()).exec(taskChain);
         }
     }
 

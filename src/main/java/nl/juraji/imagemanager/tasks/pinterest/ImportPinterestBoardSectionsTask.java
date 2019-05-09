@@ -25,12 +25,12 @@ public class ImportPinterestBoardSectionsTask extends PinterestWebTask<Void> {
     }
 
     @Override
-    protected Void call() throws Exception {
+    public Void call() throws Exception {
         super.init();
 
         final BoardSectionsResourceResult result = executeResourceRequest(new BoardSectionsResourceRequest(parentBoard.getBoardId()));
 
-        this.checkCanceled();
+        this.checkIsCanceled();
         final List<PinterestBoard> collect = result.getData().stream()
                 .map(this::mapSectionResource)
                 .collect(Collectors.toList());

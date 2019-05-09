@@ -5,6 +5,7 @@ import nl.juraji.imagemanager.model.domain.pinterest.PinMetaData;
 import nl.juraji.imagemanager.model.web.pinterest.resources.pins.DeletePinResourceRequest;
 import nl.juraji.imagemanager.model.web.pinterest.resources.pins.DeletePinResourceResult;
 import nl.juraji.imagemanager.tasks.DeleteMetaDataTask;
+import nl.juraji.imagemanager.util.exceptions.ResourceRequestFailedException;
 
 /**
  * Created by Juraji on 5-12-2018.
@@ -19,7 +20,7 @@ public class DeletePinTask extends PinterestWebTask<BaseMetaData> {
     }
 
     @Override
-    protected BaseMetaData call() throws Exception {
+    public BaseMetaData call() throws Exception {
         this.init();
 
         final DeletePinResourceRequest request = new DeletePinResourceRequest(metaData.getPinId(), getCSRFToken());
@@ -30,7 +31,6 @@ public class DeletePinTask extends PinterestWebTask<BaseMetaData> {
         }
 
         final DeleteMetaDataTask deleteMetaDataTask = new DeleteMetaDataTask(metaData, true);
-        deleteMetaDataTask.run();
-        return deleteMetaDataTask.get();
+        return deleteMetaDataTask.call();
     }
 }

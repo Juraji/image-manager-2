@@ -5,8 +5,8 @@ import io.ebean.EbeanServer;
 import nl.juraji.imagemanager.model.domain.hashes.Contrast;
 import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
 import nl.juraji.imagemanager.model.domain.local.LocalMetaData;
-import org.junit.jupiter.api.RepeatedTest;
-import util.JavaFXAndEbeanBootstrappedTest;
+import org.junit.Test;
+import util.EbeanTest;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -14,13 +14,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 /**
  * Created by Juraji on 7-5-2019.
  * image-manager
  */
-class HashDirectoryTaskTest extends JavaFXAndEbeanBootstrappedTest {
+
+public class HashDirectoryTaskTest extends EbeanTest {
     private final Path testImagesDirectory;
     private final EbeanServer db;
 
@@ -30,8 +31,8 @@ class HashDirectoryTaskTest extends JavaFXAndEbeanBootstrappedTest {
         this.db = Ebean.getDefaultServer();
     }
 
-    @RepeatedTest(5)
-    void testHashingGif() throws IOException {
+    @Test
+    public void testHashingGif() throws IOException {
         // Setup test directory
         final LocalDirectory directory = new LocalDirectory();
         directory.setName("Test GIF directory");
@@ -70,8 +71,8 @@ class HashDirectoryTaskTest extends JavaFXAndEbeanBootstrappedTest {
         assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
     }
 
-    @RepeatedTest(5)
-    void testHashingJpg() throws IOException {
+    @Test
+    public void testHashingJpg() throws IOException {
         // Setup test directory
         final LocalDirectory directory = new LocalDirectory();
         directory.setName("Test JPG directory");
@@ -110,8 +111,8 @@ class HashDirectoryTaskTest extends JavaFXAndEbeanBootstrappedTest {
         assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
     }
 
-    @RepeatedTest(5)
-    void testHashingPng() throws IOException {
+    @Test
+    public void testHashingPng() throws IOException {
         // Setup test directory
         final LocalDirectory directory = new LocalDirectory();
         directory.setName("Test PNG directory");
@@ -150,8 +151,8 @@ class HashDirectoryTaskTest extends JavaFXAndEbeanBootstrappedTest {
         assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
     }
 
-    @RepeatedTest(5)
-    void testHashingAnimatedGif() throws IOException {
+    @Test
+    public void testHashingAnimatedGif() throws IOException {
         // Setup test directory
         final LocalDirectory directory = new LocalDirectory();
         directory.setName("Test Animated GIF directory");
@@ -190,8 +191,8 @@ class HashDirectoryTaskTest extends JavaFXAndEbeanBootstrappedTest {
         assertArrayEquals(imageBits, metaDataFromDb.getHash().getBits());
     }
 
-    @RepeatedTest(5)
-    void testHashingWebP() throws IOException {
+    @Test
+    public void testHashingWebP() throws IOException {
         // Setup test directory
         final LocalDirectory directory = new LocalDirectory();
         directory.setName("Test WebP directory");

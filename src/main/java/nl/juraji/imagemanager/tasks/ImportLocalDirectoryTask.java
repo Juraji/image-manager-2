@@ -3,7 +3,7 @@ package nl.juraji.imagemanager.tasks;
 import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
 import nl.juraji.imagemanager.model.finders.LocalDirectoriesFinder;
 import nl.juraji.imagemanager.util.FileUtils;
-import nl.juraji.imagemanager.util.fxml.concurrent.IndicatorTask;
+import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +15,7 @@ import java.util.Optional;
  * Created by Juraji on 26-11-2018.
  * Image Manager 2
  */
-public class ImportLocalDirectoryTask extends IndicatorTask<LocalDirectory> {
+public class ImportLocalDirectoryTask extends ManagerTask<LocalDirectory> {
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final Path root;
     private final boolean recursive;
@@ -27,7 +27,7 @@ public class ImportLocalDirectoryTask extends IndicatorTask<LocalDirectory> {
     }
 
     @Override
-    protected LocalDirectory call() {
+    public LocalDirectory call() {
         final Optional<LocalDirectory> existingDirOpt = LocalDirectoriesFinder.find()
                 .byLocationOnDisk(root);
 
@@ -47,7 +47,7 @@ public class ImportLocalDirectoryTask extends IndicatorTask<LocalDirectory> {
     private LocalDirectory importDirectory(Path path, LocalDirectory parent) {
         final String taskName = buildTaskName(path, recursive);
         logger.info(taskName);
-        updateMessage(taskName);
+        updateTaskDescription(taskName);
 
         final LocalDirectory newDirectory = new LocalDirectory();
         newDirectory.setName(path.getFileName().toString());
@@ -65,7 +65,7 @@ public class ImportLocalDirectoryTask extends IndicatorTask<LocalDirectory> {
     }
 
     private void importSubDirectories(Path path, LocalDirectory parent) {
-        this.checkCanceled();
+        this. checkIsCanceled();
         if (recursive) {
             final List<Path> subDirectoryPaths = FileUtils.getDirectorySubDirectories(path);
             subDirectoryPaths.forEach(p -> this.importDirectory(p, parent));

@@ -1,10 +1,9 @@
 package nl.juraji.imagemanager.fxml.dialogs;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,8 +19,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
+import nl.juraji.imagemanager.util.exceptions.ImageManagerError;
 import nl.juraji.imagemanager.util.fxml.FXMLUtils;
-import nl.juraji.imagemanager.util.fxml.concurrent.IndicatorTask;
+import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -39,7 +41,8 @@ import java.util.function.Consumer;
 public class WorkDialog<T> extends BorderPane implements Initializable {
     private final Stage dialog;
     private final ObservableList<T> resultNotificationList;
-    private final AtomicReference<IndicatorTask<T>> currentTask;
+    private final AtomicReference<ManagerTask<T>> currentTask;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @FXML
     private ProgressIndicator currentTaskProgressBar;
@@ -76,7 +79,7 @@ public class WorkDialog<T> extends BorderPane implements Initializable {
 
             this.dialog.setScene(scene);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ImageManagerError("Failed setting up work dialog", e);
         }
     }
 
@@ -95,23 +98,19 @@ public class WorkDialog<T> extends BorderPane implements Initializable {
     }
 
     public void cancelCurrentTask() {
-        final IndicatorTask<T> task = currentTask.get();
+        final ManagerTask<T> task = currentTask.get();
         if (task != null) {
             task.cancel();
             currentTask.set(null);
         }
     }
 
-    protected void hide() {
-        this.dialog.close();
-    }
-
-    public void exec(IndicatorTask<T> task) {
+    public void exec(ManagerTask<T> task) {
         this.exec(task, true);
     }
 
-    public void exec(IndicatorTask<T> task, boolean closeOnCompletion) {
-        logger.info("Executing task \"{}\"", task.getMessage());
+    public void exec(ManagerTask<T> task, boolean closeOnCompletion) {
+        logger.info("Executing task \"{}\"", task.getTaskDescription());
 
         // Set current task
         this.currentTask.set(task);
@@ -121,37 +120,33 @@ public class WorkDialog<T> extends BorderPane implements Initializable {
 
         // Bind progressbar to the current task
         this.currentTaskProgressBar.setProgress(-1);
-        this.currentTaskProgressBar.progressProperty().bind(task.progressProperty());
+        this.currentTaskProgressBar.progressProperty().bind(task.taskProgressProperty());
 
         // Bind message to the current task
         this.messageLabel.textProperty().set(null);
-        this.messageLabel.textProperty().bind(task.messageProperty());
+        this.messageLabel.textProperty().bind(task.taskDescriptionProperty());
 
-        // Setup on succeeded/failed event handler
-        EventHandler<WorkerStateEvent> eh = event -> {
+        this.executorService.submit(() -> {
             try {
-                this.messageLabel.textProperty().unbind();
-                this.currentTaskProgressBar.progressProperty().unbind();
+                final T result = task.call();
+                Platform.runLater(() -> this.resultNotificationList.add(result));
 
-                if (closeOnCompletion) {
-                    this.dialog.close();
-                }
-
-                this.resultNotificationList.add(task.get());
-                this.currentTask.set(null);
-                logger.info("Completed task \"{}\"", task.getMessage());
+                logger.info("Completed task \"{}\"", task.getTaskDescription());
             } catch (CancellationException e) {
                 logger.info("Task canceled");
             } catch (Exception e) {
                 logger.error("Error executing task", e);
+            } finally {
+                task.done();
+
+                this.currentTask.set(null);
+                this.messageLabel.textProperty().unbind();
+                this.currentTaskProgressBar.progressProperty().unbind();
+
+                if (closeOnCompletion) {
+                    Platform.runLater(this.dialog::close);
+                }
             }
-        };
-
-        task.setOnSucceeded(eh);
-        task.setOnCancelled(eh);
-        task.setOnFailed(eh);
-
-        // Start worker
-        new Thread(task).start();
+        });
     }
 }
