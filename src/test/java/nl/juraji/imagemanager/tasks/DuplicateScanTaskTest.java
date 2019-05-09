@@ -13,9 +13,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 
 /**
@@ -64,28 +64,38 @@ public class DuplicateScanTaskTest extends EbeanTest {
         assertEquals(3, duplicateSets.size());
 
         // First set should be the animated gifs
-        final DuplicateSet set0 = duplicateSets.get(0);
-        final List<BaseMetaData> set0Duplicates = set0.getDuplicates();
-        assertEquals(2, set0Duplicates.size());
-
-        assertEquals("gif-animated-image2.gif", set0Duplicates.get(0).getComments());
-        assertEquals("gif-animated-image.gif", set0Duplicates.get(1).getComments());
+        assertDuplicateSetHasImages(
+                duplicateSets.get(0),
+                "gif-animated-image.gif",
+                "gif-animated-image2.gif"
+        );
 
         // Second set should be the jpg, png and still gif images
-        final DuplicateSet set1 = duplicateSets.get(1);
-        final List<BaseMetaData> set1Duplicates = set1.getDuplicates();
-        assertEquals(3, set1Duplicates.size());
-
-        assertEquals("jpg-image.jpg", set1Duplicates.get(0).getComments());
-        assertEquals("png-image.png", set1Duplicates.get(1).getComments());
-        assertEquals("gif-still-image.gif", set1Duplicates.get(2).getComments());
+        assertDuplicateSetHasImages(
+                duplicateSets.get(1),
+                "gif-still-image.gif",
+                "jpg-image.jpg",
+                "png-image.png"
+        );
 
         // Third set should be the webp images
-        final DuplicateSet set2 = duplicateSets.get(2);
-        final List<BaseMetaData> set2Duplicates = set2.getDuplicates();
-        assertEquals(2, set2Duplicates.size());
+        assertDuplicateSetHasImages(
+                duplicateSets.get(2),
+                "webp-image.webp",
+                "webp-image2.webp"
+        );
+    }
 
-        assertEquals("webp-image2.webp", set2Duplicates.get(0).getComments());
-        assertEquals("webp-image.webp", set2Duplicates.get(1).getComments());
+    private void assertDuplicateSetHasImages(DuplicateSet set, String... names) {
+        List<BaseMetaData> duplicates = set.getDuplicates();
+        assertEquals(names.length, duplicates.size());
+
+        List<String> imageNames = duplicates.stream()
+                .map(BaseMetaData::getComments)
+                .collect(Collectors.toList());
+
+        for (String name : names) {
+            assertTrue(imageNames.contains(name));
+        }
     }
 }
