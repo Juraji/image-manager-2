@@ -16,7 +16,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Platform.class, PlatformImpl.class})
-@PowerMockIgnore({"javax.xml.parsers.*"})
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.dom.*"})
 public abstract class MockFXTest {
 
     @Before
