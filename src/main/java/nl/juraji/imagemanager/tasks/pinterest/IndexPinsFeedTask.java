@@ -35,7 +35,7 @@ public abstract class IndexPinsFeedTask extends PinterestWebTask<Void> {
 
     @Override
     public Void call() throws Exception {
-        super.init();
+        super.call();
 
         final Set<PinMetaData> existingMetaData = board.getMetaData();
         final int knownMetaDataSize = existingMetaData.size();

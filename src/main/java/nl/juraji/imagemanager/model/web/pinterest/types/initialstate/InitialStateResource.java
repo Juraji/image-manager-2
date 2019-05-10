@@ -9,12 +9,12 @@ import com.google.gson.annotations.SerializedName;
  * This object, and its descendants are a partial of the fully available content!
  */
 @SuppressWarnings("unused")
-public class InitialStateObject {
+public class InitialStateResource {
 
     @SerializedName("viewer")
-    private InitialStateObjectViewer viewer;
+    private InitialStateViewer viewer;
 
-    public InitialStateObjectViewer getViewer() {
+    public InitialStateViewer getViewer() {
         return viewer;
     }
 }

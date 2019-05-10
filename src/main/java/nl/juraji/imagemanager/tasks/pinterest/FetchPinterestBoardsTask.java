@@ -31,7 +31,7 @@ public class FetchPinterestBoardsTask extends PinterestWebTask<List<PinterestBoa
 
     @Override
     public List<PinterestBoard> call() throws Exception {
-        super.init();
+        super.call();
 
         final BoardsResourceRequest request = new BoardsResourceRequest(getInitialState().getViewer().getUsername());
         final BoardsResourceResult result = executeResourceRequest(request);

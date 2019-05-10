@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by Juraji on 2-5-2019.
  * image-manager
  */
-public class InitialStateObjectViewer {
+public class InitialStateViewer {
 
     @SerializedName("id")
     private String id;

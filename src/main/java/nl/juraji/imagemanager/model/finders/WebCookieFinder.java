@@ -16,6 +16,8 @@ import java.util.UUID;
  */
 public class WebCookieFinder extends Finder<UUID, WebCookie> {
     private static final WebCookieFinder INSTANCE = new WebCookieFinder();
+    private static final String PROP_ROOT_DOMAIN = "rootDomain";
+    private static final String PROP_EXPIRY = "expiry";
 
     private WebCookieFinder() {
         super(WebCookie.class);
@@ -34,11 +36,11 @@ public class WebCookieFinder extends Finder<UUID, WebCookie> {
      */
     public boolean cookieValueEquals(String rootDomain, String name, String value) {
         final WebCookie cookie = this.query().where()
-                .endsWith("rootDomain", rootDomain)
+                .endsWith(PROP_ROOT_DOMAIN, rootDomain)
                 .eq("name", name)
                 .or(
-                        Expr.isNull("expiry"),
-                        Expr.gt("expiry", new Date())
+                        Expr.isNull(PROP_EXPIRY),
+                        Expr.gt(PROP_EXPIRY, new Date())
                 )
                 .findOne();
 
@@ -53,10 +55,10 @@ public class WebCookieFinder extends Finder<UUID, WebCookie> {
      */
     public Set<WebCookie> cookies(String rootDomain) {
         return this.query().where()
-                .endsWith("rootDomain", rootDomain)
+                .endsWith(PROP_ROOT_DOMAIN, rootDomain)
                 .or(
-                        Expr.isNull("expiry"),
-                        Expr.gt("expiry", new Date())
+                        Expr.isNull(PROP_EXPIRY),
+                        Expr.gt(PROP_EXPIRY, new Date())
                 )
                 .findSet();
     }
@@ -67,12 +69,12 @@ public class WebCookieFinder extends Finder<UUID, WebCookie> {
      * @param rootDomain The root domain, usually the website address
      * @param cookies    The set of cookies to persist
      */
-    public void saveCookies(String rootDomain, Set<Cookie> cookies) {
+    public void persistCookies(String rootDomain, Set<Cookie> cookies) {
         Set<WebCookie> updatedCookies = new HashSet<>();
 
         // Find all cookies for root domain
         final Set<WebCookie> webCookies = this.query().where()
-                .endsWith("rootDomain", rootDomain)
+                .endsWith(PROP_ROOT_DOMAIN, rootDomain)
                 .findSet();
 
         // Match each cookie en merge it
@@ -92,7 +94,7 @@ public class WebCookieFinder extends Finder<UUID, WebCookie> {
 
     public void deleteCookies(String rootDomain) {
         this.query().where()
-                .endsWith("rootDomain", rootDomain)
+                .endsWith(PROP_ROOT_DOMAIN, rootDomain)
                 .delete();
     }
 }

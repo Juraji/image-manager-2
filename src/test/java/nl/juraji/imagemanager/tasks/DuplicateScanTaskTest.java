@@ -5,7 +5,7 @@ import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
 import nl.juraji.imagemanager.model.domain.local.LocalMetaData;
 import org.junit.Test;
-import util.EbeanTest;
+import util.IMTest;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
  * Created by Juraji on 8-5-2019.
  * image-manager
  */
-public class DuplicateScanTaskTest extends EbeanTest {
+public class DuplicateScanTaskTest extends IMTest {
     private final Path testImagesDirectory;
 
     public DuplicateScanTaskTest() throws URISyntaxException {

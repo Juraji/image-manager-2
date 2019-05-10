@@ -4,8 +4,6 @@ import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.pinterest.PinMetaData;
 import nl.juraji.imagemanager.model.domain.pinterest.PinterestBoard;
 import nl.juraji.imagemanager.model.web.pinterest.resources.pins.MovePinResourceRequest;
-import nl.juraji.imagemanager.model.web.pinterest.resources.pins.MovePinResourceResult;
-import nl.juraji.imagemanager.util.exceptions.ResourceRequestFailedException;
 
 /**
  * Created by Juraji on 6-12-2018.
@@ -24,15 +22,11 @@ public class MovePinTask extends PinterestWebTask<BaseMetaData> {
 
     @Override
     public BaseMetaData call() throws Exception {
-        this.init();
+        super.call();
 
         // Move pin on Pinterest
         final MovePinResourceRequest request = new MovePinResourceRequest(metaData, targetBoard, getCSRFToken());
-        final MovePinResourceResult result = executeResourceRequest(request);
-
-        if (result.getStatus() != 200) {
-            throw new ResourceRequestFailedException(request, result);
-        }
+        executeResourceRequest(request);
 
         // Update pin info
         metaData.setPinterestUri(targetBoard.getBoardUrl().resolve("/pin/" + metaData.getPinId()));

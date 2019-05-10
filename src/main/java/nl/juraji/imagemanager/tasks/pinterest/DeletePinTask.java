@@ -3,9 +3,7 @@ package nl.juraji.imagemanager.tasks.pinterest;
 import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.pinterest.PinMetaData;
 import nl.juraji.imagemanager.model.web.pinterest.resources.pins.DeletePinResourceRequest;
-import nl.juraji.imagemanager.model.web.pinterest.resources.pins.DeletePinResourceResult;
 import nl.juraji.imagemanager.tasks.DeleteMetaDataTask;
-import nl.juraji.imagemanager.util.exceptions.ResourceRequestFailedException;
 
 /**
  * Created by Juraji on 5-12-2018.
@@ -21,14 +19,10 @@ public class DeletePinTask extends PinterestWebTask<BaseMetaData> {
 
     @Override
     public BaseMetaData call() throws Exception {
-        this.init();
+        super.call();
 
         final DeletePinResourceRequest request = new DeletePinResourceRequest(metaData.getPinId(), getCSRFToken());
-        final DeletePinResourceResult result = executeResourceRequest(request);
-
-        if (result.getStatus() != 200) {
-            throw new ResourceRequestFailedException(request, result);
-        }
+        executeResourceRequest(request);
 
         final DeleteMetaDataTask deleteMetaDataTask = new DeleteMetaDataTask(metaData, true);
         return deleteMetaDataTask.call();

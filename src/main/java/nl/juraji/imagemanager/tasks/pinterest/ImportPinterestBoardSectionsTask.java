@@ -26,7 +26,7 @@ public class ImportPinterestBoardSectionsTask extends PinterestWebTask<Void> {
 
     @Override
     public Void call() throws Exception {
-        super.init();
+        super.call();
 
         final BoardSectionsResourceResult result = executeResourceRequest(new BoardSectionsResourceRequest(parentBoard.getBoardId()));
 

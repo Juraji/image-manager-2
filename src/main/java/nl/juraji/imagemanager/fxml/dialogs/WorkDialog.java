@@ -131,14 +131,16 @@ public class WorkDialog<T> extends BorderPane implements Initializable {
                 final T result = task.call();
                 Platform.runLater(() -> this.resultNotificationList.add(result));
 
+                task.done(true);
+
                 logger.info("Completed task \"{}\"", task.getTaskDescription());
             } catch (CancellationException e) {
                 logger.info("Task canceled");
+                task.done(false);
             } catch (Exception e) {
                 logger.error("Error executing task", e);
+                task.done(false);
             } finally {
-                task.done();
-
                 this.currentTask.set(null);
                 this.messageLabel.textProperty().unbind();
                 this.currentTaskProgressBar.progressProperty().unbind();

@@ -5,11 +5,11 @@ import nl.juraji.imagemanager.model.domain.settings.WebCookie;
 import nl.juraji.imagemanager.model.finders.WebCookieFinder;
 import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceRequest;
 import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceResult;
-import nl.juraji.imagemanager.model.web.pinterest.types.initialstate.InitialStateObject;
+import nl.juraji.imagemanager.model.web.pinterest.types.initialstate.InitialStateResource;
 import nl.juraji.imagemanager.util.StringUtils;
-import nl.juraji.imagemanager.util.exceptions.ImageManagerError;
+import nl.juraji.imagemanager.util.exceptions.ManagerTaskException;
+import nl.juraji.imagemanager.util.exceptions.ResourceRequestFailedException;
 import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
-import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTaskException;
 import nl.juraji.imagemanager.util.io.web.WebDriverPool;
 import org.apache.commons.io.IOUtils;
 import org.openqa.selenium.By;
@@ -38,48 +38,20 @@ public abstract class PinterestWebTask<T> extends ManagerTask<T> {
 
     public static final URI PINTEREST_BASE_URI = URI.create("https://pinterest.com");
 
-    private final String originalTaskDescription;
     private final Gson gson;
     private RemoteWebDriver driver;
-    private InitialStateObject initialState;
+    private InitialStateResource initialState;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     public PinterestWebTask(String message, Object... params) {
         super(message, params);
-
-        try {
-            this.originalTaskDescription = this.getTaskDescription();
-            this.gson = new Gson();
-        } catch (Exception e) {
-            throw new ImageManagerError(e);
-        }
+        this.gson = new Gson();
     }
 
     @Override
-    public void done() {
-        if (driver != null) {
-            // Persist cookies
-            this.persistDriverCookies();
-
-            // Return the WebDriver instance to the pool
-            WebDriverPool.returnDriver(driver);
-        }
-    }
-
-    /**
-     * @return an InitialStateObject for the current session
-     */
-    protected InitialStateObject getInitialState() {
-        return this.initialState;
-    }
-
-    protected String getCSRFToken() {
-        final Cookie cookie = this.driver.manage().getCookieNamed("csrftoken");
-        return cookie != null ? cookie.getValue() : null;
-    }
-
-    protected void init() throws Exception {
+    public T call() throws Exception {
+        final String orgTaskDescription = this.getTaskDescription();
         super.updateTaskDescription("Initializing web session...");
 
         // Get a WebDriver instance from the pool
@@ -97,19 +69,46 @@ public abstract class PinterestWebTask<T> extends ManagerTask<T> {
             this.driver.get(pinterestHomeUri);
             this.loadDriverCookies();
             this.driver.get(pinterestHomeUri);
+        }
 
-            if (isUnAuthenticated()) {
-                logger.info("Driver: Not authenticated!");
-                throw new ManagerTaskException("Not authenticated on Pinterest");
-            }
+        if (isUnAuthenticated()) {
+            logger.info("Driver: Not authenticated!");
+            throw new ManagerTaskException("Not authenticated on Pinterest");
         }
 
         // Load initial-state
         final WebElement initialStateElement = getElementBy(By.id("initial-state"));
-        this.initialState = gson.fromJson(initialStateElement.getAttribute("innerHTML"), InitialStateObject.class);
+        this.initialState = gson.fromJson(initialStateElement.getAttribute("innerHTML"), InitialStateResource.class);
 
-        super.updateTaskDescription(originalTaskDescription);
+        super.updateTaskDescription(orgTaskDescription);
         this.persistDriverCookies();
+
+        return null;
+    }
+
+    @Override
+    public void done(boolean success) {
+        if (driver != null) {
+            if (success) {
+                // Persist cookies
+                this.persistDriverCookies();
+            }
+
+            // Return the WebDriver instance to the pool
+            WebDriverPool.returnDriver(driver);
+        }
+    }
+
+    /**
+     * @return an InitialStateObject for the current session
+     */
+    protected InitialStateResource getInitialState() {
+        return this.initialState;
+    }
+
+    protected String getCSRFToken() {
+        final Cookie cookie = this.driver.manage().getCookieNamed("csrftoken");
+        return cookie != null ? cookie.getValue() : null;
     }
 
     protected <U, R extends ResourceResult<U>> R executeResourceRequest(ResourceRequest<R> request) throws IOException {
@@ -117,7 +116,7 @@ public abstract class PinterestWebTask<T> extends ManagerTask<T> {
 
         String result;
         try (InputStream stream = PinterestWebTask.class.getResourceAsStream("/nl/juraji/imagemanager/tasks/pinterest/PinterestResourceRequestExecutor.js")) {
-            String script = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            final String script = IOUtils.toString(stream, StandardCharsets.UTF_8);
             result = (String) driver.executeScript(script,
                     request.getMethod().toString(),
                     request.getResourcePath(),
@@ -129,7 +128,7 @@ public abstract class PinterestWebTask<T> extends ManagerTask<T> {
             final R parsedResult = gson.fromJson(result, request.getResponseType());
 
             if (parsedResult.getStatus() != 200) {
-                logger.warn("Resource request failed, status: {}", parsedResult.getStatus());
+                throw new ResourceRequestFailedException(request, parsedResult);
             }
 
             return parsedResult;
@@ -147,8 +146,7 @@ public abstract class PinterestWebTask<T> extends ManagerTask<T> {
     }
 
     private void persistDriverCookies() {
-        final String rootDomain = PINTEREST_BASE_URI.getHost();
-        WebCookieFinder.find().saveCookies(rootDomain, driver.manage().getCookies());
+        WebCookieFinder.find().persistCookies(PINTEREST_BASE_URI.getHost(), driver.manage().getCookies());
     }
 
     private WebElement getElementBy(By by) {

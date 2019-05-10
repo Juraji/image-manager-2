@@ -45,7 +45,7 @@ public class PinterestLoginTask extends ManagerTask<Boolean> {
             }
 
             // Persist all cookies
-            WebCookieFinder.find().saveCookies(rootDomain, driver.manage().getCookies());
+            WebCookieFinder.find().persistCookies(rootDomain, driver.manage().getCookies());
 
             // Close driver
             driver.close();

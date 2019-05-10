@@ -6,7 +6,7 @@ import nl.juraji.imagemanager.model.domain.hashes.Contrast;
 import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
 import nl.juraji.imagemanager.model.domain.local.LocalMetaData;
 import org.junit.Test;
-import util.EbeanTest;
+import util.IMTest;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
  * image-manager
  */
 
-public class HashDirectoryTaskTest extends EbeanTest {
+public class HashDirectoryTaskTest extends IMTest {
     private final Path testImagesDirectory;
     private final EbeanServer db;
 

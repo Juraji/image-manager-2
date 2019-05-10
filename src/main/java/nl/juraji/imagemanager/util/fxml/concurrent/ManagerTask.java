@@ -51,7 +51,7 @@ public abstract class ManagerTask<T> implements Callable<T> {
         this.isCanceled = new AtomicBoolean(false);
     }
 
-    public void done() {
+    public void done(boolean success) {
         // Do nothing by default
     }
 

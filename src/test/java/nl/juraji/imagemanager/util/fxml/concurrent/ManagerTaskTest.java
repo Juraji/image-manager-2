@@ -1,7 +1,7 @@
 package nl.juraji.imagemanager.util.fxml.concurrent;
 
 import org.junit.Test;
-import util.MockFXTest;
+import util.IMTest;
 
 import java.util.concurrent.CancellationException;
 
@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
  * Created by Juraji on 9-5-2019.
  * image-manager
  */
-public class ManagerTaskTest extends MockFXTest {
+public class ManagerTaskTest extends IMTest {
 
     @Test
     public void updateTaskDescription() throws Exception {

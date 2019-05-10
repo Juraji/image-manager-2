@@ -67,15 +67,17 @@ public class ManagerTaskChain<T, R> extends ManagerTask<Void> {
 
                     try {
                         final R result = task.call();
-                        afterEachRunnables.forEach(c -> c.accept(result));
-                    } finally {
-                        task.done();
+                        Platform.runLater(() -> afterEachRunnables.forEach(c -> c.accept(result)));
+                        task.done(true);
+                    } catch (Exception e) {
+                        task.done(false);
+                        throw e;
                     }
                 }
             }
         }
 
-        afterAllRunnables.forEach(Runnable::run);
+        Platform.runLater(() -> afterAllRunnables.forEach(Runnable::run));
         return null;
     }
 }
