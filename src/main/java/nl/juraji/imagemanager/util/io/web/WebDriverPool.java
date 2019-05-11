@@ -44,6 +44,17 @@ public final class WebDriverPool extends GenericObjectPool<RemoteWebDriver> {
         INSTANCE.get().returnObject(driver);
     }
 
+    public static void returnDriverAndInvalidate(RemoteWebDriver driver) {
+        final WebDriverPool pool = INSTANCE.get();
+        if (pool != null) {
+            try {
+                pool.invalidateObject(driver);
+            } catch (Exception e) {
+                // Ignored
+            }
+        }
+    }
+
     public static void clearDrivers() {
         final WebDriverPool pool = INSTANCE.get();
         if (pool != null) {

@@ -8,7 +8,8 @@ import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceResult;
 import nl.juraji.imagemanager.model.web.pinterest.types.initialstate.InitialStateResource;
 import nl.juraji.imagemanager.util.StringUtils;
 import nl.juraji.imagemanager.util.exceptions.ManagerTaskException;
-import nl.juraji.imagemanager.util.exceptions.ResourceRequestFailedException;
+import nl.juraji.imagemanager.util.exceptions.ResourceErrorException;
+import nl.juraji.imagemanager.util.exceptions.ResourceNotFoundException;
 import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
 import nl.juraji.imagemanager.util.io.web.WebDriverPool;
 import org.apache.commons.io.IOUtils;
@@ -61,7 +62,7 @@ public abstract class PinterestWebTask<T> extends ManagerTask<T> {
             throw new ManagerTaskException("Failed requesting web driver instance from driver pool");
         }
 
-        if (this.driver.getCurrentUrl().equals("data:,")) {
+        if (!this.driver.getCurrentUrl().contains(PINTEREST_BASE_URI.getHost())) {
             logger.info("Initializing driver for {}", PINTEREST_BASE_URI);
             final String pinterestHomeUri = PINTEREST_BASE_URI.toString();
 
@@ -80,9 +81,10 @@ public abstract class PinterestWebTask<T> extends ManagerTask<T> {
         final WebElement initialStateElement = getElementBy(By.id("initial-state"));
         this.initialState = gson.fromJson(initialStateElement.getAttribute("innerHTML"), InitialStateResource.class);
 
-        super.updateTaskDescription(orgTaskDescription);
+        // Refresh persisted cookies
         this.persistDriverCookies();
 
+        super.updateTaskDescription(orgTaskDescription);
         return null;
     }
 
@@ -92,10 +94,12 @@ public abstract class PinterestWebTask<T> extends ManagerTask<T> {
             if (success) {
                 // Persist cookies
                 this.persistDriverCookies();
+                // Return the WebDriver instance to the pool
+                WebDriverPool.returnDriver(driver);
+            } else {
+                // Something went wrong, invalidate the driver
+                WebDriverPool.returnDriverAndInvalidate(driver);
             }
-
-            // Return the WebDriver instance to the pool
-            WebDriverPool.returnDriver(driver);
         }
     }
 
@@ -127,11 +131,14 @@ public abstract class PinterestWebTask<T> extends ManagerTask<T> {
         if (StringUtils.isNotEmpty(result)) {
             final R parsedResult = gson.fromJson(result, request.getResponseType());
 
-            if (parsedResult.getStatus() != 200) {
-                throw new ResourceRequestFailedException(request, parsedResult);
+            switch (parsedResult.getStatus()) {
+                case 200:
+                    return parsedResult;
+                case 404:
+                    throw new ResourceNotFoundException(request, parsedResult);
+                default:
+                    throw new ResourceErrorException(request, parsedResult);
             }
-
-            return parsedResult;
         }
 
         return null;

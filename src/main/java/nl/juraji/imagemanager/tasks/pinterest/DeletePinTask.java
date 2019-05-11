@@ -4,6 +4,7 @@ import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.pinterest.PinMetaData;
 import nl.juraji.imagemanager.model.web.pinterest.resources.pins.DeletePinResourceRequest;
 import nl.juraji.imagemanager.tasks.DeleteMetaDataTask;
+import nl.juraji.imagemanager.util.exceptions.ResourceNotFoundException;
 
 /**
  * Created by Juraji on 5-12-2018.
@@ -21,8 +22,13 @@ public class DeletePinTask extends PinterestWebTask<BaseMetaData> {
     public BaseMetaData call() throws Exception {
         super.call();
 
-        final DeletePinResourceRequest request = new DeletePinResourceRequest(metaData.getPinId(), getCSRFToken());
-        executeResourceRequest(request);
+        try {
+            final DeletePinResourceRequest request = new DeletePinResourceRequest(metaData.getPinId(), getCSRFToken());
+            executeResourceRequest(request);
+        } catch (ResourceNotFoundException e) {
+            // Ignore not found errors
+            logger.warn("Pin {} does no longer exist on Pinterest", metaData.getPinId());
+        }
 
         final DeleteMetaDataTask deleteMetaDataTask = new DeleteMetaDataTask(metaData, true);
         return deleteMetaDataTask.call();
