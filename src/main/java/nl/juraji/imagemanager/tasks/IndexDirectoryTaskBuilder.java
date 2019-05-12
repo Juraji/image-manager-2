@@ -20,6 +20,7 @@ import java.util.function.Consumer;
  * Created by Juraji on 29-11-2018.
  * Image Manager 2
  */
+@Deprecated
 public final class IndexDirectoryTaskBuilder extends ManagerTaskChain<BaseDirectory, Void> {
     private final Collection<BaseDirectory> directories;
     private final Window owner;

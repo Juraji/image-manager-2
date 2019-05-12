@@ -119,10 +119,12 @@ public class WorkDialog<T> extends BorderPane implements Initializable {
         this.dialog.show();
 
         // Bind progressbar to the current task
+        this.currentTaskProgressBar.progressProperty().unbind();
         this.currentTaskProgressBar.setProgress(-1);
         this.currentTaskProgressBar.progressProperty().bind(task.taskProgressProperty());
 
         // Bind message to the current task
+        this.messageLabel.textProperty().unbind();
         this.messageLabel.textProperty().set(null);
         this.messageLabel.textProperty().bind(task.taskDescriptionProperty());
 

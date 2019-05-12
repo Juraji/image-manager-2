@@ -62,7 +62,8 @@ public abstract class PinterestWebTask<T> extends ManagerTask<T> {
             throw new ManagerTaskException("Failed requesting web driver instance from driver pool");
         }
 
-        if (!this.driver.getCurrentUrl().contains(PINTEREST_BASE_URI.getHost())) {
+        if (isUnAuthenticated()) {
+            // When unauthenticated, authenticate
             logger.info("Initializing driver for {}", PINTEREST_BASE_URI);
             final String pinterestHomeUri = PINTEREST_BASE_URI.toString();
 
@@ -73,7 +74,8 @@ public abstract class PinterestWebTask<T> extends ManagerTask<T> {
         }
 
         if (isUnAuthenticated()) {
-            logger.info("Driver: Not authenticated!");
+            // Still unauthenticated
+            logger.error("Driver: Not authenticated!");
             throw new ManagerTaskException("Not authenticated on Pinterest");
         }
 
@@ -100,6 +102,8 @@ public abstract class PinterestWebTask<T> extends ManagerTask<T> {
                 // Something went wrong, invalidate the driver
                 WebDriverPool.returnDriverAndInvalidate(driver);
             }
+
+            driver = null;
         }
     }
 

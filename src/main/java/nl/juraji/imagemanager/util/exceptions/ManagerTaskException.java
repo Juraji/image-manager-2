@@ -4,7 +4,7 @@ package nl.juraji.imagemanager.util.exceptions;
  * Created by Juraji on 9-5-2019.
  * image-manager
  */
-public class ManagerTaskException extends Exception {
+public class ManagerTaskException extends RuntimeException {
     public ManagerTaskException() {
     }
 
