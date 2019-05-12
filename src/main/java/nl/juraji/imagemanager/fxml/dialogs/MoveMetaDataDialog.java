@@ -90,7 +90,7 @@ public class MoveMetaDataDialog extends Controller implements Initializable {
         final List<BaseMetaData> metaData = metaDataToMove.stream().filter(Objects::nonNull).collect(Collectors.toList());
         final List<BaseMetaData> movedItems = new ArrayList<>();
 
-        final ManagerTaskChain<BaseMetaData, BaseMetaData> taskChain = new ManagerTaskChain<>(metaData);
+        final ManagerTaskChain<BaseMetaData, BaseMetaData> taskChain = new ManagerTaskChain<>(metaData, true);
 
         if (doMoveOnPinterest) {
             taskChain.nextTask(m -> new MovePinTask((PinMetaData) m, (PinterestBoard) directory));

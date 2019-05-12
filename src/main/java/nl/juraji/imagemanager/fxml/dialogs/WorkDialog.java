@@ -135,10 +135,10 @@ public class WorkDialog<T> extends BorderPane implements Initializable {
 
                 logger.info("Completed task \"{}\"", task.getTaskDescription());
             } catch (CancellationException e) {
-                logger.info("Task canceled");
+                logger.info("Task \"{}\" canceled", task.getTaskDescription());
                 task.done(false);
             } catch (Exception e) {
-                logger.error("Error executing task", e);
+                logger.error("Error executing task \"" + task.getTaskDescription() + "\"", e);
                 task.done(false);
             } finally {
                 this.currentTask.set(null);

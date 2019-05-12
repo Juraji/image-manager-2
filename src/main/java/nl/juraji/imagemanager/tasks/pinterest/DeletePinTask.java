@@ -3,7 +3,6 @@ package nl.juraji.imagemanager.tasks.pinterest;
 import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.pinterest.PinMetaData;
 import nl.juraji.imagemanager.model.web.pinterest.resources.pins.DeletePinResourceRequest;
-import nl.juraji.imagemanager.tasks.DeleteMetaDataTask;
 import nl.juraji.imagemanager.util.exceptions.ResourceNotFoundException;
 
 /**
@@ -30,7 +29,6 @@ public class DeletePinTask extends PinterestWebTask<BaseMetaData> {
             logger.warn("Pin {} does no longer exist on Pinterest", metaData.getPinId());
         }
 
-        final DeleteMetaDataTask deleteMetaDataTask = new DeleteMetaDataTask(metaData, true);
-        return deleteMetaDataTask.call();
+        return metaData;
     }
 }

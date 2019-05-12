@@ -18,13 +18,19 @@ import java.util.function.Function;
  */
 public class ManagerTaskChain<T, R> extends ManagerTask<Void> {
     private final Collection<T> subjects;
+    private final boolean stopOnTaskFail;
     private final LinkedList<Function<T, ManagerTask<R>>> taskConverters;
     private final List<Consumer<R>> afterEachRunnables;
     private final List<Runnable> afterAllRunnables;
 
     public ManagerTaskChain(Collection<T> subjects) {
+        this(subjects, false);
+    }
+
+    public ManagerTaskChain(Collection<T> subjects, boolean stopOnTaskFail) {
         super("");
         this.subjects = subjects;
+        this.stopOnTaskFail = stopOnTaskFail;
         this.taskConverters = new LinkedList<>();
         this.afterEachRunnables = new ArrayList<>();
         this.afterAllRunnables = new ArrayList<>();
@@ -71,7 +77,10 @@ public class ManagerTaskChain<T, R> extends ManagerTask<Void> {
                         task.done(true);
                     } catch (Exception e) {
                         task.done(false);
-                        throw e;
+
+                        if (stopOnTaskFail) {
+                            throw e;
+                        }
                     }
                 }
             }

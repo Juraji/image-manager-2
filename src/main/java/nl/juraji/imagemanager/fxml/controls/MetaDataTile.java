@@ -171,9 +171,9 @@ public class MetaDataTile extends VBox implements Initializable {
                 if (doDeletePin) {
                     wd.exec(new DeletePinTask((PinMetaData) metaData));
                 }
-            } else {
-                wd.exec(new DeleteMetaDataTask(metaData, true));
             }
+
+            wd.exec(new DeleteMetaDataTask(metaData, true));
 
             wd.addTaskEndNotification(item -> {
                 if (item != null) {
