@@ -1,10 +1,9 @@
 package nl.juraji.imagemanager.tasks;
 
-import nl.juraji.imagemanager.fxml.controls.DuplicateSet;
 import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
 import nl.juraji.imagemanager.model.domain.local.LocalMetaData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import util.IMTest;
 
 import java.net.URISyntaxException;
@@ -14,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -65,7 +64,7 @@ public class DuplicateScanTaskTest extends IMTest {
 
         // Call Duplicate scanner task
         final DuplicateScanTask duplicateScanTask = new DuplicateScanTask(directory, 0.7);
-        final List<DuplicateSet> duplicateSets = duplicateScanTask.call();
+        final List<DuplicateScanTask.DuplicateSet> duplicateSets = duplicateScanTask.call();
 
         assertEquals(3, duplicateSets.size());
 
@@ -92,7 +91,7 @@ public class DuplicateScanTaskTest extends IMTest {
         );
     }
 
-    private void assertDuplicateSetHasImages(DuplicateSet set, String... names) {
+    private void assertDuplicateSetHasImages(DuplicateScanTask.DuplicateSet set, String... names) {
         List<BaseMetaData> duplicates = set.getDuplicates();
         assertEquals(names.length, duplicates.size());
 

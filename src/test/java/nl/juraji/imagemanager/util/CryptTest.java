@@ -1,11 +1,11 @@
 package nl.juraji.imagemanager.util;
 
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.security.GeneralSecurityException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by Juraji on 25-12-2018.

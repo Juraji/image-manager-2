@@ -5,7 +5,7 @@ import io.ebean.EbeanServer;
 import nl.juraji.imagemanager.model.domain.hashes.Contrast;
 import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
 import nl.juraji.imagemanager.model.domain.local.LocalMetaData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import util.IMTest;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by Juraji on 7-5-2019.

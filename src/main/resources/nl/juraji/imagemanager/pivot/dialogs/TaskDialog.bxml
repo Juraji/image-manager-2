@@ -1,0 +1,9 @@
+<im:TaskDialog title="Working..."
+                                xmlns:bxml="http://pivot.apache.org/bxml"
+                                xmlns:im="nl.juraji.imagemanager.pivot.dialogs"
+                                xmlns="org.apache.pivot.wtk">
+    <BoxPane orientation="vertical" styles="{padding:6, spacing:8, fill:true}">
+        <Label bxml:id="taskDescription" preferredWidth="300" styles="{wrapText:true}"/>
+        <Meter bxml:id="meter" preferredWidth="300" preferredHeight="16" percentage="0"/>
+    </BoxPane>
+</im:TaskDialog>

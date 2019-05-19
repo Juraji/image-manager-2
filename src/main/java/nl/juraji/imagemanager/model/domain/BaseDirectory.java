@@ -4,6 +4,8 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -14,7 +16,7 @@ import java.util.Set;
 public abstract class BaseDirectory<T extends BaseDirectory<T, U>, U extends BaseMetaData> extends BaseModel {
 
     @Transient
-    private final String origin;
+    private final DirectoryOrigin origin;
 
     @Column(nullable = false)
     private String name;
@@ -25,7 +27,7 @@ public abstract class BaseDirectory<T extends BaseDirectory<T, U>, U extends Bas
     @Column
     private Boolean favorite;
 
-    protected BaseDirectory(String origin) {
+    protected BaseDirectory(DirectoryOrigin origin) {
         this.origin = origin;
     }
 
@@ -53,8 +55,20 @@ public abstract class BaseDirectory<T extends BaseDirectory<T, U>, U extends Bas
         this.favorite = favorite;
     }
 
-    public String getOrigin() {
+    public DirectoryOrigin getOrigin() {
         return origin;
+    }
+
+    public String getParentPath() {
+        final StringBuilder builder = new StringBuilder(this.getName());
+        BaseDirectory<T, U> current = this.getParent();
+
+        while (current != null) {
+            builder.insert(0, current.getName() + "/");
+            current = current.getParent();
+        }
+
+        return builder.toString();
     }
 
     // Implement property in sub-class

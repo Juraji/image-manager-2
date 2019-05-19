@@ -1,7 +1,7 @@
 package nl.juraji.imagemanager.tasks.pinterest;
 
 import nl.juraji.imagemanager.model.finders.WebCookieFinder;
-import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
+import nl.juraji.imagemanager.util.concurrent.ManagerTask;
 import nl.juraji.imagemanager.util.io.web.ChromeDriverFactory;
 import nl.juraji.imagemanager.util.io.web.WebDriverPool;
 import org.openqa.selenium.Cookie;
@@ -20,10 +20,14 @@ public class PinterestLoginTask extends ManagerTask<Boolean> {
         super("Authenticating on Pinterest...");
     }
 
+    public static boolean hasAuth() {
+        return WebCookieFinder.find().cookieValueEquals(PINTEREST_BASE_URI.getHost(), "_auth", "1");
+    }
+
     @Override
     public Boolean call() throws Exception {
         // Clear drivers in the web driver pool, so no session information is kept in memory
-        WebDriverPool.clearDrivers();
+        WebDriverPool.getInstance().clear();
 
         // Delete any existing Pinterest cookies
         final String rootDomain = PINTEREST_BASE_URI.getHost();
@@ -53,6 +57,6 @@ public class PinterestLoginTask extends ManagerTask<Boolean> {
             // User closed browser
         }
 
-        return WebCookieFinder.find().cookieValueEquals(rootDomain, "_auth", "1");
+        return hasAuth();
     }
 }

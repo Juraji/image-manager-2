@@ -1,0 +1,37 @@
+<im:DirectoryFrame title="image-manager" maximized="true" preferredWidth="1024" preferredHeight="600"
+                   xmlns:bxml="http://pivot.apache.org/bxml"
+                   xmlns:content="org.apache.pivot.wtk.content"
+                   xmlns:im="nl.juraji.imagemanager.pivot.frames"
+                   xmlns="org.apache.pivot.wtk">
+    <SplitPane orientation="horizontal" splitRatio="0.3">
+        <left>
+            <ScrollPane verticalScrollBarPolicy="fill_to_capacity"
+                        horizontalScrollBarPolicy="fill_to_capacity">
+                <TableView bxml:id="tableView">
+                    <columns>
+                        <TableView.Column name="path" width="1000"/>
+                    </columns>
+                </TableView>
+            </ScrollPane>
+        </left>
+        <right>
+            <ScrollPane verticalScrollBarPolicy="fill" horizontalScrollBarPolicy="fill">
+                <columnHeader>
+                    <BoxPane orientation="vertical">
+                        <MenuBar bxml:id="imageMenuBar"/>
+
+                        <BoxPane orientation="horizontal">
+                            <Label text="Size:"/>
+                            <Label bxml:id="dimensionsLabel" text="-"/>
+                            <Label text="Indexed on:"/>
+                            <Label bxml:id="indexedOnLabel" text="-"/>
+                        </BoxPane>
+                    </BoxPane>
+                </columnHeader>
+                <Border>
+                    <ImageView bxml:id="imageView" asynchronous="true" styles="{fill:true}"/>
+                </Border>
+            </ScrollPane>
+        </right>
+    </SplitPane>
+</im:DirectoryFrame>

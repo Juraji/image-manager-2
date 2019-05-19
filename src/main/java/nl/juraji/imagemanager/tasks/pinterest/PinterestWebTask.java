@@ -7,10 +7,10 @@ import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceRequest;
 import nl.juraji.imagemanager.model.web.pinterest.resources.ResourceResult;
 import nl.juraji.imagemanager.model.web.pinterest.types.initialstate.InitialStateResource;
 import nl.juraji.imagemanager.util.StringUtils;
+import nl.juraji.imagemanager.util.concurrent.ManagerTask;
 import nl.juraji.imagemanager.util.exceptions.ManagerTaskException;
 import nl.juraji.imagemanager.util.exceptions.ResourceErrorException;
 import nl.juraji.imagemanager.util.exceptions.ResourceNotFoundException;
-import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
 import nl.juraji.imagemanager.util.io.web.WebDriverPool;
 import org.apache.commons.io.IOUtils;
 import org.openqa.selenium.By;
@@ -52,11 +52,11 @@ public abstract class PinterestWebTask<T> extends ManagerTask<T> {
 
     @Override
     public T call() throws Exception {
-        final String orgTaskDescription = this.getTaskDescription();
+        final String orgTaskDescription = this.getTaskDescription().getValue();
         super.updateTaskDescription("Initializing web session...");
 
         // Get a WebDriver instance from the pool
-        this.driver = WebDriverPool.borrowDriver();
+        this.driver = WebDriverPool.getInstance().borrowObject();
 
         if (driver == null) {
             throw new ManagerTaskException("Failed requesting web driver instance from driver pool");
@@ -93,14 +93,18 @@ public abstract class PinterestWebTask<T> extends ManagerTask<T> {
     @Override
     public void done(boolean success) {
         if (driver != null) {
-            if (success) {
-                // Persist cookies
-                this.persistDriverCookies();
-                // Return the WebDriver instance to the pool
-                WebDriverPool.returnDriver(driver);
-            } else {
-                // Something went wrong, invalidate the driver
-                WebDriverPool.returnDriverAndInvalidate(driver);
+            try {
+                if (success) {
+                    // Persist cookies
+                    this.persistDriverCookies();
+                    // Return the WebDriver instance to the pool
+                    WebDriverPool.getInstance().returnObject(driver);
+                } else {
+                    // Something went wrong, invalidate the driver
+                    WebDriverPool.getInstance().invalidateObject(driver);
+                }
+            } catch (Exception e) {
+                // Ignored
             }
 
             driver = null;

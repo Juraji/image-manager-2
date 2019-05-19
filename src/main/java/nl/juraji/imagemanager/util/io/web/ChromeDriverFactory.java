@@ -1,7 +1,6 @@
 package nl.juraji.imagemanager.util.io.web;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import nl.juraji.imagemanager.Main;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.PooledObject;
@@ -32,7 +31,7 @@ public final class ChromeDriverFactory extends BasePooledObjectFactory<RemoteWeb
 
         this.driverOptions = new ChromeOptions();
         this.driverOptions.addArguments("--window-size=1024,768");
-        this.driverOptions.setHeadless(headless && !Main.isDebugMode());
+        this.driverOptions.setHeadless(headless);
 
         final LoggingPreferences loggingPreferences = new LoggingPreferences();
         loggingPreferences.enable(LogType.BROWSER, Level.WARNING);

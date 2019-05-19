@@ -1,0 +1,84 @@
+<im:MainWindow title="Image Manager" maximized="true"
+               xmlns:bxml="http://pivot.apache.org/bxml"
+               xmlns:content="org.apache.pivot.wtk.content"
+               xmlns:im="nl.juraji.imagemanager.pivot"
+               xmlns:im.controls="nl.juraji.imagemanager.pivot.controls"
+               xmlns="org.apache.pivot.wtk">
+
+    <actionMappings>
+        <Window.ActionMapping action="FileOpenSettings" keyStroke="CMD-S"/>
+        <Window.ActionMapping action="FileViewLogs" keyStroke="CMD-L"/>
+        <Window.ActionMapping action="FileExit" keyStroke="CMD-Q"/>
+        <Window.ActionMapping action="DirectoriesIndexAllDirectories" keyStroke="CMD-I"/>
+    </actionMappings>
+
+    <ScrollPane verticalScrollBarPolicy="fill_to_capacity" horizontalScrollBarPolicy="fill">
+        <columnHeader>
+            <MenuBar>
+                <MenuBar.Item buttonData="File">
+                    <Menu>
+                        <Menu.Section>
+                            <Menu.Item action="FileOpenSettings">
+                                <buttonData>
+                                    <content:MenuItemData text="Settings" keyboardShortcut="CMD-S"/>
+                                </buttonData>
+                            </Menu.Item>
+                            <Menu.Item action="FileViewLogs">
+                                <buttonData>
+                                    <content:MenuItemData text="View logs" keyboardShortcut="CMD-L"/>
+                                </buttonData>
+                            </Menu.Item>
+                        </Menu.Section>
+                        <Menu.Section>
+                            <Menu.Item action="FileExit">
+                                <buttonData>
+                                    <content:MenuItemData text="Exit" keyboardShortcut="CMD-Q"/>
+                                </buttonData>
+                            </Menu.Item>
+                        </Menu.Section>
+                    </Menu>
+                </MenuBar.Item>
+                <MenuBar.Item buttonData="Directories">
+                    <Menu>
+                        <Menu.Section>
+                            <Menu.Item buttonData="Add...">
+                                <Menu>
+                                    <Menu.Section>
+                                        <Menu.Item action="DirectoriesAddLocalDirectory">
+                                            <buttonData>
+                                                <content:MenuItemData text="Local directory"/>
+                                            </buttonData>
+                                        </Menu.Item>
+                                        <Menu.Item action="DirectoriesAddPinterestBoards">
+                                            <buttonData>
+                                                <content:MenuItemData text="Pinterest boards"/>
+                                            </buttonData>
+                                        </Menu.Item>
+                                    </Menu.Section>
+                                </Menu>
+                            </Menu.Item>
+                            <Menu.Item action="DirectoriesIndexAllDirectories">
+                                <buttonData>
+                                    <content:MenuItemData text="Index all directories" keyboardShortcut="CMD-I"/>
+                                </buttonData>
+                            </Menu.Item>
+                        </Menu.Section>
+                    </Menu>
+                </MenuBar.Item>
+                <MenuBar.Item buttonData="Tools">
+                    <Menu>
+                        <Menu.Section>
+                            <Menu.Item action="ToolsDuplicateScanner">
+                                <buttonData>
+                                    <content:MenuItemData text="Duplicate scanner" keyboardShortcut="CMD-D"/>
+                                </buttonData>
+                            </Menu.Item>
+                        </Menu.Section>
+                    </Menu>
+                </MenuBar.Item>
+            </MenuBar>
+        </columnHeader>
+
+        <im.controls:DirectoryTreeView bxml:id="directoryTreeView"/>
+    </ScrollPane>
+</im:MainWindow>

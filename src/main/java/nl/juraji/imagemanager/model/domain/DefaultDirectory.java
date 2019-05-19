@@ -13,7 +13,7 @@ public class DefaultDirectory extends BaseDirectory<DefaultDirectory, BaseMetaDa
     private Set<BaseMetaData> metaData;
 
     public DefaultDirectory() {
-        super("");
+        super(DirectoryOrigin.DEFAULT);
     }
 
     @Override

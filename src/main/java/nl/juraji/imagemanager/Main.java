@@ -1,41 +1,54 @@
 package nl.juraji.imagemanager;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
-import nl.juraji.imagemanager.fxml.MainWindow;
-import nl.juraji.imagemanager.util.fxml.Controller;
+import nl.juraji.imagemanager.pivot.MainWindow;
+import nl.juraji.imagemanager.util.pivot.BXMLLoader;
 import nl.juraji.imagemanager.util.io.db.EbeanInit;
-
-import java.util.concurrent.atomic.AtomicReference;
+import org.apache.pivot.collections.Map;
+import org.apache.pivot.wtk.Application;
+import org.apache.pivot.wtk.DesktopApplicationContext;
+import org.apache.pivot.wtk.Display;
+import org.apache.pivot.wtk.Window;
 
 /**
  * Created by Juraji on 21-11-2018.
  * Image Manager 2
  */
-public class Main extends Application {
-    private static final AtomicReference<Main> INSTANCE = new AtomicReference<>();
+public class Main implements Application {
 
-    public static void init(String[] args) {
-        Application.launch(Main.class, args);
-    }
+    private Window window;
 
-    public static boolean isDebugMode() {
-        return INSTANCE.get().getParameters().getUnnamed().contains("--debug");
-    }
-
-    @Override
-    public void start(Stage stage) {
-        INSTANCE.set(this);
-
+    public static void main(String[] args) {
         // Setup database
         EbeanInit.initDataSource();
 
         // Setup primary stage with root scene and load
-        Controller.initStage(MainWindow.class, "Image manager", stage);
-        stage.show();
+        DesktopApplicationContext.main(Main.class, args);
     }
 
-    public static void exit() {
-        System.exit(0);
+    @Override
+    public void startup(Display display, Map<String, String> properties) {
+        this.window = BXMLLoader.load(MainWindow.class);
+        this.window.open(display);
+    }
+
+    @Override
+    public boolean shutdown(boolean optional) {
+        if (this.window != null) {
+            this.window.close();
+        }
+
+        EbeanInit.shutdown();
+
+        return false;
+    }
+
+    @Override
+    public void suspend() {
+        // Unused
+    }
+
+    @Override
+    public void resume() {
+        // Unused
     }
 }

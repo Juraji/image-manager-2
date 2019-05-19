@@ -1,0 +1,28 @@
+<im:PinterestBoardsSheet title="image-manager"
+                         xmlns:bxml="http://pivot.apache.org/bxml"
+                         xmlns:im="nl.juraji.imagemanager.pivot.sheets"
+                         xmlns="org.apache.pivot.wtk">
+    <BoxPane orientation="vertical" styles="{fill:true}">
+        <Label styles="{wrapText:true}" text="These are the boards found on your Pinterest account."/>
+        <Label styles="{wrapText:true}" text="Select the boards you want to add and click Add."/>
+        <Label styles="{wrapText:true}"
+               text="If a board is already known to Image Manager any changes, like name and sections. will be persisted."/>
+        <ScrollPane verticalScrollBarPolicy="always" horizontalScrollBarPolicy="fill_to_capacity" preferredHeight="400">
+            <TableView bxml:id="tableView" selectMode="multi">
+                <columns>
+                    <TableView.Column name="name" width="130" headerData="Name"/>
+                    <TableView.Column name="locationOnDisk" width="200" headerData="Target location"/>
+                    <TableView.Column name="created" width="100" headerData="Index created on"/>
+                </columns>
+            </TableView>
+
+            <columnHeader>
+                <TableViewHeader tableView="$tableView"/>
+            </columnHeader>
+        </ScrollPane>
+        <BoxPane orientation="horizontal">
+            <PushButton bxml:id="addButton" buttonData="Add"/>
+            <PushButton bxml:id="cancelButton" buttonData="Cancel"/>
+        </BoxPane>
+    </BoxPane>
+</im:PinterestBoardsSheet>

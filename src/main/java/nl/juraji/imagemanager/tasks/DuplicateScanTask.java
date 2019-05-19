@@ -1,11 +1,10 @@
 package nl.juraji.imagemanager.tasks;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import nl.juraji.imagemanager.fxml.controls.DuplicateSet;
 import nl.juraji.imagemanager.model.domain.BaseDirectory;
 import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.hashes.HashData;
-import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
+import nl.juraji.imagemanager.util.concurrent.ManagerTask;
 
 import java.util.*;
 
@@ -13,7 +12,7 @@ import java.util.*;
  * Created by Juraji on 1-12-2018.
  * Image Manager 2
  */
-public class DuplicateScanTask extends ManagerTask<List<DuplicateSet>> {
+public class DuplicateScanTask extends ManagerTask<List<DuplicateScanTask.DuplicateSet>> {
     private final BaseDirectory directory;
     private final double minSimilarity;
 
@@ -116,5 +115,30 @@ public class DuplicateScanTask extends ManagerTask<List<DuplicateSet>> {
         }
 
         return -1.0;
+    }
+
+    public static class DuplicateSet {
+        private final BaseDirectory parent;
+        private final List<BaseMetaData> duplicates;
+        private final int averageSimilarity;
+
+        public DuplicateSet(BaseDirectory parent, List<BaseMetaData> duplicates, int averageSimilarity) {
+
+            this.parent = parent;
+            this.duplicates = duplicates;
+            this.averageSimilarity = averageSimilarity;
+        }
+
+        public BaseDirectory getParent() {
+            return parent;
+        }
+
+        public List<BaseMetaData> getDuplicates() {
+            return duplicates;
+        }
+
+        public int getAverageSimilarity() {
+            return averageSimilarity;
+        }
     }
 }

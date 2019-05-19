@@ -1,5 +1,7 @@
 package nl.juraji.imagemanager.util;
 
+import nl.juraji.imagemanager.util.exceptions.ImageManagerError;
+
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
@@ -10,6 +12,12 @@ import java.nio.file.Path;
  * Image Manager 2
  */
 public final class DesktopUtils {
+    static {
+        if(!Desktop.isDesktopSupported()) {
+            throw new ImageManagerError("Desktop is not supported on your system!");
+        }
+    }
+
     private DesktopUtils() {
     }
 
@@ -17,7 +25,7 @@ public final class DesktopUtils {
         try {
             Desktop.getDesktop().open(path.toFile());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ImageManagerError(e);
         }
     }
 
@@ -25,7 +33,7 @@ public final class DesktopUtils {
         try {
             Desktop.getDesktop().browse(uri);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ImageManagerError(e);
         }
     }
 }

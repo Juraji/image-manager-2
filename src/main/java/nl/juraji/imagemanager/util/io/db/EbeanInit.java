@@ -1,5 +1,6 @@
 package nl.juraji.imagemanager.util.io.db;
 
+import io.ebean.Ebean;
 import io.ebean.EbeanServerFactory;
 import io.ebean.config.ServerConfig;
 
@@ -36,5 +37,9 @@ public final class EbeanInit {
 
         // Start server
         EbeanServerFactory.create(serverConfig);
+    }
+
+    public static void shutdown() {
+        Ebean.getDefaultServer().shutdown(true, false);
     }
 }

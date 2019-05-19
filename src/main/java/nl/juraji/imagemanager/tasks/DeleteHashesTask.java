@@ -3,7 +3,7 @@ package nl.juraji.imagemanager.tasks;
 import io.ebean.Model;
 import nl.juraji.imagemanager.model.domain.BaseDirectory;
 import nl.juraji.imagemanager.model.domain.BaseMetaData;
-import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
+import nl.juraji.imagemanager.util.concurrent.ManagerTask;
 
 import java.util.Objects;
 import java.util.Set;

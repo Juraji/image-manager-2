@@ -1,6 +1,7 @@
 package nl.juraji.imagemanager.model.domain.pinterest;
 
 import nl.juraji.imagemanager.model.domain.BaseDirectory;
+import nl.juraji.imagemanager.model.domain.DirectoryOrigin;
 import nl.juraji.imagemanager.util.CollectionUtils;
 
 import javax.persistence.*;
@@ -36,7 +37,7 @@ public class PinterestBoard extends BaseDirectory<PinterestBoard, PinMetaData> {
     private PinterestBoard parent;
 
     public PinterestBoard() {
-        super("Pinterest");
+        super(DirectoryOrigin.PINTEREST);
         setFavorite(false);
     }
 

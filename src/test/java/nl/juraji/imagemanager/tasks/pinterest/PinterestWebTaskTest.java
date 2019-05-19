@@ -3,43 +3,41 @@ package nl.juraji.imagemanager.tasks.pinterest;
 import nl.juraji.imagemanager.model.web.pinterest.types.initialstate.InitialStateResource;
 import nl.juraji.imagemanager.util.exceptions.ManagerTaskException;
 import nl.juraji.imagemanager.util.io.web.WebDriverPool;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import util.IMTest;
+import util.TestUtils;
 
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 /**
  * Created by Juraji on 10-5-2019.
  * image-manager
  */
-@PrepareForTest({WebDriverPool.class})
 public class PinterestWebTaskTest extends IMTest {
 
+    private WebDriverPool webDriverPoolMock;
     private RemoteWebDriver webDriverMock;
     private PinterestWebTask<Void> pinterestWebTask;
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        this.webDriverMock = Mockito.mock(RemoteWebDriver.class);
+        this.webDriverPoolMock = Mockito.mock(WebDriverPool.class);
+        TestUtils.setStaticFinal(WebDriverPool.class, "INSTANCE", new AtomicReference<>(webDriverPoolMock));
 
-        PowerMockito.mockStatic(WebDriverPool.class);
-        PowerMockito.when(WebDriverPool.borrowDriver()).thenReturn(webDriverMock);
+        this.webDriverMock = Mockito.mock(RemoteWebDriver.class);
+        Mockito.when(webDriverPoolMock.borrowObject()).thenReturn(webDriverMock);
 
         this.pinterestWebTask = new PinterestWebTask<Void>("%s %s", "Initial", "message") {
         };
@@ -48,18 +46,13 @@ public class PinterestWebTaskTest extends IMTest {
     @Test
     public void initNoDriverAvailable() throws Exception {
         // Simulate fail getting driver
-        PowerMockito.when(WebDriverPool.borrowDriver()).thenReturn(null);
+        Mockito.when(webDriverPoolMock.borrowObject()).thenReturn(null);
 
-        // Expect
-        expectedException.expect(ManagerTaskException.class);
-        expectedException.expectMessage("Failed requesting web driver instance from driver pool");
-
-        // Should fail
-        pinterestWebTask.call();
+        assertThrows(ManagerTaskException.class, pinterestWebTask::call, "Failed requesting web driver instance from driver pool");
     }
 
-    @Test(expected = ManagerTaskException.class)
-    public void initLoginMissing() throws Exception {
+    @Test
+    public void initLoginMissing() {
         // Setup Webdriver mock
         Mockito.when(webDriverMock.getCurrentUrl()).thenReturn("data:,");
 
@@ -67,8 +60,7 @@ public class PinterestWebTaskTest extends IMTest {
         Mockito.when(webDriverMock.manage()).thenReturn(webDriverOptionsMock);
         Mockito.when(webDriverOptionsMock.getCookieNamed("_auth")).thenReturn(null);
 
-        // Should fail
-        pinterestWebTask.call();
+        assertThrows(ManagerTaskException.class, pinterestWebTask::call);
     }
 
     @Test
@@ -92,7 +84,7 @@ public class PinterestWebTaskTest extends IMTest {
 
         // Should have loaded initial state
         assertEquals("Juraji", initialState.getViewer().getUsername());
-        assertEquals("Initial message", pinterestWebTask.getTaskDescription());
+        assertEquals("Initial message", pinterestWebTask.getTaskDescription().getValue());
     }
 
     @Test
@@ -105,12 +97,7 @@ public class PinterestWebTaskTest extends IMTest {
         Mockito.when(webDriverOptionsMock.getCookieNamed("_auth"))
                 .thenReturn(new Cookie("_auth", "0", "/", new Date()));
 
-        // Expect
-        expectedException.expect(ManagerTaskException.class);
-        expectedException.expectMessage("Not authenticated on Pinterest");
-
-        // Should fail
-        pinterestWebTask.call();
+        assertThrows(ManagerTaskException.class, pinterestWebTask::call, "Not authenticated on Pinterest");
     }
 
     @Test
@@ -133,6 +120,6 @@ public class PinterestWebTaskTest extends IMTest {
         // Should have loaded initial state
         final InitialStateResource initialState = pinterestWebTask.getInitialState();
         assertEquals("Juraji", initialState.getViewer().getUsername());
-        assertEquals("Initial message", pinterestWebTask.getTaskDescription());
+        assertEquals("Initial message", pinterestWebTask.getTaskDescription().getValue());
     }
 }

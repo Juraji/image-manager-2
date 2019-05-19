@@ -1,0 +1,32 @@
+<im:SettingsSheet title="Image Manager - Settings" preferredWidth="400"
+                  xmlns:bxml="http://pivot.apache.org/bxml"
+                  xmlns:im="nl.juraji.imagemanager.pivot.sheets"
+                  xmlns="org.apache.pivot.wtk">
+    <BoxPane orientation="vertical" styles="{padding:6, spacing:8, fill:true}">
+        <Border title="Duplicate scanner settings" styles="{padding:6}">
+            <BoxPane orientation="vertical">
+                <Label bxml:id="duplicateScannerSimilarityThresholdLabel"/>
+                <Slider bxml:id="duplicateScannerSimilarityThresholdSlider" range="{start:0, end:100}" value="0"/>
+                <Label text="The similarity threshold defines how much of two different images should match before they are a duplicate, where 0% is always and 100% is only when images exactly match."
+                styles="{wrapText:true}"/>
+            </BoxPane>
+        </Border>
+        <Border title="Pinterest integration" styles="{padding:6}">
+            <BoxPane orientation="vertical">
+                <Label text="Target directory"
+                       tooltipText="Where boards, downloaded from Pinterest, should go."/>
+                <BoxPane orientation="horizontal" styles="{spacing:5}">
+                    <TextInput bxml:id="pinterestTargetDirectoryTextInput" editable="false"/>
+                    <PushButton bxml:id="pinterestTargetDirectoryBrowseButton" buttonData="Browse..."/>
+                </BoxPane>
+                <BoxPane orientation="horizontal">
+                    <PushButton bxml:id="pinterestLoginButton" buttonData="Login on Pinterest"/>
+                </BoxPane>
+            </BoxPane>
+        </Border>
+        <BoxPane orientation="horizontal">
+            <PushButton bxml:id="saveButton" buttonData="Save"/>
+            <PushButton bxml:id="cancelButton" buttonData="Cancel"/>
+        </BoxPane>
+    </BoxPane>
+</im:SettingsSheet>

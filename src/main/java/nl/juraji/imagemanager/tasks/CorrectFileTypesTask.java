@@ -7,7 +7,7 @@ import nl.juraji.imagemanager.model.domain.BaseDirectory;
 import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.util.FileUtils;
 import nl.juraji.imagemanager.util.StringUtils;
-import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
+import nl.juraji.imagemanager.util.concurrent.ManagerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

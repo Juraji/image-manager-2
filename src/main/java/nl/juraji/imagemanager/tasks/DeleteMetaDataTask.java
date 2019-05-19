@@ -2,7 +2,7 @@ package nl.juraji.imagemanager.tasks;
 
 import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.util.FileUtils;
-import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
+import nl.juraji.imagemanager.util.concurrent.ManagerTask;
 
 /**
  * Created by Juraji on 9-12-2018.

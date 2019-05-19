@@ -1,6 +1,7 @@
 package nl.juraji.imagemanager.model.domain.local;
 
 import nl.juraji.imagemanager.model.domain.BaseDirectory;
+import nl.juraji.imagemanager.model.domain.DirectoryOrigin;
 import nl.juraji.imagemanager.util.CollectionUtils;
 
 import javax.persistence.*;
@@ -23,7 +24,7 @@ public class LocalDirectory extends BaseDirectory<LocalDirectory, LocalMetaData>
     private LocalDirectory parent;
 
     public LocalDirectory() {
-        super("Local");
+        super(DirectoryOrigin.LOCAL);
         setFavorite(false);
     }
 
