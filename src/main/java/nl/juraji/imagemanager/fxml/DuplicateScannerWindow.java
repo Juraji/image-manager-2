@@ -12,12 +12,11 @@ import javafx.util.Duration;
 import nl.juraji.imagemanager.fxml.controls.DuplicateSet;
 import nl.juraji.imagemanager.fxml.controls.MetaDataTile;
 import nl.juraji.imagemanager.fxml.dialogs.WorkDialog;
-import nl.juraji.imagemanager.model.domain.BaseDirectory;
-import nl.juraji.imagemanager.model.domain.BaseMetaData;
-import nl.juraji.imagemanager.model.domain.DefaultDirectory;
+import nl.juraji.imagemanager.model.domain.local.Directory;
+import nl.juraji.imagemanager.model.domain.local.MetaData;
 import nl.juraji.imagemanager.model.domain.settings.Settings;
-import nl.juraji.imagemanager.model.finders.BaseDirectoryFinder;
-import nl.juraji.imagemanager.model.finders.BaseMetaDataFinder;
+import nl.juraji.imagemanager.model.finders.DirectoryFinder;
+import nl.juraji.imagemanager.model.finders.MetaDataFinder;
 import nl.juraji.imagemanager.model.finders.SettingsFinder;
 import nl.juraji.imagemanager.tasks.DuplicateScanTask;
 import nl.juraji.imagemanager.util.fxml.Controller;
@@ -64,7 +63,7 @@ public class DuplicateScannerWindow extends Controller implements Initializable 
                 .addListener((ValueListener<DuplicateSet>) this::renderDuplicateSetViewItems);
     }
 
-    public void scan(List<BaseDirectory> directories) {
+    public void scan(List<Directory> directories) {
         this.runScanPerDirectory(directories);
     }
 
@@ -83,7 +82,7 @@ public class DuplicateScannerWindow extends Controller implements Initializable 
         }
     }
 
-    private void runScanPerDirectory(List<BaseDirectory> directories) {
+    private void runScanPerDirectory(List<Directory> directories) {
         this.duplicateSetList.getItems().clear();
         this.duplicateSetView.getChildren().clear();
         this.duplicateSetList.getSelectionModel().clearSelection();
@@ -92,10 +91,10 @@ public class DuplicateScannerWindow extends Controller implements Initializable 
         final WorkDialog<Void> wd = new WorkDialog<>(getStage());
 
         if (directories == null) {
-            directories = BaseDirectoryFinder.findAllRootDirectories();
+            directories = DirectoryFinder.find().rootDirectories();
         }
 
-        final ManagerTaskChain<BaseDirectory, List<DuplicateSet>> taskChain = new ManagerTaskChain<BaseDirectory, List<DuplicateSet>>(directories)
+        final ManagerTaskChain<Directory, List<DuplicateSet>> taskChain = new ManagerTaskChain<Directory, List<DuplicateSet>>(directories)
                 .nextTask(d -> new DuplicateScanTask(d, minSimilarity))
                 .afterEach(list -> this.duplicateSetList.getItems().addAll(list))
                 .afterAll(() -> {
@@ -113,8 +112,8 @@ public class DuplicateScannerWindow extends Controller implements Initializable 
         this.duplicateSetView.getChildren().clear();
         this.duplicateSetList.getSelectionModel().clearSelection();
 
-        final List<BaseMetaData> allMetaData = BaseMetaDataFinder.findAllMetaData();
-        final DefaultDirectory directory = new DefaultDirectory();
+        final List<MetaData> allMetaData = MetaDataFinder.find().all();
+        final Directory directory = new Directory();
         directory.setName("All directories");
         directory.getMetaData().addAll(allMetaData);
 
@@ -138,7 +137,7 @@ public class DuplicateScannerWindow extends Controller implements Initializable 
 
         if (set != null) {
             set.getDuplicates().stream()
-                    .sorted(Comparator.comparingLong(BaseMetaData::getQualityRating).reversed())
+                    .sorted(Comparator.comparingLong(MetaData::getQualityRating).reversed())
                     .map(MetaDataTile::new)
                     .forEach(children::add);
         }

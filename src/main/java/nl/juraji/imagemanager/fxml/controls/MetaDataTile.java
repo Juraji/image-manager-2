@@ -13,11 +13,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Window;
 import nl.juraji.imagemanager.fxml.dialogs.MoveMetaDataDialog;
 import nl.juraji.imagemanager.fxml.dialogs.WorkDialog;
-import nl.juraji.imagemanager.model.domain.BaseMetaData;
-import nl.juraji.imagemanager.model.domain.pinterest.PinMetaData;
-import nl.juraji.imagemanager.model.finders.BaseMetaDataFinder;
+import nl.juraji.imagemanager.model.domain.local.MetaData;
 import nl.juraji.imagemanager.tasks.DeleteMetaDataTask;
-import nl.juraji.imagemanager.tasks.pinterest.DeletePinTask;
 import nl.juraji.imagemanager.util.DesktopUtils;
 import nl.juraji.imagemanager.util.FileUtils;
 import nl.juraji.imagemanager.util.fxml.AlertBuilder;
@@ -28,7 +25,6 @@ import nl.juraji.imagemanager.util.fxml.FXMLStage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -36,7 +32,7 @@ import java.util.ResourceBundle;
  * Image Manager 2
  */
 public class MetaDataTile extends VBox implements Initializable {
-    private final BaseMetaData metaData;
+    private final MetaData metaData;
 
     @FXML
     private ImageView imageView;
@@ -56,7 +52,7 @@ public class MetaDataTile extends VBox implements Initializable {
     @FXML
     private Button deleteFromDiskButton;
 
-    public MetaDataTile(BaseMetaData metaData) {
+    public MetaDataTile(MetaData metaData) {
         this.metaData = metaData;
 
         // Load FXML
@@ -75,7 +71,6 @@ public class MetaDataTile extends VBox implements Initializable {
         // Setup context menu
         ContextMenuBuilder.build(metaData)
                 .appendItem("Open in viewer", this::openInViewerAction)
-                .appendItem("Open in pinterest", this::openInPinterestAction, s -> !(s instanceof PinMetaData))
                 .setOnShowing(i -> this.setSelectedStyle())
                 .setOnHiding(i -> this.setUnselectedStyle())
                 .bindTo(this);
@@ -102,7 +97,7 @@ public class MetaDataTile extends VBox implements Initializable {
         }
 
         // Set labels
-        this.directoryLabel.setText(Objects.requireNonNull(BaseMetaDataFinder.getParent(metaData)).getName());
+        this.directoryLabel.setText(metaData.getDirectory().getName());
 
         this.fileNameLabel.setText(metaData.getPath().toString());
         if (!fileExists) {
@@ -126,15 +121,11 @@ public class MetaDataTile extends VBox implements Initializable {
         }
     }
 
-    private void openInPinterestAction(BaseMetaData metaData) {
-        DesktopUtils.openWebUri(((PinMetaData) metaData).getPinterestUri());
-    }
-
-    private void openInViewerAction(BaseMetaData metaData) {
+    private void openInViewerAction(MetaData metaData) {
         DesktopUtils.openFile(metaData.getPath());
     }
 
-    private void moveAction(BaseMetaData metaData) {
+    private void moveAction(MetaData metaData) {
         final FXMLStage<MoveMetaDataDialog> fxmlStage = Controller.init(MoveMetaDataDialog.class, "Move item", getWindow());
         final MoveMetaDataDialog controller = fxmlStage.getController();
 
@@ -152,7 +143,7 @@ public class MetaDataTile extends VBox implements Initializable {
         fxmlStage.show();
     }
 
-    private void deleteAction(BaseMetaData metaData) {
+    private void deleteAction(MetaData metaData) {
         this.setSelectedStyle();
         final boolean doDelete = AlertBuilder.confirm(getWindow())
                 .withTitle("Delete item")
@@ -161,20 +152,8 @@ public class MetaDataTile extends VBox implements Initializable {
                 .showAndWait();
 
         if (doDelete) {
-            final WorkDialog<BaseMetaData> wd = new WorkDialog<>(getWindow());
-
-            if (metaData instanceof PinMetaData) {
-                final boolean doDeletePin = AlertBuilder.confirm(getWindow())
-                        .withTitle("Delete from Pinterest")
-                        .withMessage("Do you want this pin to be deleted from Pinterest as well?")
-                        .showAndWait();
-                if (doDeletePin) {
-                    wd.exec(new DeletePinTask((PinMetaData) metaData));
-                }
-            }
-
+            final WorkDialog<MetaData> wd = new WorkDialog<>(getWindow());
             wd.exec(new DeleteMetaDataTask(metaData, true));
-
             wd.addTaskEndNotification(item -> {
                 if (item != null) {
                     this.updateView();

@@ -1,6 +1,7 @@
 package nl.juraji.imagemanager.model.domain.hashes;
 
 import nl.juraji.imagemanager.model.domain.BaseModel;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -39,6 +40,7 @@ public class HashData extends BaseModel {
         this.contrast = contrast;
     }
 
+    @Nullable
     public BitSet getBitSet() {
         if (bitSet == null && bits != null) {
             bitSet = BitSet.valueOf(bits);

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply" dropsFor="1.8">
+        <dropColumn columnName="default_target_directory" tableName="settings"/>
+        <dropTable name="local_directory" sequenceCol="id"/>
+        <dropTable name="local_meta_data" sequenceCol="id"/>
+        <dropTable name="pin_meta_data" sequenceCol="id"/>
+        <dropTable name="pinterest_board" sequenceCol="id"/>
+        <dropTable name="web_cookie" sequenceCol="id"/>
+    </changeSet>
+</migration>

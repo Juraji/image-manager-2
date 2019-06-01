@@ -1,8 +1,7 @@
 package nl.juraji.imagemanager.fxml.controls;
 
 import javafx.scene.control.TreeItem;
-import nl.juraji.imagemanager.model.domain.BaseDirectory;
-import nl.juraji.imagemanager.model.domain.DefaultDirectory;
+import nl.juraji.imagemanager.model.domain.local.Directory;
 
 import java.util.Set;
 
@@ -10,23 +9,22 @@ import java.util.Set;
  * Created by Juraji on 23-11-2018.
  * Image Manager 2
  */
-public class DirectoryTreeItem extends TreeItem<BaseDirectory> {
+public class DirectoryTreeItem extends TreeItem<Directory> {
 
-    public DirectoryTreeItem(BaseDirectory directory) {
+    public DirectoryTreeItem(Directory directory) {
         super(directory);
         this.setExpanded(true);
         buildChildNodes(this);
     }
 
     public static DirectoryTreeItem root() {
-        final DefaultDirectory defaultDirectory = new DefaultDirectory();
+        final Directory defaultDirectory = new Directory();
         defaultDirectory.setName("Root");
         return new DirectoryTreeItem(defaultDirectory);
     }
 
-    @SuppressWarnings("unchecked")
     private void buildChildNodes(DirectoryTreeItem parent) {
-        final Set<BaseDirectory> children = parent.getValue().getChildren();
+        final Set<Directory> children = parent.getValue().getChildren();
         if (children != null) {
             children.stream()
                     .map(DirectoryTreeItem::new)

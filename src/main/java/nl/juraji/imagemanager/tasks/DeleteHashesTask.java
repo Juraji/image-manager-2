@@ -1,8 +1,8 @@
 package nl.juraji.imagemanager.tasks;
 
 import io.ebean.Model;
-import nl.juraji.imagemanager.model.domain.BaseDirectory;
-import nl.juraji.imagemanager.model.domain.BaseMetaData;
+import nl.juraji.imagemanager.model.domain.local.Directory;
+import nl.juraji.imagemanager.model.domain.local.MetaData;
 import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
 
 import java.util.Objects;
@@ -13,9 +13,9 @@ import java.util.Set;
  * Image Manager 2
  */
 public class DeleteHashesTask extends ManagerTask<Void> {
-    private final BaseDirectory directory;
+    private final Directory directory;
 
-    public DeleteHashesTask(BaseDirectory directory) {
+    public DeleteHashesTask(Directory directory) {
         super("Deleting hashes");
         this.directory = directory;
     }
@@ -26,11 +26,10 @@ public class DeleteHashesTask extends ManagerTask<Void> {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    private void deleteHashes(BaseDirectory parent) {
+    private void deleteHashes(Directory parent) {
         updateTaskDescription("Deleting hashes for %s", directory.getName());
 
-        final Set<BaseMetaData> metaData = parent.getMetaData();
+        final Set<MetaData> metaData = parent.getMetaData();
         addWorkTodo(metaData.size());
 
         metaData.stream()
@@ -41,6 +40,6 @@ public class DeleteHashesTask extends ManagerTask<Void> {
                 .filter(Objects::nonNull)
                 .forEach(Model::delete);
 
-        parent.getChildren().forEach(o -> this.deleteHashes((BaseDirectory) o));
+        parent.getChildren().forEach(this::deleteHashes);
     }
 }

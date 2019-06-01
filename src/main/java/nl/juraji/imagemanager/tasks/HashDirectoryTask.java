@@ -1,9 +1,9 @@
 package nl.juraji.imagemanager.tasks;
 
-import nl.juraji.imagemanager.model.domain.BaseDirectory;
-import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.hashes.Contrast;
 import nl.juraji.imagemanager.model.domain.hashes.HashData;
+import nl.juraji.imagemanager.model.domain.local.Directory;
+import nl.juraji.imagemanager.model.domain.local.MetaData;
 import nl.juraji.imagemanager.util.FileUtils;
 import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
 import org.slf4j.Logger;
@@ -32,9 +32,9 @@ public class HashDirectoryTask extends ManagerTask<Void> {
     public static final int CONTRAST_BRIGHTNESS_THRESHOLD = 152;
 
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    private final BaseDirectory directory;
+    private final Directory directory;
 
-    public HashDirectoryTask(BaseDirectory directory) {
+    public HashDirectoryTask(Directory directory) {
         super("Creating hashes");
         this.directory = directory;
     }
@@ -45,11 +45,10 @@ public class HashDirectoryTask extends ManagerTask<Void> {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    private void buildHashes(BaseDirectory parent) {
+    private void buildHashes(Directory parent) {
         updateTaskDescription("Creating hashes for: %s", parent.getName());
 
-        final Set<BaseMetaData> parentMetaData = ((Set<BaseMetaData>) parent.getMetaData()).stream()
+        final Set<MetaData> parentMetaData = parent.getMetaData().stream()
                 .filter(m -> m.getHash() == null || m.getHash().getBits() == null)
                 .collect(Collectors.toSet());
         final int metaDataCount = parent.getMetaData().size();
@@ -66,10 +65,10 @@ public class HashDirectoryTask extends ManagerTask<Void> {
         }
 
         this.checkIsCanceled();
-        parent.getChildren().forEach(o -> this.buildHashes((BaseDirectory) o));
+        parent.getChildren().forEach(this::buildHashes);
     }
 
-    private void generate(BaseMetaData metaData) {
+    private void generate(MetaData metaData) {
         final HashData hashData = new HashData();
         final Path filePath = metaData.getPath();
 

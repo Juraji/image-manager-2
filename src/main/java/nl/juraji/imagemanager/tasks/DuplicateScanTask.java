@@ -1,23 +1,23 @@
 package nl.juraji.imagemanager.tasks;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import nl.juraji.imagemanager.fxml.controls.DuplicateSet;
-import nl.juraji.imagemanager.model.domain.BaseDirectory;
-import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.hashes.HashData;
+import nl.juraji.imagemanager.model.domain.local.Directory;
+import nl.juraji.imagemanager.model.domain.local.MetaData;
 import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by Juraji on 1-12-2018.
  * Image Manager 2
  */
 public class DuplicateScanTask extends ManagerTask<List<DuplicateSet>> {
-    private final BaseDirectory directory;
+    private final Directory directory;
     private final double minSimilarity;
 
-    public DuplicateScanTask(BaseDirectory directory, double minSimilarity) {
+    public DuplicateScanTask(Directory directory, double minSimilarity) {
         super("Scanning duplicates");
         this.directory = directory;
         this.minSimilarity = (minSimilarity > 1 ? minSimilarity / 100.0 : minSimilarity);
@@ -29,31 +29,30 @@ public class DuplicateScanTask extends ManagerTask<List<DuplicateSet>> {
         return this.scanForDuplicates(directory);
     }
 
-    private void updateMessage(BaseDirectory d) {
+    private void updateMessage(Directory d) {
         updateTaskDescription("Scanning duplicates for %s", d.getName());
     }
 
-    @SuppressWarnings("unchecked")
-    private List<DuplicateSet> scanForDuplicates(BaseDirectory parent) {
+    private List<DuplicateSet> scanForDuplicates(Directory parent) {
         updateMessage(parent);
         final ArrayList<DuplicateSet> duplicateSets = new ArrayList<>();
 
-        final Set<BaseMetaData> directoryMetaData = parent.getMetaData();
-        final ArrayList<BaseMetaData> compareQueue = new ArrayList<>(directoryMetaData);
+        final Set<MetaData> directoryMetaData = parent.getMetaData();
+        final ArrayList<MetaData> compareQueue = new ArrayList<>(directoryMetaData);
 
         directoryMetaData.stream()
                 .map(a -> {
                     this.checkIsCanceled();
                     this.incrementWorkDone();
 
-                    final AtomicDouble addedSimilarity = new AtomicDouble(0.0);
-                    final List<BaseMetaData> similarMetaData = new ArrayList<>();
+                    final AtomicReference<Double> addedSimilarity = new AtomicReference<>(0.0);
+                    final Set<MetaData> similarMetaData = new HashSet<>();
 
-                    for (BaseMetaData b : compareQueue) {
+                    for (MetaData b : compareQueue) {
                         if (!b.equals(a)) {
                             final double similarity = this.compareHashes(a, b);
                             if (similarity > 0) {
-                                addedSimilarity.addAndGet(similarity);
+                                addedSimilarity.updateAndGet(v -> v + similarity);
                                 similarMetaData.add(b);
                             }
                         }
@@ -73,9 +72,9 @@ public class DuplicateScanTask extends ManagerTask<List<DuplicateSet>> {
                 .forEach(duplicateSets::add);
 
         this.checkIsCanceled();
-        final Set<BaseDirectory> children = parent.getChildren();
+        final Set<Directory> children = parent.getChildren();
         if (children != null) {
-            for (BaseDirectory child : children) {
+            for (Directory child : children) {
                 duplicateSets.addAll(this.scanForDuplicates(child));
             }
         }
@@ -95,16 +94,16 @@ public class DuplicateScanTask extends ManagerTask<List<DuplicateSet>> {
      * @param b The meta data if the compared image
      * @return The percentage of similarity
      */
-    private double compareHashes(BaseMetaData a, BaseMetaData b) {
+    private double compareHashes(MetaData a, MetaData b) {
         final HashData ah = a.getHash();
         final HashData bh = b.getHash();
 
         if (ah != null && bh != null && ah.getContrast().equals(bh.getContrast())) {
             final BitSet ahBits = ah.getBitSet();
             final BitSet bhBits = bh.getBitSet();
-            if (ahBits.equals(bhBits)) {
+            if (Objects.equals(ahBits, bhBits)) {
                 return 100.0;
-            } else {
+            } else if (ahBits != null && bhBits != null) {
                 BitSet xor = (BitSet) ahBits.clone();
                 xor.xor(bhBits);
                 int similarBitCount = xor.length() - xor.cardinality();

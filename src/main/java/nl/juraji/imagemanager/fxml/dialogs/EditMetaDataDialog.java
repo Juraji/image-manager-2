@@ -8,7 +8,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.FileChooser;
-import nl.juraji.imagemanager.model.domain.BaseMetaData;
+import nl.juraji.imagemanager.model.domain.local.MetaData;
 import nl.juraji.imagemanager.util.DateUtils;
 import nl.juraji.imagemanager.util.FileUtils;
 import nl.juraji.imagemanager.util.fxml.Controller;
@@ -25,7 +25,7 @@ import java.util.ResourceBundle;
  * Image Manager 2
  */
 public class EditMetaDataDialog extends Controller implements Initializable {
-    private final SimpleObjectProperty<BaseMetaData> metaData = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<MetaData> metaData = new SimpleObjectProperty<>();
 
     public Label dimensionsLabel;
     public Label fileSizeLabel;
@@ -36,13 +36,13 @@ public class EditMetaDataDialog extends Controller implements Initializable {
     public TextArea commentsTextArea;
     public Button saveButton;
 
-    public void setMetaData(BaseMetaData metaData) {
+    public void setMetaData(MetaData metaData) {
         this.metaData.set(metaData);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        metaData.addListener((ValueListener<BaseMetaData>) md -> {
+        metaData.addListener((ValueListener<MetaData>) md -> {
             dimensionsLabel.setText(md.getWidth() + "x" + md.getHeight());
             fileSizeLabel.setText(FileUtils.getHumanReadableSize(md.getFileSize()));
             qualityRatingLabel.setText(String.valueOf(md.getQualityRating()));
@@ -62,7 +62,7 @@ public class EditMetaDataDialog extends Controller implements Initializable {
     }
 
     public void save() {
-        final BaseMetaData md = this.metaData.get();
+        final MetaData md = this.metaData.get();
 
         md.setPath(Paths.get(pathTextField.getText()));
         md.setComments(commentsTextArea.getText());

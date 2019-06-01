@@ -5,14 +5,10 @@ import javafx.collections.FXCollections;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import nl.juraji.imagemanager.model.domain.BaseDirectory;
-import nl.juraji.imagemanager.model.domain.BaseMetaData;
-import nl.juraji.imagemanager.model.domain.pinterest.PinMetaData;
-import nl.juraji.imagemanager.model.domain.pinterest.PinterestBoard;
-import nl.juraji.imagemanager.model.finders.LocalDirectoriesFinder;
-import nl.juraji.imagemanager.model.finders.PinterestBoardsFinder;
+import nl.juraji.imagemanager.model.domain.local.Directory;
+import nl.juraji.imagemanager.model.domain.local.MetaData;
+import nl.juraji.imagemanager.model.finders.DirectoryFinder;
 import nl.juraji.imagemanager.tasks.MoveMetaDataTask;
-import nl.juraji.imagemanager.tasks.pinterest.MovePinTask;
 import nl.juraji.imagemanager.util.fxml.AlertBuilder;
 import nl.juraji.imagemanager.util.fxml.Controller;
 import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTaskChain;
@@ -28,42 +24,32 @@ import java.util.stream.Collectors;
  * Image Manager 2
  */
 public class MoveMetaDataDialog extends Controller implements Initializable {
-    private final SimpleListProperty<BaseMetaData> metaDataToMove = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final SimpleListProperty<BaseMetaData> itemsMoved = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final SimpleListProperty<MetaData> metaDataToMove = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final SimpleListProperty<MetaData> itemsMoved = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     public Button moveItemButton;
     public ChoiceBox<DirectoryChoiceBoxItem> directoryChoiceBox;
 
-    public void setMetaDataToMove(List<BaseMetaData> metaData) {
+    public void setMetaDataToMove(List<MetaData> metaData) {
         this.metaDataToMove.addAll(metaData);
     }
 
-    public void onItemsMoved(Consumer<List<? extends BaseMetaData>> onItemMoved) {
-        this.itemsMoved.addListener((ListAdditionListener<BaseMetaData>) onItemMoved::accept);
+    public void onItemsMoved(Consumer<List<? extends MetaData>> onItemMoved) {
+        this.itemsMoved.addListener((ListAdditionListener<MetaData>) onItemMoved::accept);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         moveItemButton.disableProperty().bind(this.directoryChoiceBox.getSelectionModel().selectedItemProperty().isNull());
 
-        metaDataToMove.addListener((ListAdditionListener<BaseMetaData>) newValue -> {
+        metaDataToMove.addListener((ListAdditionListener<MetaData>) newValue -> {
             this.directoryChoiceBox.getItems().clear();
 
             if (newValue.size() > 0) {
-                final boolean isPins = this.checkIsPins(newValue);
-
-                List<DirectoryChoiceBoxItem> items;
-                if (isPins) {
-                    items = PinterestBoardsFinder.find().all().stream()
-                            .sorted(Comparator.comparing(BaseDirectory::getLocationOnDisk))
-                            .map(DirectoryChoiceBoxItem::new)
-                            .collect(Collectors.toList());
-                } else {
-                    items = LocalDirectoriesFinder.find().all().stream()
-                            .sorted(Comparator.comparing(BaseDirectory::getLocationOnDisk))
-                            .map(DirectoryChoiceBoxItem::new)
-                            .collect(Collectors.toList());
-                }
+                List<DirectoryChoiceBoxItem> items = DirectoryFinder.find().all().stream()
+                        .sorted(Comparator.comparing(Directory::getLocationOnDisk))
+                        .map(DirectoryChoiceBoxItem::new)
+                        .collect(Collectors.toList());
 
                 this.directoryChoiceBox.getItems().addAll(items);
             }
@@ -76,25 +62,11 @@ public class MoveMetaDataDialog extends Controller implements Initializable {
             return;
         }
 
-        final BaseDirectory directory = selectedItem.directory;
-        boolean doMoveOnPinterest = false;
+        final Directory directory = selectedItem.directory;
+        final List<MetaData> metaData = metaDataToMove.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        final List<MetaData> movedItems = new ArrayList<>();
 
-        if (this.checkIsPins(metaDataToMove)) {
-            doMoveOnPinterest = AlertBuilder.confirm(getStage())
-                    .withTitle("Move Pinterest pins")
-                    .withMessage("Do you want the selected pin(s) to be moved to %s on Pinterest as well?",
-                            directory.getName())
-                    .showAndWait();
-        }
-
-        final List<BaseMetaData> metaData = metaDataToMove.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        final List<BaseMetaData> movedItems = new ArrayList<>();
-
-        final ManagerTaskChain<BaseMetaData, BaseMetaData> taskChain = new ManagerTaskChain<>(metaData, true);
-
-        if (doMoveOnPinterest) {
-            taskChain.nextTask(m -> new MovePinTask((PinMetaData) m, (PinterestBoard) directory));
-        }
+        final ManagerTaskChain<MetaData, MetaData> taskChain = new ManagerTaskChain<>(metaData, true);
 
         taskChain.nextTask(m -> new MoveMetaDataTask(m, directory));
         taskChain.afterEach(movedItems::add);
@@ -122,14 +94,10 @@ public class MoveMetaDataDialog extends Controller implements Initializable {
         new WorkDialog<Void>(getStage()).exec(taskChain);
     }
 
-    private boolean checkIsPins(List<? extends BaseMetaData> metaDataToMove) {
-        return metaDataToMove.stream().anyMatch(m -> m instanceof PinMetaData);
-    }
-
     private static class DirectoryChoiceBoxItem {
-        private final BaseDirectory directory;
+        private final Directory directory;
 
-        private DirectoryChoiceBoxItem(BaseDirectory directory) {
+        private DirectoryChoiceBoxItem(Directory directory) {
             this.directory = directory;
         }
 
@@ -137,7 +105,7 @@ public class MoveMetaDataDialog extends Controller implements Initializable {
         public String toString() {
             final String s = directory.getLocationOnDisk().toString();
             final String name = s.length() > 40 ? s.substring(s.length() - 40) : s;
-            return String.format("(%s) ...%s", directory.getOrigin(), name);
+            return String.format("...%s", name);
         }
     }
 }

@@ -65,16 +65,16 @@ public abstract class BaseModel extends Model implements Comparable<BaseModel> {
         this.modified = modified;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
-        } else if (!(o instanceof BaseMetaData)) {
-            return false;
-        } else {
-            return id != null && id == ((BaseMetaData) o).getId();
         }
+        if (!(o instanceof BaseModel)) {
+            return false;
+        }
+        BaseModel baseModel = (BaseModel) o;
+        return Objects.equals(id, baseModel.id);
     }
 
     @Override

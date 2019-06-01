@@ -1,8 +1,7 @@
 package nl.juraji.imagemanager.tasks;
 
-import nl.juraji.imagemanager.model.domain.BaseDirectory;
-import nl.juraji.imagemanager.model.domain.BaseMetaData;
-import nl.juraji.imagemanager.model.finders.BaseMetaDataFinder;
+import nl.juraji.imagemanager.model.domain.local.Directory;
+import nl.juraji.imagemanager.model.domain.local.MetaData;
 import nl.juraji.imagemanager.util.FileUtils;
 import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
 
@@ -14,19 +13,19 @@ import java.nio.file.StandardCopyOption;
  * Created by Juraji on 8-12-2018.
  * Image Manager 2
  */
-public class MoveMetaDataTask extends ManagerTask<BaseMetaData> {
+public class MoveMetaDataTask extends ManagerTask<MetaData> {
 
-    private final BaseMetaData sourceMetaData;
-    private final BaseDirectory targetDirectory;
+    private final MetaData sourceMetaData;
+    private final Directory targetDirectory;
 
-    public MoveMetaDataTask(BaseMetaData metaData, BaseDirectory target) {
+    public MoveMetaDataTask(MetaData metaData, Directory target) {
         super("Moving file %s to %s", metaData.getId(), target.getName());
         this.sourceMetaData = metaData;
         this.targetDirectory = target;
     }
 
     @Override
-    public BaseMetaData call() throws Exception {
+    public MetaData call() throws Exception {
         final Path source = sourceMetaData.getPath();
         final Path target = targetDirectory.getLocationOnDisk().resolve(source.getFileName());
 
@@ -40,7 +39,7 @@ public class MoveMetaDataTask extends ManagerTask<BaseMetaData> {
             sourceMetaData.setPath(target);
 
             // Move metadata in db
-            BaseMetaDataFinder.setParent(sourceMetaData, targetDirectory);
+            sourceMetaData.setDirectory(targetDirectory);
             sourceMetaData.save();
         }
 

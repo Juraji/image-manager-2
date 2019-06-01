@@ -1,9 +1,8 @@
 package nl.juraji.imagemanager.tasks;
 
 import nl.juraji.imagemanager.fxml.controls.DuplicateSet;
-import nl.juraji.imagemanager.model.domain.BaseMetaData;
-import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
-import nl.juraji.imagemanager.model.domain.local.LocalMetaData;
+import nl.juraji.imagemanager.model.domain.local.Directory;
+import nl.juraji.imagemanager.model.domain.local.MetaData;
 import org.junit.Test;
 import util.IMTest;
 
@@ -12,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -33,7 +33,7 @@ public class DuplicateScanTaskTest extends IMTest {
     @Test
     public void testDuplicateDetection() {
         // Setup test directory
-        final LocalDirectory directory = new LocalDirectory();
+        final Directory directory = new Directory();
         directory.setName("Duplicate scan test");
         directory.setLocationOnDisk(testImagesDirectory);
 
@@ -49,7 +49,7 @@ public class DuplicateScanTaskTest extends IMTest {
 
         testImages.forEach(imageName -> {
             // Add the image as metadata
-            final LocalMetaData metaData = new LocalMetaData();
+            final MetaData metaData = new MetaData();
             metaData.setDirectory(directory);
             metaData.setPath(testImagesDirectory.resolve(imageName));
             metaData.setComments(imageName);
@@ -93,11 +93,11 @@ public class DuplicateScanTaskTest extends IMTest {
     }
 
     private void assertDuplicateSetHasImages(DuplicateSet set, String... names) {
-        List<BaseMetaData> duplicates = set.getDuplicates();
+        Set<MetaData> duplicates = set.getDuplicates();
         assertEquals(names.length, duplicates.size());
 
         List<String> imageNames = duplicates.stream()
-                .map(BaseMetaData::getComments)
+                .map(MetaData::getComments)
                 .collect(Collectors.toList());
 
         for (String name : names) {

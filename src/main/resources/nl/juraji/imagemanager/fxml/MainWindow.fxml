@@ -16,14 +16,11 @@
             </Menu>
             <Menu text="Directories">
                 <MenuItem accelerator="Alt+A" onAction="#menuDirectoriesAddLocalDirectoryAction"
-                          text="Add local directory..."/>
-                <MenuItem accelerator="Alt+Shift+A" onAction="#menuDirectoriesAddPinterestBoardAction"
-                          text="Add Pinterest board..."/>
+                          text="Add directory..."/>
                 <MenuItem accelerator="Shortcut+I" onAction="#menuDirectoriesIndexAllDirectoriesAction"
                           text="Index all directories"/>
                 <MenuItem accelerator="Shortcut+Alt+I" onAction="#menuDirectoriesIndexFavoriteDirectoriesAction"
                           text="Index favorite directories"/>
-                <MenuItem onAction="#menuDirectoriesOpenTargetDirectoryAction" text="Open Target Directory"/>
             </Menu>
             <Menu text="Tools">
                 <MenuItem accelerator="Shortcut+D" onAction="#menuToolsDuplicateScannerAction"

@@ -17,7 +17,6 @@
                     </font>
                 </Label>
                 <Label fx:id="imageCountLabel" text="Image count" ButtonBar.buttonData="LEFT"/>
-                <Label fx:id="originLabel" text="source" ButtonBar.buttonData="LEFT"/>
                 <MenuButton fx:id="metaDataOptionsMenu" mnemonicParsing="false" text="Options"/>
             </buttons>
             <padding>

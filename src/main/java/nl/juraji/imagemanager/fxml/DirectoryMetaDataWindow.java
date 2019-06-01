@@ -18,13 +18,10 @@ import nl.juraji.imagemanager.fxml.controls.MetaDataLabel;
 import nl.juraji.imagemanager.fxml.dialogs.EditMetaDataDialog;
 import nl.juraji.imagemanager.fxml.dialogs.MoveMetaDataDialog;
 import nl.juraji.imagemanager.fxml.dialogs.WorkDialog;
-import nl.juraji.imagemanager.model.domain.BaseDirectory;
-import nl.juraji.imagemanager.model.domain.BaseMetaData;
 import nl.juraji.imagemanager.model.domain.BaseModel;
-import nl.juraji.imagemanager.model.domain.pinterest.PinMetaData;
-import nl.juraji.imagemanager.model.domain.pinterest.PinterestBoard;
+import nl.juraji.imagemanager.model.domain.local.Directory;
+import nl.juraji.imagemanager.model.domain.local.MetaData;
 import nl.juraji.imagemanager.tasks.DeleteMetaDataTask;
-import nl.juraji.imagemanager.tasks.pinterest.DeletePinTask;
 import nl.juraji.imagemanager.util.DateUtils;
 import nl.juraji.imagemanager.util.DesktopUtils;
 import nl.juraji.imagemanager.util.FileUtils;
@@ -37,7 +34,6 @@ import nl.juraji.imagemanager.util.types.ValueListener;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -46,14 +42,13 @@ import java.util.stream.Collectors;
  */
 public class DirectoryMetaDataWindow extends Controller implements Initializable {
 
-    private final SimpleObjectProperty<BaseDirectory> directory = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<Directory> directory = new SimpleObjectProperty<>();
     private final SimpleListProperty<MetaDataLabel> metaDataLabels = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final FilteredList<MetaDataLabel> filteredMetaDataLabels = new FilteredList<>(metaDataLabels, s -> true);
-    private NullSafeBinding<BaseMetaData> selectedMetaData;
+    private NullSafeBinding<MetaData> selectedMetaData;
 
     public Label directoryNameLabel;
     public Label imageCountLabel;
-    public Label originLabel;
     public TextField searchTextField;
     public ListView<MetaDataLabel> metaDataListView;
     public ImageView imageView;
@@ -63,12 +58,11 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
     public Label downloadedOnLabel;
     public MenuButton metaDataOptionsMenu;
 
-    public void setDirectory(BaseDirectory directory) {
+    public void setDirectory(Directory directory) {
         this.directory.set(directory);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void initialize(URL location, ResourceBundle resources) {
         final MultipleSelectionModel<MetaDataLabel> selectionModel = metaDataListView.getSelectionModel();
         selectionModel.setSelectionMode(SelectionMode.MULTIPLE);
@@ -87,16 +81,10 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
                 directory.get().getMetaDataCount() + " images", directory);
         this.imageCountLabel.textProperty().bind(imageCountBinding);
 
-
-        // Bind directory source
-        final NullSafeBinding<String> originBinding = NullSafeBinding.create(() ->
-                "Source: " + directory.get().getOrigin(), directory);
-        this.originLabel.textProperty().bind(originBinding);
-
         // Bind metadata list to directory metadata
-        directory.addListener((ValueListener<BaseDirectory>) newValue -> {
+        directory.addListener((ValueListener<Directory>) newValue -> {
             metaDataLabels.clear();
-            ((Set<BaseMetaData>) newValue.getMetaData()).stream()
+            newValue.getMetaData().stream()
                     .sorted(Comparator.comparing(BaseModel::getModified).reversed())
                     .map(MetaDataLabel::new)
                     .forEach(metaDataLabels::add);
@@ -127,7 +115,7 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
         localPathLabel.textProperty().bind(localPathBinding);
 
         final NullSafeBinding<String> dimensionsBinding = NullSafeBinding.create(() -> {
-            final BaseMetaData metaData = selectedMetaData.get();
+            final MetaData metaData = selectedMetaData.get();
             return String.valueOf(metaData.getWidth()) + 'x' + metaData.getHeight() +
                     ' ' + FileUtils.getHumanReadableSize(metaData.getFileSize());
         }, selectedMetaData);
@@ -143,18 +131,10 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
         final BooleanBinding multipleSelectedBinding = Bindings.createBooleanBinding(() ->
                         metaDataListView.getSelectionModel().getSelectedItems().size() > 1,
                 metaDataListView.getSelectionModel().getSelectedItems());
-        NullSafeBinding.create(directory::get, directory).addListener((ValueListener<BaseDirectory>) d -> {
-            final ContextMenuBuilder<BaseDirectory> contextMenuBuilder = ContextMenuBuilder.build(d)
+        NullSafeBinding.create(directory::get, directory).addListener((ValueListener<Directory>) d -> {
+            final ContextMenuBuilder<Directory> contextMenuBuilder = ContextMenuBuilder.build(d)
                     .appendItem("Open in viewer", this::openInViewerAction, selectionEmptyBinding.or(multipleSelectedBinding))
                     .appendItem("Open directory", this::openDirectoryAction, selectionEmptyBinding);
-
-            if (d instanceof PinterestBoard) {
-                // If directory is a PinterestBoard
-                // Add actions to options menu related to pins
-                contextMenuBuilder
-                        .appendItem("Open pin in Pinterest", this::openPinInPinterestAction, selectionEmptyBinding.or(multipleSelectedBinding))
-                        .appendItem("Open board in Pinterest", this::openBoardInPinterestAction, selectionEmptyBinding);
-            }
 
             contextMenuBuilder
                     .appendItem("Edit meta data", this::editMetaDataAction, selectionEmptyBinding.or(multipleSelectedBinding))
@@ -180,7 +160,7 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
         final MetaDataLabel selectedItem = selectionModel.getSelectedItem();
 
         if (selectedItem != null) {
-            final BaseMetaData metaData = selectedItem.getMetaData();
+            final MetaData metaData = selectedItem.getMetaData();
             final OptionDialogBuilder dialogBuilder = OptionDialogBuilder.build(getStage())
                     .withTitle("Delete " + selectedItem.getText())
                     .withMessage("Should I delete the index only or the image from disk as well?\n" +
@@ -188,23 +168,15 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
                     .withOption("Index only")
                     .withOption("Index and from disk");
 
-            if (metaData instanceof PinMetaData) {
-                dialogBuilder.withOption("Index, disk and Pinterest");
-            }
-
             final int option = dialogBuilder.show();
 
             if (option > -1) {
-                final WorkDialog<BaseMetaData> wd = new WorkDialog<>(getStage());
+                final WorkDialog<MetaData> wd = new WorkDialog<>(getStage());
 
                 if (option == 0) {
                     wd.exec(new DeleteMetaDataTask(metaData, false));
                 } else if (option == 1) {
                     wd.exec(new DeleteMetaDataTask(metaData, true));
-                } else if (option == 2) {
-                    wd.exec(new DeleteMetaDataTask(metaData, true));
-                    //noinspection ConstantConditions
-                    wd.exec(new DeletePinTask((PinMetaData) metaData));
                 }
 
                 wd.addTaskEndNotification(deletedItem -> {
@@ -262,13 +234,5 @@ public class DirectoryMetaDataWindow extends Controller implements Initializable
 
             fxmlStage.show();
         }
-    }
-
-    public void openPinInPinterestAction() {
-        DesktopUtils.openWebUri(((PinMetaData) selectedMetaData.get()).getPinterestUri());
-    }
-
-    public void openBoardInPinterestAction() {
-        DesktopUtils.openWebUri(((PinterestBoard) directory.get()).getBoardUrl());
     }
 }

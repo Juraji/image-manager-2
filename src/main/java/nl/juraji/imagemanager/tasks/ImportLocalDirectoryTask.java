@@ -1,7 +1,7 @@
 package nl.juraji.imagemanager.tasks;
 
-import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
-import nl.juraji.imagemanager.model.finders.LocalDirectoriesFinder;
+import nl.juraji.imagemanager.model.domain.local.Directory;
+import nl.juraji.imagemanager.model.finders.DirectoryFinder;
 import nl.juraji.imagemanager.util.FileUtils;
 import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
 import org.slf4j.Logger;
@@ -15,7 +15,7 @@ import java.util.Optional;
  * Created by Juraji on 26-11-2018.
  * Image Manager 2
  */
-public class ImportLocalDirectoryTask extends ManagerTask<LocalDirectory> {
+public class ImportLocalDirectoryTask extends ManagerTask<Directory> {
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final Path root;
     private final boolean recursive;
@@ -27,12 +27,12 @@ public class ImportLocalDirectoryTask extends ManagerTask<LocalDirectory> {
     }
 
     @Override
-    public LocalDirectory call() {
-        final Optional<LocalDirectory> existingDirOpt = LocalDirectoriesFinder.find()
+    public Directory call() {
+        final Optional<Directory> existingDirOpt = DirectoryFinder.find()
                 .byLocationOnDisk(root);
 
         if (existingDirOpt.isPresent()) {
-            final LocalDirectory existingDir = existingDirOpt.get();
+            final Directory existingDir = existingDirOpt.get();
             this.importSubDirectories(root, existingDir);
             return null;
         } else {
@@ -44,12 +44,12 @@ public class ImportLocalDirectoryTask extends ManagerTask<LocalDirectory> {
         return String.format("Importing local directory \"%s\"%s", path.toString(), (recursive ? " recursively" : ""));
     }
 
-    private LocalDirectory importDirectory(Path path, LocalDirectory parent) {
+    private Directory importDirectory(Path path, Directory parent) {
         final String taskName = buildTaskName(path, recursive);
         logger.info(taskName);
         updateTaskDescription(taskName);
 
-        final LocalDirectory newDirectory = new LocalDirectory();
+        final Directory newDirectory = new Directory();
         newDirectory.setName(path.getFileName().toString());
         newDirectory.setLocationOnDisk(path);
 
@@ -64,7 +64,7 @@ public class ImportLocalDirectoryTask extends ManagerTask<LocalDirectory> {
         return newDirectory;
     }
 
-    private void importSubDirectories(Path path, LocalDirectory parent) {
+    private void importSubDirectories(Path path, Directory parent) {
         this. checkIsCanceled();
         if (recursive) {
             final List<Path> subDirectoryPaths = FileUtils.getDirectorySubDirectories(path);

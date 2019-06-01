@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply">
+        <createTable name="directory" identityType="external" pkName="pk_directory">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="name" type="varchar" notnull="true"/>
+            <column name="location_on_disk" type="varchar(2048)" notnull="true"/>
+            <column name="favorite" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="parent_id" type="uuid" references="directory.id" foreignKeyName="fk_directory_parent_id" foreignKeyIndex="ix_directory_parent_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="meta_data" identityType="external" pkName="pk_meta_data">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="path" type="varchar(2048)"/>
+            <column name="quality_rating" type="bigint" notnull="true"/>
+            <column name="file_size" type="bigint" notnull="true"/>
+            <column name="width" type="integer" notnull="true"/>
+            <column name="height" type="integer" notnull="true"/>
+            <column name="file_corrected" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="comments" type="TEXT"/>
+            <column name="hash_id" type="uuid" uniqueOneToOne="uq_meta_data_hash_id" references="hash_data.id" foreignKeyName="fk_meta_data_hash_id"/>
+            <column name="directory_id" type="uuid" references="directory.id" foreignKeyName="fk_meta_data_directory_id" foreignKeyIndex="ix_meta_data_directory_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+        </createTable>
+    </changeSet>
+    <changeSet type="pendingDrops">
+        <dropColumn columnName="default_target_directory" tableName="settings"/>
+        <dropTable name="local_directory" sequenceCol="id"/>
+        <dropTable name="local_meta_data" sequenceCol="id"/>
+        <dropTable name="pin_meta_data" sequenceCol="id"/>
+        <dropTable name="pinterest_board" sequenceCol="id"/>
+        <dropTable name="web_cookie" sequenceCol="id"/>
+    </changeSet>
+</migration>

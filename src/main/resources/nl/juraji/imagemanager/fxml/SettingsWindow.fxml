@@ -39,28 +39,6 @@
                     </GridPane>
                 </AnchorPane>
             </TitledPane>
-            <TitledPane text="Pinterest Settings">
-                <AnchorPane>
-                    <GridPane hgap="10.0" layoutX="70.0" layoutY="-35.0" vgap="5.0" AnchorPane.bottomAnchor="0.0"
-                              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                        <columnConstraints>
-                            <ColumnConstraints hgrow="NEVER" minWidth="150.0" prefWidth="150.0"/>
-                            <ColumnConstraints hgrow="NEVER" minWidth="300.0" prefWidth="100.0"/>
-                            <ColumnConstraints hgrow="NEVER" minWidth="100.0" prefWidth="100.0"/>
-                        </columnConstraints>
-                        <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
-                            <RowConstraints/>
-                        </rowConstraints>
-                        <Button mnemonicParsing="false" text="Log in on Pinterest" onAction="#runPinterestLogin"/>
-                        <Label text="Default target directory" GridPane.rowIndex="1"/>
-                        <TextField fx:id="defaultTargetDirectoryTextField" GridPane.columnIndex="1"
-                                   GridPane.rowIndex="1"/>
-                        <Button mnemonicParsing="false" onAction="#browseDefaultTargetDirectory" text="Browse..."
-                                GridPane.columnIndex="2" GridPane.rowIndex="1"/>
-                    </GridPane>
-                </AnchorPane>
-            </TitledPane>
         </VBox>
     </center>
 </BorderPane>

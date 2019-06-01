@@ -3,8 +3,8 @@ package nl.juraji.imagemanager.tasks;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import net.sf.jmimemagic.*;
-import nl.juraji.imagemanager.model.domain.BaseDirectory;
-import nl.juraji.imagemanager.model.domain.BaseMetaData;
+import nl.juraji.imagemanager.model.domain.local.Directory;
+import nl.juraji.imagemanager.model.domain.local.MetaData;
 import nl.juraji.imagemanager.util.FileUtils;
 import nl.juraji.imagemanager.util.StringUtils;
 import nl.juraji.imagemanager.util.fxml.concurrent.ManagerTask;
@@ -25,10 +25,10 @@ import java.util.stream.Collectors;
  */
 public class CorrectFileTypesTask extends ManagerTask<Void> {
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    private final BaseDirectory directory;
+    private final Directory directory;
     private final EbeanServer db;
 
-    public CorrectFileTypesTask(BaseDirectory directory) {
+    public CorrectFileTypesTask(Directory directory) {
         super("Correcting file types");
         this.directory = directory;
         this.db = Ebean.getDefaultServer();
@@ -41,17 +41,16 @@ public class CorrectFileTypesTask extends ManagerTask<Void> {
         return null;
     }
 
-    private void updateMessage(BaseDirectory d) {
+    private void updateMessage(Directory d) {
         super.updateTaskDescription("Correcting file types for %s", d.getName());
     }
 
-    @SuppressWarnings("unchecked")
-    private void correctFileTypes(BaseDirectory parent) {
+    private void correctFileTypes(Directory parent) {
         this.checkIsCanceled();
         updateMessage(parent);
 
         // Correct files not previously corrected
-        final Set<BaseMetaData> correctedMetaData = ((Set<BaseMetaData>) parent.getMetaData()).stream()
+        final Set<MetaData> correctedMetaData = parent.getMetaData().stream()
                 .filter(m -> !m.isFileCorrected())
                 .map(m -> {
                     this.checkIsCanceled();
@@ -64,13 +63,13 @@ public class CorrectFileTypesTask extends ManagerTask<Void> {
         this.db.updateAll(correctedMetaData);
 
         // Check child directories
-        final Set<BaseDirectory> children = parent.getChildren();
-        for (BaseDirectory child : children) {
+        final Set<Directory> children = parent.getChildren();
+        for (Directory child : children) {
             this.correctFileTypes(child);
         }
     }
 
-    private BaseMetaData correctFileTypeFor(BaseMetaData item) {
+    private MetaData correctFileTypeFor(MetaData item) {
         final Path originalPath = item.getPath();
 
         if (FileUtils.exists(originalPath)) {

@@ -7,9 +7,9 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableView;
 import nl.juraji.imagemanager.fxml.DirectoryMetaDataWindow;
 import nl.juraji.imagemanager.fxml.DuplicateScannerWindow;
-import nl.juraji.imagemanager.model.domain.BaseDirectory;
-import nl.juraji.imagemanager.model.domain.pinterest.PinterestBoard;
-import nl.juraji.imagemanager.tasks.IndexDirectoryTaskBuilder;
+import nl.juraji.imagemanager.fxml.dialogs.WorkDialog;
+import nl.juraji.imagemanager.model.domain.local.Directory;
+import nl.juraji.imagemanager.tasks.DefaultDirectoriesTask;
 import nl.juraji.imagemanager.util.DesktopUtils;
 import nl.juraji.imagemanager.util.FileUtils;
 import nl.juraji.imagemanager.util.fxml.AlertBuilder;
@@ -44,7 +44,6 @@ public class DirectoryTreeTableContextMenu extends ContextMenu {
                 .appendItem("Scan for duplicates", this::scanForDuplicatesAction)
                 .appendSeparator()
                 .appendItem("Open in explorer", this::openInExplorerAction)
-                .appendItem("Open in Pinterest", this::openInPinterestAction)
                 .appendSeparator()
                 .appendItem("Toggle favorite", this::toggleFavoriteAction)
                 .appendSeparator()
@@ -57,10 +56,10 @@ public class DirectoryTreeTableContextMenu extends ContextMenu {
 
     // Actions
     private void viewContentAction() {
-        final TreeItem<BaseDirectory> selectedItem = getSelectedItem();
+        final TreeItem<Directory> selectedItem = getSelectedItem();
 
         if (selectedItem != null) {
-            final BaseDirectory directory = selectedItem.getValue();
+            final Directory directory = selectedItem.getValue();
             final FXMLStage<DirectoryMetaDataWindow> fxmlStage = Controller.init(DirectoryMetaDataWindow.class,
                     "Directory - " + directory.getName(), getOwnerWindow());
 
@@ -74,20 +73,20 @@ public class DirectoryTreeTableContextMenu extends ContextMenu {
     }
 
     private void indexSelectedDirectoriesAction() {
-        final List<TreeItem<BaseDirectory>> directories = reduceSelectionToParents();
+        final List<TreeItem<Directory>> directories = reduceSelectionToParents();
         if (!directories.isEmpty()) {
-            final List<BaseDirectory> directories1 = directories.stream()
+            final List<Directory> directories1 = directories.stream()
                     .map(TreeItem::getValue)
                     .collect(Collectors.toList());
 
-            IndexDirectoryTaskBuilder.standard(getOwnerWindow(), directories1)
-                    .afterEach(o -> parentTableView.refresh())
-                    .runIndex();
+            final WorkDialog<Void> dialog = new WorkDialog<>(getOwnerWindow());
+            dialog.addTaskEndNotification(o -> parentTableView.refresh());
+            dialog.exec(new DefaultDirectoriesTask(directories1));
         }
     }
 
     private void scanForDuplicatesAction() {
-        final List<TreeItem<BaseDirectory>> selection = reduceSelectionToParents();
+        final List<TreeItem<Directory>> selection = reduceSelectionToParents();
 
         if (!selection.isEmpty()) {
             final FXMLStage<DuplicateScannerWindow> fxmlStage = Controller.init(DuplicateScannerWindow.class,
@@ -105,24 +104,14 @@ public class DirectoryTreeTableContextMenu extends ContextMenu {
     }
 
     private void openInExplorerAction() {
-        final TreeItem<BaseDirectory> item = getSelectedItem();
+        final TreeItem<Directory> item = getSelectedItem();
         if (item != null) {
             DesktopUtils.openFile(item.getValue().getLocationOnDisk());
         }
     }
 
-    private void openInPinterestAction() {
-        final TreeItem<BaseDirectory> item = getSelectedItem();
-        if (item != null) {
-            final BaseDirectory directory = item.getValue();
-            if (directory instanceof PinterestBoard) {
-                DesktopUtils.openWebUri(((PinterestBoard) directory).getBoardUrl());
-            }
-        }
-    }
-
     private void toggleFavoriteAction() {
-        final List<TreeItem<BaseDirectory>> selection = getSelectedItems();
+        final List<TreeItem<Directory>> selection = getSelectedItems();
         selection.stream()
                 .map(TreeItem::getValue)
                 .forEach(directory -> {
@@ -143,7 +132,7 @@ public class DirectoryTreeTableContextMenu extends ContextMenu {
     }
 
     private void deleteActionImpl(boolean deleteFromDisk) {
-        final List<TreeItem<BaseDirectory>> selection = reduceSelectionToParents();
+        final List<TreeItem<Directory>> selection = reduceSelectionToParents();
 
         if (!selection.isEmpty()) {
             final boolean doDelete = AlertBuilder.confirm(getOwnerWindow())
@@ -156,8 +145,8 @@ public class DirectoryTreeTableContextMenu extends ContextMenu {
 
             if (doDelete) {
                 try {
-                    for (TreeItem<BaseDirectory> item : selection) {
-                        final BaseDirectory directory = item.getValue();
+                    for (TreeItem<Directory> item : selection) {
+                        final Directory directory = item.getValue();
                         if (deleteFromDisk) {
                             FileUtils.delete(directory.getLocationOnDisk());
                         }
@@ -180,7 +169,7 @@ public class DirectoryTreeTableContextMenu extends ContextMenu {
     /**
      * Get all selected items.
      */
-    private List<TreeItem<BaseDirectory>> getSelectedItems() {
+    private List<TreeItem<Directory>> getSelectedItems() {
         return parentTableView.getSelectionModel().getSelectedItems().stream()
                 .filter(Objects::nonNull).collect(Collectors.toList());
     }
@@ -188,8 +177,8 @@ public class DirectoryTreeTableContextMenu extends ContextMenu {
     /**
      * Get last selected item.
      */
-    private TreeItem<BaseDirectory> getSelectedItem() {
-        final TreeTableView.TreeTableViewSelectionModel<BaseDirectory> selectionModel = parentTableView.getSelectionModel();
+    private TreeItem<Directory> getSelectedItem() {
+        final TreeTableView.TreeTableViewSelectionModel<Directory> selectionModel = parentTableView.getSelectionModel();
         final int selectedIndex = selectionModel.getSelectedIndex();
         selectionModel.clearSelection();
         selectionModel.select(selectedIndex);
@@ -200,9 +189,9 @@ public class DirectoryTreeTableContextMenu extends ContextMenu {
      * Get all selected items.
      * If a child and its parent are selected the child gets deselected.
      */
-    private List<TreeItem<BaseDirectory>> reduceSelectionToParents() {
-        final TreeTableView.TreeTableViewSelectionModel<BaseDirectory> selectionModel = parentTableView.getSelectionModel();
-        final List<TreeItem<BaseDirectory>> selection = new ArrayList<>(getSelectedItems());
+    private List<TreeItem<Directory>> reduceSelectionToParents() {
+        final TreeTableView.TreeTableViewSelectionModel<Directory> selectionModel = parentTableView.getSelectionModel();
+        final List<TreeItem<Directory>> selection = new ArrayList<>(getSelectedItems());
 
         selectionModel.clearSelection();
         return selection.stream()

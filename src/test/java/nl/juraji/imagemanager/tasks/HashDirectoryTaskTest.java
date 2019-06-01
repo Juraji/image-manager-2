@@ -3,8 +3,8 @@ package nl.juraji.imagemanager.tasks;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import nl.juraji.imagemanager.model.domain.hashes.Contrast;
-import nl.juraji.imagemanager.model.domain.local.LocalDirectory;
-import nl.juraji.imagemanager.model.domain.local.LocalMetaData;
+import nl.juraji.imagemanager.model.domain.local.Directory;
+import nl.juraji.imagemanager.model.domain.local.MetaData;
 import org.junit.Test;
 import util.IMTest;
 
@@ -34,11 +34,11 @@ public class HashDirectoryTaskTest extends IMTest {
     @Test
     public void testHashingGif() throws IOException {
         // Setup test directory
-        final LocalDirectory directory = new LocalDirectory();
+        final Directory directory = new Directory();
         directory.setName("Test GIF directory");
         directory.setLocationOnDisk(testImagesDirectory);
 
-        final LocalMetaData metaData = new LocalMetaData();
+        final MetaData metaData = new MetaData();
         metaData.setDirectory(directory);
         metaData.setPath(testImagesDirectory.resolve("gif-still-image.gif"));
 
@@ -52,7 +52,7 @@ public class HashDirectoryTaskTest extends IMTest {
 
         // Check hashes
         // Reload entity from the database, to make sure it persisted
-        final LocalMetaData metaDataFromDb = db.find(LocalMetaData.class, metaData.getId());
+        final MetaData metaDataFromDb = db.find(MetaData.class, metaData.getId());
         assertNotNull(metaDataFromDb);
 
         // Check image properties
@@ -74,11 +74,11 @@ public class HashDirectoryTaskTest extends IMTest {
     @Test
     public void testHashingJpg() throws IOException {
         // Setup test directory
-        final LocalDirectory directory = new LocalDirectory();
+        final Directory directory = new Directory();
         directory.setName("Test JPG directory");
         directory.setLocationOnDisk(testImagesDirectory);
 
-        final LocalMetaData metaData = new LocalMetaData();
+        final MetaData metaData = new MetaData();
         metaData.setDirectory(directory);
         metaData.setPath(testImagesDirectory.resolve("jpg-image.jpg"));
 
@@ -92,7 +92,7 @@ public class HashDirectoryTaskTest extends IMTest {
 
         // Check hashes
         // Reload entity from the database, to make sure it persisted
-        final LocalMetaData metaDataFromDb = db.find(LocalMetaData.class, metaData.getId());
+        final MetaData metaDataFromDb = db.find(MetaData.class, metaData.getId());
         assertNotNull(metaDataFromDb);
 
         // Check image properties
@@ -114,11 +114,11 @@ public class HashDirectoryTaskTest extends IMTest {
     @Test
     public void testHashingPng() throws IOException {
         // Setup test directory
-        final LocalDirectory directory = new LocalDirectory();
+        final Directory directory = new Directory();
         directory.setName("Test PNG directory");
         directory.setLocationOnDisk(testImagesDirectory);
 
-        final LocalMetaData metaData = new LocalMetaData();
+        final MetaData metaData = new MetaData();
         metaData.setDirectory(directory);
         metaData.setPath(testImagesDirectory.resolve("png-image.png"));
 
@@ -132,7 +132,7 @@ public class HashDirectoryTaskTest extends IMTest {
 
         // Check hashes
         // Reload entity from the database, to make sure it persisted
-        final LocalMetaData metaDataFromDb = db.find(LocalMetaData.class, metaData.getId());
+        final MetaData metaDataFromDb = db.find(MetaData.class, metaData.getId());
         assertNotNull(metaDataFromDb);
 
         // Check image properties
@@ -154,11 +154,11 @@ public class HashDirectoryTaskTest extends IMTest {
     @Test
     public void testHashingAnimatedGif() throws IOException {
         // Setup test directory
-        final LocalDirectory directory = new LocalDirectory();
+        final Directory directory = new Directory();
         directory.setName("Test Animated GIF directory");
         directory.setLocationOnDisk(testImagesDirectory);
 
-        final LocalMetaData metaData = new LocalMetaData();
+        final MetaData metaData = new MetaData();
         metaData.setDirectory(directory);
         metaData.setPath(testImagesDirectory.resolve("gif-animated-image.gif"));
 
@@ -172,7 +172,7 @@ public class HashDirectoryTaskTest extends IMTest {
 
         // Check hashes
         // Reload entity from the database, to make sure it persisted
-        final LocalMetaData metaDataFromDb = db.find(LocalMetaData.class, metaData.getId());
+        final MetaData metaDataFromDb = db.find(MetaData.class, metaData.getId());
         assertNotNull(metaDataFromDb);
 
         // Check image properties
@@ -194,11 +194,11 @@ public class HashDirectoryTaskTest extends IMTest {
     @Test
     public void testHashingWebP() throws IOException {
         // Setup test directory
-        final LocalDirectory directory = new LocalDirectory();
+        final Directory directory = new Directory();
         directory.setName("Test WebP directory");
         directory.setLocationOnDisk(testImagesDirectory);
 
-        final LocalMetaData metaData = new LocalMetaData();
+        final MetaData metaData = new MetaData();
         metaData.setDirectory(directory);
         metaData.setPath(testImagesDirectory.resolve("webp-image.webp"));
 
@@ -212,7 +212,7 @@ public class HashDirectoryTaskTest extends IMTest {
 
         // Check hashes
         // Reload entity from the database, to make sure it persisted
-        final LocalMetaData metaDataFromDb = db.find(LocalMetaData.class, metaData.getId());
+        final MetaData metaDataFromDb = db.find(MetaData.class, metaData.getId());
         assertNotNull(metaDataFromDb);
 
         // Check image properties
